@@ -1,0 +1,1 @@
+STC12C5608AD + 4M external crystal + DHT11 +DS18B20
