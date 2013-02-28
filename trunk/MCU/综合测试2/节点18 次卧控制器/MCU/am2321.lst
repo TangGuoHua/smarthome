@@ -1,0 +1,296 @@
+C51 COMPILER V9.00   AM2321                                                                02/27/2013 21:18:00 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE AM2321
+OBJECT MODULE PLACED IN .\obj\am2321.obj
+COMPILER INVOKED BY: D:\MCU\Keil_uVision4\C51\BIN\C51.EXE source\am2321.c OPTIMIZE(9,SPEED) BROWSE DEBUG OBJECTEXTEND PR
+                    -INT(.\am2321.lst) OBJECT(.\obj\am2321.obj)
+
+line level    source
+
+   1          //
+   2          // STC11F04E 1T单片机调试成功
+   3          //
+   4          
+   5          #include <reg52.h>
+   6          #include <intrins.h>
+   7          #include "am2321.h"
+   8          
+   9          static unsigned char AM2321_Data[5]={0x00,0x00,0x00,0x00,0x00};
+  10          
+  11          
+  12          /********************************************\
+  13          |* 功能： 延时  晶振为11.0592M时  STC12C5608AD 1T
+  14          |* 延时大约 1ms
+  15          \********************************************/ 
+  16          void am2321DelayMS(unsigned int t)
+  17          {
+  18   1              unsigned int i;
+  19   1              unsigned int j;
+  20   1              for(j=t;j>0;j--)
+  21   1                      //for(i=848;i>0;i--);  //1T STC12C5608AD 晶振为11.0592M
+  22   1                      //for( i=530; i>0; i-- ); // 1T STC11F04E 内部RC 6.97MHz
+  23   1                      for( i=490; i>0; i-- ); // 1T STC11F04E 内部RC 6.38MHz
+  24   1      }
+  25          
+  26          
+  27          
+  28          /****************************************************
+  29          函数功能: 延时30us
+  30          
+  31          *****************************************************/
+  32          void am2321DelayUS()
+  33          {  
+  34   1      //      // 1T STC11F04E 内部RC 6.97MHz
+  35   1      //    unsigned char a,b;
+  36   1      //    for(b=1;b>0;b--)
+  37   1      //        for(a=49;a>0;a--);
+  38   1      //    _nop_();  //if Keil,require use intrins.h
+  39   1      
+  40   1      //      //1T STC12c5608ad 11.0592Mhz
+  41   1      //    unsigned char a;
+  42   1      //    for(a=81;a>0;a--);
+  43   1      //    _nop_();  //if Keil,require use intrins.h
+  44   1      
+  45   1              // 1T STC11F04E 内部RC 6.38MHz
+  46   1          unsigned char a;
+  47   1          for(a=46;a>0;a--);
+  48   1          _nop_();  //if Keil,require use intrins.h
+  49   1      } 
+  50          
+  51          //数据清零
+  52          void ClearData(void)
+  53          {
+  54   1              int i;
+C51 COMPILER V9.00   AM2321                                                                02/27/2013 21:18:00 PAGE 2   
+
+  55   1              for(i=0;i<5;i++)
+  56   1              {
+  57   2                      AM2321_Data[i] = 0x00;
+  58   2              }
+  59   1      }
+  60          
+  61          
+  62          //初始化AM2321，并触发一次测量
+  63          void initAM2321()
+  64          {
+  65   1              AM2321_SDA = 1;
+  66   1              am2321DelayMS(3);  //延时2Ms
+  67   1              
+  68   1              //触发一次测量
+  69   1              
+  70   1              //主机拉低(Min=800US Max=20Ms) 
+  71   1              AM2321_SDA = 0;
+  72   1              am2321DelayMS(3);  //延时2Ms
+  73   1              //释放总线 延时(Min=30us Max=50us)
+  74   1              AM2321_SDA = 1;
+  75   1              
+  76   1              // 等待测量完成
+  77   1              am2321DelayMS(2500);  //延时2.5s
+  78   1      }
+  79          
+  80          // 从AM2321读取一个字节的数据
+  81          unsigned char Read_SensorData(void)
+  82          {
+  83   1              unsigned char i, temp, returnData, loopCount;
+  84   1              
+  85   1              
+  86   1              for(i=0;i<8;i++)           
+  87   1              {
+  88   2                      loopCount = 500;
+  89   2                      while( !AM2321_SDA && loopCount-- ); //检测低电平是否结束
+  90   2                      
+  91   2                      //延时Min=26us Max50us, 跳过数据"0"的高电平
+  92   2                      am2321DelayUS(); //延时30us
+  93   2                      temp= AM2321_SDA?1:0;
+  94   2      
+  95   2                      loopCount = 500;
+  96   2                      while( AM2321_SDA && loopCount-- ); //等待高电平结束
+  97   2                      //超时则跳出for循环               
+  98   2                      
+  99   2                      returnData<<=1;
+ 100   2                      returnData|=temp;
+ 101   2              }//rof
+ 102   1              
+ 103   1              return returnData;
+ 104   1      
+ 105   1      }
+ 106          
+ 107          
+ 108          
+ 109          /********************************************
+ 110          功能： 读传感器
+ 111          
+ 112          参数：mode - 读取模式
+ 113            1 - 读取1次AM2321的值 。返回快 但返回值是上一次测量的值
+ 114            2 - 先触发一次AM2321采样，等待2.9秒，再读取一次AM2321。返回需要3秒，但返回值是本次测量的值
+ 115          
+ 116          返回值：
+C51 COMPILER V9.00   AM2321                                                                02/27/2013 21:18:00 PAGE 3   
+
+ 117            0 - 读取AM2321成功
+ 118            1 - AM2321未响应（传感器没有接）
+ 119            2 - 读出的数据校验和出错       
+ 120            3 - 读取出错 （General error）
+ 121          ********************************************/
+ 122          unsigned char readAM2321() // readAM2321(unsigned char mode ) 
+ 123          {
+ 124   1              unsigned char result = 0;
+ 125   1              unsigned char i;
+ 126   1              unsigned char checkSum;
+ 127   1              unsigned int cnt=0;
+ 128   1              unsigned int tmp;
+ 129   1              
+ 130   1              //清除数据
+ 131   1              ClearData();
+ 132   1              
+ 133   1              //主机拉低(Min=800US Max=20Ms) 
+ 134   1              AM2321_SDA = 0;
+ 135   1              am2321DelayMS(3);  //延时2Ms
+ 136   1              //释放总线 延时(Min=30us Max=50us)
+ 137   1              AM2321_SDA = 1;
+ 138   1              
+ 139   1      //      if( mode==2)
+ 140   1      //      {
+ 141   1      //              am2321DelayMS(2900);
+ 142   1      //              AM2321_SDA = 0;
+ 143   1      //              am2321DelayMS(3);  //延时2Ms
+ 144   1      //              //释放总线 延时(Min=30us Max=50us)
+ 145   1      //              AM2321_SDA = 1;
+ 146   1      //      }
+ 147   1      
+ 148   1              am2321DelayUS(); //延时30us
+ 149   1              
+ 150   1              
+ 151   1              //判断从机是否有低电平响应信号 如不响应则跳出，响应则向下运行 
+ 152   1              if(AM2321_SDA ==0)
+ 153   1              {
+ 154   2              
+ 155   2                      //收到起始信号
+ 156   2                      
+ 157   2                      //判断从机是否发出 80us 的低电平响应信号是否结束
+ 158   2                      cnt=0;
+ 159   2                      while((!AM2321_SDA))
+ 160   2                      {
+ 161   3                              if(++cnt>2500) //防止进入死循环
+ 162   3                              {
+ 163   4                                      //读取出错
+ 164   4                                      return 3;
+ 165   4                              } 
+ 166   3                      }
+ 167   2                      
+ 168   2                      cnt = 0;
+ 169   2                      //判断从机是否发出 80us 的高电平，如发出则进入数据接收状态
+ 170   2                      while((AM2321_SDA))
+ 171   2                      {
+ 172   3                              if(++cnt>2500) //防止进入死循环
+ 173   3                              {
+ 174   4                                      //读取出错
+ 175   4                                      return 3;
+ 176   4                              }
+ 177   3                      }
+ 178   2                      // 数据接收     传感器共发送40位数据
+C51 COMPILER V9.00   AM2321                                                                02/27/2013 21:18:00 PAGE 4   
+
+ 179   2                      // 即5个字节 高位先送  5个字节分别为湿度高位 湿度低位 温度高位 温度低位 校验和
+ 180   2                      // 校验和为：湿度高位+湿度低位+温度高位+温度低位
+ 181   2                      for(i=0;i<5;i++)
+ 182   2                      {
+ 183   3                              AM2321_Data[i] = Read_SensorData();
+ 184   3                      }
+ 185   2                      
+ 186   2                      checkSum = AM2321_Data[0]+AM2321_Data[1]+AM2321_Data[2]+AM2321_Data[3];
+ 187   2                      
+ 188   2                      if( checkSum == 0 )
+ 189   2                      {
+ 190   3                              //读取出错，一般来说温湿度不会同时为0
+ 191   3                              return 3;
+ 192   3                      }
+ 193   2                      
+ 194   2                      if( AM2321_Data[4] != checkSum )
+ 195   2                      {
+ 196   3                              //校验和出错
+ 197   3                              return 2;
+ 198   3                      }
+ 199   2              }
+ 200   1              else
+ 201   1              {
+ 202   2                      return 1; // 未收到传感器响应
+ 203   2              }
+ 204   1              
+ 205   1              //运行到这里，数据已经被正确地读出了
+ 206   1              //下面处理数据
+ 207   1              
+ 208   1              //湿度
+ 209   1              tmp = AM2321_Data[0]*256 + AM2321_Data[1];
+ 210   1              AM2321_Data[0] = tmp/10; //取得整数部分
+ 211   1              AM2321_Data[1] = tmp%10; //取得小数部分
+ 212   1              
+ 213   1              //温度
+ 214   1              if( (AM2321_Data[2] & 0x80) == 0x80 )
+ 215   1              {
+ 216   2                      AM2321_Data[4]=1;
+ 217   2                      AM2321_Data[2] = AM2321_Data[2] & 0x7f;
+ 218   2              }
+ 219   1              else
+ 220   1              {
+ 221   2                      AM2321_Data[4]=0;
+ 222   2              }
+ 223   1              
+ 224   1              tmp = AM2321_Data[2]*256 + AM2321_Data[3];
+ 225   1              AM2321_Data[2] = tmp/10; //取得整数部分
+ 226   1              AM2321_Data[3] = tmp%10; //取得小数部分
+ 227   1              
+ 228   1              return result;
+ 229   1      }
+ 230          
+ 231          
+ 232          /********************************
+ 233          功能：取得从AM2321读出的值
+ 234          
+ 235          首先，调用readAM2321()方法，并确保其返回值为0（读取AM2321成功）。
+ 236          否则调用本方法得到的数据是不正确的。
+ 237          
+ 238          Index   Value 
+ 239          -----------------------------------
+ 240          0       湿度整数部分
+C51 COMPILER V9.00   AM2321                                                                02/27/2013 21:18:00 PAGE 5   
+
+ 241          1       湿度小数部分
+ 242          2       温度整数部分
+ 243          3       温度小数部分
+ 244          4       负温度标记 （0:正温度，1:负温度）
+ 245          
+ 246          例1：湿度53.8% 温度18.3，返回值如下：
+ 247          getAM2321Data(0)  53
+ 248          getAM2321Data(1)  8
+ 249          getAM2321Data(2)  18
+ 250          getAM2321Data(3)  3
+ 251          getAM2321Data(4)  0 （0表示正温度）
+ 252          
+ 253          例2：湿度20.5% 温度-2.6，返回值如下：
+ 254          getAM2321Data(0)  20
+ 255          getAM2321Data(1)  5
+ 256          getAM2321Data(2)  2
+ 257          getAM2321Data(3)  6
+ 258          getAM2321Data(4)  1 （1表示负温度）
+ 259          
+ 260          *********************************/
+ 261          unsigned char getAM2321Data( unsigned char index )
+ 262          {
+ 263   1              return AM2321_Data[index];
+ 264   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    319    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
