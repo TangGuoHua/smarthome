@@ -158,7 +158,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		cnt=0;
 		while((!AM2321_SDA))
 		{
-			if(++cnt>2500) //防止进入死循环
+			if(++cnt>6000) //防止进入死循环
 			{
 				//读取出错
 				return 3;
@@ -169,7 +169,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		//判断从机是否发出 80us 的高电平，如发出则进入数据接收状态
 		while((AM2321_SDA))
 		{
-			if(++cnt>2500) //防止进入死循环
+			if(++cnt>6000) //防止进入死循环
 			{
 				//读取出错
 				return 3;
