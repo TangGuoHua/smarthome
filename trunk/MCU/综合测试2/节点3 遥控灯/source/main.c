@@ -2,6 +2,7 @@
 When        Who        Remarks
 --------------------------------------
 2011-SEP-25 Changhao   Initial version
+2013-MAR-02 Changhao   增加自动红外感应控制，增加向主机发送有无人状态的功能
 */
 
 #include <reg52.h>
@@ -10,23 +11,25 @@ When        Who        Remarks
 #include "delay.h"
 
 sbit RELAY=P3^7;  // 继电器
+sbit PIR=P3^4; //红外探头
 
-//void sendData()
-//{
-//	byte txData[HOST_DATA_WIDTH];
-//
-//	
-//	txData[0] = 100; //Node ID0
-//	txData[1] = 2; //Node ID1
-//	txData[2] = 5;
-//	txData[3] = 6;
-//	txData[4] = 7;
-//	txData[5] = 8;
-//	txData[6] = 9;
-//		
-//	nrfSendData( HOST_RF_CHANNEL, ADDRESS_WIDTH, HOST_ADDR, HOST_DATA_WIDTH, txData);//发送
-//
-//}				
+unsigned char workMode = 0; //工作模式 0：常关，1：常开，2：自动感应
+
+void sendData( bit thisPIR )
+{
+	byte txData[HOST_DATA_WIDTH];
+
+	
+	txData[0] = 100; //Node ID0
+	txData[1] = 3; //Node ID1
+	txData[2] = thisPIR;
+
+		
+	nrfSendData( HOST_RF_CHANNEL, ADDRESS_WIDTH, HOST_ADDR, HOST_DATA_WIDTH, txData);//发送
+	
+	//再次进入接收模式
+	nrfSetRxMode();
+}				
 
 void initINT0(void)
 {
@@ -40,6 +43,8 @@ void initINT0(void)
 ------------------------------------------------*/
 void main()
 {
+	bit thisPIR, lastPIR;
+
 	// 关断
 	RELAY=1;
 	
@@ -53,18 +58,27 @@ void main()
 	//设置24L01为接收模式PRX
 	nrfSetRxMode();
 
-	
+	thisPIR = PIR;
+	lastPIR = thisPIR;
 
 	while(1)
 	{
-
-		//RELAY = ~RELAY;
-		//delay(2000);
-	  
+		//读取红外传感器输出状态
+		thisPIR = PIR;
+		
+		if( thisPIR != lastPIR )
+		{
+			//如果工作在自动感应模式，则控制继电器
+			if( workMode ==2 )
+				RELAY = ~thisPIR;
+				
+			//发送餐厅有无人的信息给主机
+			sendData( thisPIR );
+			
+			lastPIR = thisPIR;
+		}
 	}
 }
-
-
 
 
 
@@ -73,18 +87,22 @@ void main()
 void interrupt24L01(void) interrupt 0
 {
 	byte* receivedData;
-
 	
 	receivedData = nrfGetReceivedData();
 
-	//接收到0则关闭LED，非0则打开。
-	RELAY = (*receivedData==0)?1:0;
-		
-	//cmd = *receivedData++ ;
-	//param = *receivedData++;
+	//设置工作模式
+	workMode = *receivedData;
+	if( workMode==0 )
+	{
+		//off
+		RELAY=1;
+	}
+	else if( workMode==1 )
+	{
+		//on
+		RELAY=0;
+	}
 	
-
 	//再次进入接收模式
 	nrfSetRxMode();
-
 }
