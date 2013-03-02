@@ -22,11 +22,11 @@ void delay10s(void)
 {
 	// 6.38MHz RC internal, 1T STC11F04E
     unsigned char a,b,c;
-    for(c=215;c>0;c--) //5s
+    for(c=217;c>0;c--) //5s
         for(b=252;b>0;b--)
             for(a=143;a>0;a--);
 
-    for(c=215;c>0;c--) //5s
+    for(c=217;c>0;c--) //5s
         for(b=252;b>0;b--)
             for(a=143;a>0;a--); 
 
@@ -151,14 +151,14 @@ void main()
 		
 		
 		//向主机发送数据
-		if( ++sendDataTimerCount >= 1 )  //如果设置为30，则每30*10＝300秒发送一次数据
+		if( ++sendDataTimerCount >= 30 )  //如果设置为30，则每30*10＝300秒发送一次数据
 		{
 			sendDataToHost( readAm2321Result );	
 			sendDataTimerCount=0;
 		}
 		
 		
-		delay10s();
+		delay10s(); //延时约10秒
 	}
 }
 
