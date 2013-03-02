@@ -1,0 +1,81 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>智能家</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"></meta>	
+	<link rel="stylesheet" href="/js/JQueryMobile/jquery.mobile-1.2.0.min.css" />
+	<script src="/js/JQueryMobile/jquery-1.8.2.min.js"></script>
+	<script src="/js/JQueryMobile/jquery.mobile-1.2.0.min.js"></script>
+</head> 
+<body> 
+
+<div data-role="page">
+
+	<div data-role="header">
+		<h1>My Title</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<p>Hello world</p>	
+
+<ul data-role="listview" data-inset="true" data-filter="true">
+	<li><a href="#">Acura</a></li>
+	<li><a href="#">Audi</a></li>
+	<li><a href="#">BMW</a></li>
+	<li><a href="#">Cadillac</a></li>
+	<li><a href="#">Ferrari</a></li>
+</ul>
+		
+		<form>
+   <label for="slider-0">Input slider:</label>
+   <input type="range" name="slider" id="slider-0" value="25" min="0" max="100"  />
+</form>
+		<a href="#" data-role="button" data-icon="star" data-theme="b">Button</a>
+		
+		<button data-icon="refresh">Button element</button>
+		
+		<a href="index.html" data-role="button" data-inline="true">Cancel</a>
+<a href="index.html" data-role="button" data-inline="true" data-theme="b">Save</a>
+
+<div data-role="controlgroup">
+<a href="index.html" data-role="button">Yes</a>
+<a href="index.html" data-role="button">No</a>
+<a href="index.html" data-role="button">Maybe</a>
+</div>
+
+<label for="slider-fill">Input slider:</label>
+<input type="range" name="slider-fill" id="slider-fill" value="60" min="0" max="100" data-highlight="true" />
+
+
+<label for="flip-1">Flip switch:</label>
+<select name="flip-1" id="flip-1" data-role="slider">
+	<option value="off">关</option>
+	<option value="on">开</option>
+</select> 
+
+
+			<ul data-role="listview" data-inset="true" data-theme="d" data-divider-theme="d">
+				<li data-role="list-divider">Links that will be Ajax-loaded with page transitions</li>
+				<li><a href="../../index.html">Link in the same domain</a></li>
+				<li><a href="../pages/dialog.html" data-rel="dialog">Dialog link: data-rel="dialog" (not tracked in history)</a></li>
+				<li data-role="list-divider">Links that will refresh the page</li>
+				<li><a href="http://www.jquery.com">External domain</a></li>
+				<li><a href="../../index.html" rel="external">Link with rel="external"</a></li>
+				<li><a href="index.html" data-ajax="false">link with [data-ajax="false"]</a></li>
+				<li><a href="../../index.html" target="foo">Link with target="foo"</a></li>
+				<li data-role="list-divider">Email links</li>
+				<li><a href="mailto:jdoe@foo.com">Basic email: mailto:jdoe@foo.com</a></li>
+				<li><a href="mailto:jdoe@foo.com?cc=bill@bar.com&bcc=mark@abc.com&subject=Happy%20Birthday&body=Best%20wishes!">Mailto with a cc:, bcc:, subject and body pre-filled</a></li>
+
+				<li data-role="list-divider">Phone links</li>
+				<li><a href="tel:15555555555">Phone: tel:15555555555</a></li>
+				<li data-role="list-divider">Other</li>
+				<li><a href="#">A href="#" will return false</a></li>
+			</ul>
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
+</html>
