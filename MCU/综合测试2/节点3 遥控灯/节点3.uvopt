@@ -172,10 +172,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>72</ColumnNumber>
+      <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>181</TopLine>
-      <CurrentLine>181</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\nrf24L01.c</PathWithFileName>
       <FilenameWithoutPath>nrf24L01.c</FilenameWithoutPath>
@@ -186,10 +186,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>1</ColumnNumber>
+      <ColumnNumber>27</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
-      <CurrentLine>16</CurrentLine>
+      <CurrentLine>20</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\delay.c</PathWithFileName>
       <FilenameWithoutPath>delay.c</FilenameWithoutPath>
@@ -200,10 +200,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>11</ColumnNumber>
+      <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
-      <CurrentLine>12</CurrentLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -211,7 +211,7 @@
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点3\SOURCE\NRF24L01.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点3 遥控灯\SOURCE\NRF24L01.H</PathWithFilename>
     <TopLine>22</TopLine>
     <CurrentLine>34</CurrentLine>
     <Constant>0</Constant>
@@ -237,7 +237,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点3\SOURCE\NRF24L01NODE.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点3 遥控灯\SOURCE\NRF24L01NODE.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>21</CurrentLine>
     <Constant>0</Constant>
@@ -1607,21 +1607,21 @@
       <Documents>
         <Doc>
           <Name>.\source\nrf24L01.c</Name>
-          <ColumnNumber>72</ColumnNumber>
-          <TopLine>181</TopLine>
-          <CurrentLine>181</CurrentLine>
+          <ColumnNumber>1</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
           <Name>.\source\delay.c</Name>
-          <ColumnNumber>1</ColumnNumber>
+          <ColumnNumber>27</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>16</CurrentLine>
+          <CurrentLine>20</CurrentLine>
         </Doc>
         <Doc>
           <Name>.\source\main.c</Name>
-          <ColumnNumber>11</ColumnNumber>
+          <ColumnNumber>26</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>12</CurrentLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\NRF24L01NODE.H</Name>
