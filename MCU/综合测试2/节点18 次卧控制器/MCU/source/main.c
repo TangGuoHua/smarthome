@@ -151,7 +151,7 @@ void main()
 		
 		
 		//向主机发送数据
-		if( ++sendDataTimerCount >= 30 )  //如果设置为30，则每30*10＝300秒发送一次数据
+		if( ++sendDataTimerCount >= 1 )  //如果设置为30，则每30*10＝300秒发送一次数据
 		{
 			sendDataToHost( readAm2321Result );	
 			sendDataTimerCount=0;
