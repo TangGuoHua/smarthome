@@ -80,19 +80,20 @@ void initAM2321()
 // 从AM2321读取一个字节的数据
 unsigned char Read_SensorData(void)
 {
-	unsigned char i, temp, returnData, loopCount;
+	unsigned char i, temp, returnData;
+	unsigned int loopCount;
 	
 	
 	for(i=0;i<8;i++)	   
 	{
-		loopCount = 500;
+		loopCount = 5000;
 		while( !AM2321_SDA && loopCount-- ); //检测低电平是否结束
 		
 		//延时Min=26us Max50us, 跳过数据"0"的高电平
 		am2321DelayUS(); //延时30us
 		temp= AM2321_SDA?1:0;
 
-		loopCount = 500;
+		loopCount = 5000;
 		while( AM2321_SDA && loopCount-- ); //等待高电平结束
 		//超时则跳出for循环		  
 		
@@ -158,7 +159,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		cnt=0;
 		while((!AM2321_SDA))
 		{
-			if(++cnt>2500) //防止进入死循环
+			if(++cnt>6000) //防止进入死循环
 			{
 				//读取出错
 				return 3;
@@ -169,7 +170,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		//判断从机是否发出 80us 的高电平，如发出则进入数据接收状态
 		while((AM2321_SDA))
 		{
-			if(++cnt>2500) //防止进入死循环
+			if(++cnt>6000) //防止进入死循环
 			{
 				//读取出错
 				return 3;
