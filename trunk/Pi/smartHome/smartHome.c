@@ -5,8 +5,11 @@
 
 编译命令行： gcc smartHome.c -o smartHome -l sqlite3
 
-Reversion history:
+Todo:
+1. 与单片机通讯码率提高到115200bps （需要单片机同时修改程序支持）
+2. 修改通信协议：变长帧
 
+修改记录：
 Date         Author      Remarks
 -------------------------------------------------------------------------------
 2013-FEB-25  Changhao    增加用于处理计划任务的功能函数checkScheduledTask()
@@ -22,7 +25,7 @@ Date         Author      Remarks
 #include <strings.h>
 
 #define BAUDRATE B57600
-#define SERIALDEVICE "/dev/ttyAMA0"
+#define SERIAL_DEVICE "/dev/ttyAMA0"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
@@ -82,7 +85,7 @@ void initSerialPort()
 	//int spHandle;
 	struct termios newtio;
 	
-	g_spHandle = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY ); 
+	g_spHandle = open( SERIAL_DEVICE, O_RDWR | O_NOCTTY ); //"/dev/ttyAMA0"
 	if (g_spHandle <0) {perror("serial open error! "); exit(-1); }
 
 	//tcgetattr(fd,&oldtio); //获取当前设置
