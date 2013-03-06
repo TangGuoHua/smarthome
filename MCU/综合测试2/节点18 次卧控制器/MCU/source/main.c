@@ -1,4 +1,4 @@
-//STC11F04E 1T , Internal RC 6.38MHz
+//STC11F04E 1T , 4MHz¾§Õñ
 
 #include <reg52.h>
 #include "nrf24L01Node.h"
@@ -20,15 +20,21 @@ void initINT0(void)
 
 void delay10s(void) 
 {
-	// 6.38MHz RC internal, 1T STC11F04E
-    unsigned char a,b,c;
-    for(c=217;c>0;c--) //5s
-        for(b=252;b>0;b--)
-            for(a=143;a>0;a--);
+//	// 6.38MHz RC internal, 1T STC11F04E
+//    unsigned char a,b,c;
+//    for(c=217;c>0;c--) //5s
+//        for(b=252;b>0;b--)
+//            for(a=143;a>0;a--);
+//
+//    for(c=217;c>0;c--) //5s
+//        for(b=252;b>0;b--)
+//            for(a=143;a>0;a--); 
 
-    for(c=217;c>0;c--) //5s
-        for(b=252;b>0;b--)
-            for(a=143;a>0;a--); 
+	//4Mhz Crystal, 1T STC11F04E
+    unsigned char a,b,c;
+    for(c=191;c>0;c--)
+        for(b=209;b>0;b--)
+            for(a=249;a>0;a--);
 
 }
 
