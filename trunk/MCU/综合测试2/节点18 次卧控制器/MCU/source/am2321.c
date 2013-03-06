@@ -9,43 +9,36 @@
 static unsigned char AM2321_Data[5]={0x00,0x00,0x00,0x00,0x00};
 
 
-/********************************************\
-|* 功能： 延时	晶振为11.0592M时  STC12C5608AD 1T
-|* 延时大约 1ms
-\********************************************/ 
+/******************************\
+|* 功能：延时大约 t毫秒（ms）
+\*******************************/ 
 void am2321DelayMS(unsigned int t)
 {
-	unsigned int i;
-	unsigned int j;
-	for(j=t;j>0;j--)
-		//for(i=848;i>0;i--);  //1T STC12C5608AD 晶振为11.0592M
-		//for( i=530; i>0; i-- ); // 1T STC11F04E 内部RC 6.97MHz
-		for( i=490; i>0; i-- ); // 1T STC11F04E 内部RC 6.38MHz
+//	unsigned int i;
+//	unsigned int j;
+//	for(j=t;j>0;j--)
+//		//for(i=848;i>0;i--);  //1T STC12C5608AD 晶振为11.0592M
+//		//for( i=530; i>0; i-- ); // 1T STC11F04E 内部RC 6.97MHz
+//		for( i=490; i>0; i-- ); // 1T STC11F04E 内部RC 6.38MHz
+	
+	//晶振为4MHz时 1T STC11F04E
+	unsigned char a,b;
+	for(; t>0; t-- )
+		for(b=4;b>0;b--)
+	        for(a=248;a>0;a--);
 }
 
 
 
-/****************************************************
-函数功能: 延时30us
-
-*****************************************************/
+/******************
+函数功能: 延时40us
+*******************/
 void am2321DelayUS()
 {  
-//	// 1T STC11F04E 内部RC 6.97MHz
-//    unsigned char a,b;
-//    for(b=1;b>0;b--)
-//        for(a=49;a>0;a--);
-//    _nop_();  //if Keil,require use intrins.h
-
-//	//1T STC12c5608ad 11.0592Mhz
-//    unsigned char a;
-//    for(a=81;a>0;a--);
-//    _nop_();  //if Keil,require use intrins.h
-
-	// 1T STC11F04E 内部RC 6.38MHz
-    unsigned char a;
-    for(a=46;a>0;a--);
-    _nop_();  //if Keil,require use intrins.h
+	// 1T STC11F04E 4MHz晶振
+    unsigned char a,b;
+    for(b=11;b>0;b--)
+        for(a=2;a>0;a--);
 } 
 
 //数据清零
@@ -63,13 +56,13 @@ void ClearData(void)
 void initAM2321()
 {
 	AM2321_SDA = 1;
-	am2321DelayMS(3);  //延时2Ms
+	am2321DelayMS(2);  //延时2Ms
 	
 	//触发一次测量
 	
 	//主机拉低(Min=800US Max=20Ms) 
 	AM2321_SDA = 0;
-	am2321DelayMS(3);  //延时2Ms
+	am2321DelayMS(2);  //延时2Ms
 	//释放总线 延时(Min=30us Max=50us)
 	AM2321_SDA = 1;
 	
@@ -86,14 +79,14 @@ unsigned char Read_SensorData(void)
 	
 	for(i=0;i<8;i++)	   
 	{
-		loopCount = 5000;
+		loopCount = 9000;
 		while( !AM2321_SDA && loopCount-- ); //检测低电平是否结束
 		
 		//延时Min=26us Max50us, 跳过数据"0"的高电平
-		am2321DelayUS(); //延时30us
+		am2321DelayUS(); //延时40us
 		temp= AM2321_SDA?1:0;
 
-		loopCount = 5000;
+		loopCount = 9000;
 		while( AM2321_SDA && loopCount-- ); //等待高电平结束
 		//超时则跳出for循环		  
 		
@@ -133,7 +126,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 	
 	//主机拉低(Min=800US Max=20Ms) 
 	AM2321_SDA = 0;
-	am2321DelayMS(3);  //延时2Ms
+	am2321DelayMS(2);  //延时2Ms
 	//释放总线 延时(Min=30us Max=50us)
 	AM2321_SDA = 1;
 	
@@ -141,12 +134,12 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 //	{
 //		am2321DelayMS(2900);
 //		AM2321_SDA = 0;
-//		am2321DelayMS(3);  //延时2Ms
+//		am2321DelayMS(2);  //延时2Ms
 //		//释放总线 延时(Min=30us Max=50us)
 //		AM2321_SDA = 1;
 //	}
 
-	am2321DelayUS(); //延时30us
+	am2321DelayUS(); //延时40us
 	
 	
 	//判断从机是否有低电平响应信号 如不响应则跳出，响应则向下运行 
@@ -159,7 +152,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		cnt=0;
 		while((!AM2321_SDA))
 		{
-			if(++cnt>6000) //防止进入死循环
+			if(++cnt>9000) //防止进入死循环
 			{
 				//读取出错
 				return 3;
@@ -170,7 +163,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		//判断从机是否发出 80us 的高电平，如发出则进入数据接收状态
 		while((AM2321_SDA))
 		{
-			if(++cnt>6000) //防止进入死循环
+			if(++cnt>9000) //防止进入死循环
 			{
 				//读取出错
 				return 3;
