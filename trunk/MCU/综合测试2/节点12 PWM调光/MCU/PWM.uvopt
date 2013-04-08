@@ -174,8 +174,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>87</TopLine>
-      <CurrentLine>87</CurrentLine>
+      <TopLine>34</TopLine>
+      <CurrentLine>34</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\nrf24L01.c</PathWithFileName>
       <FilenameWithoutPath>nrf24L01.c</FilenameWithoutPath>
@@ -186,7 +186,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>16</ColumnNumber>
+      <ColumnNumber>48</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
       <CurrentLine>9</CurrentLine>
@@ -197,9 +197,9 @@
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点12 PWM调光\SOURCE\NRF24L01.H</PathWithFilename>
-    <TopLine>1</TopLine>
-    <CurrentLine>1</CurrentLine>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点12 PWM调光\MCU\SOURCE\NRF24L01.H</PathWithFilename>
+    <TopLine>28</TopLine>
+    <CurrentLine>28</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -223,7 +223,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点12 PWM调光\SOURCE\NRF24L01NODE.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点12 PWM调光\MCU\SOURCE\NRF24L01NODE.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>11</CurrentLine>
     <Constant>0</Constant>
@@ -1593,7 +1593,7 @@
       <Documents>
         <Doc>
           <Name>.\source\main.c</Name>
-          <ColumnNumber>16</ColumnNumber>
+          <ColumnNumber>48</ColumnNumber>
           <TopLine>1</TopLine>
           <CurrentLine>9</CurrentLine>
         </Doc>
@@ -1606,14 +1606,14 @@
         <Doc>
           <Name>SOURCE\NRF24L01.H</Name>
           <ColumnNumber>15</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>1</CurrentLine>
+          <TopLine>28</TopLine>
+          <CurrentLine>28</CurrentLine>
         </Doc>
         <Doc>
           <Name>.\source\nrf24L01.c</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>87</TopLine>
-          <CurrentLine>87</CurrentLine>
+          <TopLine>34</TopLine>
+          <CurrentLine>34</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

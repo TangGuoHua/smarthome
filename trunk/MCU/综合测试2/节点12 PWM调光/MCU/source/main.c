@@ -1,6 +1,12 @@
 /*
 STC 12C5608AD
 4MHz外部晶振
+
+日期        谁？    做了什么？
+----------------------------------------------------
+2013-APR-09 黄长浩  为调光台灯修改程序: initPWM()里面，设置CMOD = 0x00，
+                    以使PCA的时钟源频率为SYSclk/12,
+					因为新买的3W LED驱动模块推荐的PWM频率为1KHz左右。
 */
 
 #include "reg52.h"
@@ -34,7 +40,8 @@ void initPWM()
 	
 	CL = 0;
 	CH = 0;
-	CMOD = 0x02;
+	//CMOD = 0x02;
+	CMOD = 0x00;
 	CCAP0H = CCAP0L = 0;
 	CCAP2H = CCAP2L = 0;
 	CCAPM0 = 0X42;
