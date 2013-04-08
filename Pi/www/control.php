@@ -1,4 +1,10 @@
 <?php
+/*
+日期        谁？   做了什么？
+------------------------------------------
+2013-APR-09 黄长浩 增加了调光台灯控制滑条
+*/
+
 $gPageTitle = "控制";
 include "include/templateHeader.php";
 include "include/utils.php";
@@ -6,9 +12,10 @@ include "include/utils.php";
 <script>
 // document ready之后就执行这里的一些函数
 $(document).ready(function() {
-	//隐藏两个温度设定按钮
+	//隐藏设定按钮
 	showButton( "btnLivingTempSet", false );
 	showButton( "btnSetSecondaryBedTemp", false );
+	showButton( 'btnSetAdjLamp', false );
 });
 
 //餐厅射灯
@@ -41,6 +48,20 @@ function radioLEDClicked( GBIndicator, val )
 		$.post("/api/sendData.php", { nodeID1: "100", nodeID2: "12", data2: val } );
 	}
 }
+
+//调光台灯
+function btnSetAdjLampClicked()
+{
+	var setVal = document.getElementById('sliderAdjLamp').value;
+	
+	if( setVal>=0 && setVal <=10 ) //设置的值在1－10之间
+	{
+		$.post("/api/sendData.php", { nodeID1: "100", nodeID2: "12", data1:setVal } );
+	}
+
+	showButton( 'btnSetAdjLamp', false );
+}
+
 
 //书房灯Radio Clicked事件
 function radioStudyRmLightClicked( val )
@@ -77,6 +98,7 @@ function setHeaterTempClicked()
 	//alert( document.getElementById('sliderHeater').value );
 	showButton( "btnLivingTempSet", false );
 }
+
 
 // Show or Hide a button
 // btnID   : button ID, eg. <button id="btnTest">Test</button>
@@ -225,7 +247,12 @@ while ($row = $results->fetchArray())
 					<input type="radio" name="radioLEDBlue" id="radioLEDBlue10" value="10" onclick="radioLEDClicked('B', 10);" <?php echo $row["fldData2"]==10?"checked":"";?> />
 					<label for="radioLEDBlue10">强</label>
 			</fieldset>
-		</li>		
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderAdjLamp">调光台灯</label>
+			<input type="range" name="sliderAdjLamp" id="sliderAdjLamp" onchange="showButton( 'btnSetAdjLamp', true );" value="<?php echo $row["fldData1"];?>" min="0" max="10" step="1" data-highlight="true" />
+			<button id="btnSetAdjLamp" data-icon="check" onclick="btnSetAdjLampClicked();">设定</button>
+		</li>
 	<?php	
 	}
 }
