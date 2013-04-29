@@ -98,6 +98,7 @@ void blink(void)
 
 
 //设置LED亮度，0：关， 255：最亮
+//与现有亮度比较，并实现渐变
 void setBrightness( unsigned bri )
 {
 	if( bri>brightness )
