@@ -188,8 +188,8 @@
       <Focus>0</Focus>
       <ColumnNumber>30</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>115</TopLine>
-      <CurrentLine>144</CurrentLine>
+      <TopLine>91</TopLine>
+      <CurrentLine>118</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -1593,9 +1593,9 @@
       <Documents>
         <Doc>
           <Name>.\source\main.c</Name>
-          <ColumnNumber>1</ColumnNumber>
-          <TopLine>73</TopLine>
-          <CurrentLine>73</CurrentLine>
+          <ColumnNumber>30</ColumnNumber>
+          <TopLine>91</TopLine>
+          <CurrentLine>118</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\NRF24L01NODE.H</Name>
