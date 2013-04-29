@@ -3,6 +3,7 @@
 日期        谁？   做了什么？
 ------------------------------------------
 2013-APR-09 黄长浩 增加了调光台灯控制滑条
+2013-APR-29 黄长浩 修改蓝绿调光LED为主卧台灯，并增加延时关功能
 */
 
 $gPageTitle = "控制";
@@ -224,7 +225,7 @@ while ($row = $results->fetchArray())
 		
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
-				<legend>绿色LED调光灯 *</legend>
+				<legend>主卧台灯</legend>
 					<input type="radio" name="radioLEDGreen" id="radioLEDGreen0" value="0" onclick="radioLEDClicked('G', 0);" <?php echo $row["fldData1"]==0?"checked":"";?> />
 					<label for="radioLEDGreen0">关</label>
 					<input type="radio" name="radioLEDGreen" id="radioLEDGreen3" value="3" onclick="radioLEDClicked('G', 3);" <?php echo $row["fldData1"]==3?"checked":"";?> />
@@ -233,9 +234,11 @@ while ($row = $results->fetchArray())
 					<label for="radioLEDGreen6">中</label>
 					<input type="radio" name="radioLEDGreen" id="radioLEDGreen10" value="10" onclick="radioLEDClicked('G', 10);" <?php echo $row["fldData1"]==10?"checked":"";?> />
 					<label for="radioLEDGreen10">强</label>
+					<input type="radio" name="radioLEDGreen" id="radioLEDGreen20" value="20" onclick="radioLEDClicked('G', 20);" <?php echo $row["fldData1"]==20?"checked":"";?> />
+					<label for="radioLEDGreen20">延时关</label>
 			</fieldset>
 		</li>
-		<li data-role="fieldcontain">
+		<!--li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>蓝色LED调光灯 *</legend>
 					<input type="radio" name="radioLEDBlue" id="radioLEDBlue0" value="0" onclick="radioLEDClicked('B', 0);" <?php echo $row["fldData2"]==0?"checked":"";?> />
@@ -247,9 +250,9 @@ while ($row = $results->fetchArray())
 					<input type="radio" name="radioLEDBlue" id="radioLEDBlue10" value="10" onclick="radioLEDClicked('B', 10);" <?php echo $row["fldData2"]==10?"checked":"";?> />
 					<label for="radioLEDBlue10">强</label>
 			</fieldset>
-		</li>
+		</li-->
 		<li data-role="fieldcontain">
-			<label for="sliderAdjLamp">调光台灯</label>
+			<label for="sliderAdjLamp">主卧台灯</label>
 			<input type="range" name="sliderAdjLamp" id="sliderAdjLamp" onchange="showButton( 'btnSetAdjLamp', true );" value="<?php echo $row["fldData1"];?>" min="0" max="10" step="1" data-highlight="true" />
 			<button id="btnSetAdjLamp" data-icon="check" onclick="btnSetAdjLampClicked();">设定</button>
 		</li>
