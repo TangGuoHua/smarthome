@@ -45,9 +45,9 @@
 
 /*********************************************************/
 sbit CE =  P2^5; //Pin3
-sbit CSN=  P1^0; //Pin4
+sbit CSN=  P3^3; //Pin4
 sbit SCLK= P2^4; //Pin5
-sbit MOSI= P1^1; //Pin6
+sbit MOSI= P3^4; //Pin6
 sbit MISO= P3^5; //Pin7
 sbit IRQ = P3^2; //Pin8
 
