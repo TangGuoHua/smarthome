@@ -166,7 +166,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 			if(++cnt>9000) //防止进入死循环
 			{
 				//读取出错
-				return 3;
+				return 4;
 			}
 		}
 		// 数据接收	传感器共发送40位数据
@@ -182,7 +182,7 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 		if( checkSum == 0 )
 		{
 			//读取出错，一般来说温湿度不会同时为0
-			return 3;
+			return 5;
 		}
 		
 		if( AM2321_Data[4] != checkSum )
