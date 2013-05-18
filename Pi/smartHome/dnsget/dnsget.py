@@ -3,7 +3,8 @@ import urllib,smtplib
 from email.mime.text import MIMEText
 
 def getMyIp():
-    return urllib.urlopen("http://myip.dnsdynamic.org/").read()
+    return urllib.urlopen("http://www.instrument.com.cn/ip.aspx").read()
+    #return urllib.urlopen("http://myip.dnsdynamic.org/").read()
 
 def sendEmail(ipAddr, result):
     sender = 'hchanghao@163.com'
@@ -27,7 +28,8 @@ def sendEmail(ipAddr, result):
         return False
 
 myIp=getMyIp()
-result=urllib.urlopen("https://hchanghao@163.com:3303272q@www.dnsdynamic.org/api/?hostname=hao.dnsget.org&myip=" + myIp).read()
+#result=urllib.urlopen("https://hchanghao@163.com:3303272q@www.dnsdynamic.org/api/?hostname=hao.dnsget.org&myip=" + myIp).read()
+result=urllib.urlopen("http://hchanghao:3303272@dynupdate.no-ip.com/nic/update?hostname=hao.myftp.org&myip=" + myIp).read()
 
 #print result
 #print "good" in result
