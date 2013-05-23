@@ -254,7 +254,7 @@ $db->close();
 			<label for="select-native-1">厨房收音机 *</label>
 			<select name="select-native-1" id="select-native-1">
 				<option value="0">关</option>
-				<option value="1">苏州台 91.1MHz</option>
+				<option value="1">苏州新闻台 91.1MHz</option>
 				<option value="2">苏州音乐台 94.8MHz</option>
 				<option value="3">苏州生活台 96.5MHz</option>
 				<option value="4">苏州台 100MHz</option>
