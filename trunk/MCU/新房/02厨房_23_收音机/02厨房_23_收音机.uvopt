@@ -160,10 +160,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
+      <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>32</TopLine>
-      <CurrentLine>32</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>1</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -174,10 +174,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>44</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>107</TopLine>
-      <CurrentLine>107</CurrentLine>
+      <TopLine>162</TopLine>
+      <CurrentLine>189</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\RDA5802.c</PathWithFileName>
       <FilenameWithoutPath>RDA5802.c</FilenameWithoutPath>
@@ -1555,9 +1555,9 @@
       <Documents>
         <Doc>
           <Name>.\source\main.c</Name>
-          <ColumnNumber>26</ColumnNumber>
-          <TopLine>32</TopLine>
-          <CurrentLine>32</CurrentLine>
+          <ColumnNumber>21</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>1</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\RDA5802.H</Name>
@@ -1567,9 +1567,9 @@
         </Doc>
         <Doc>
           <Name>.\source\RDA5802.c</Name>
-          <ColumnNumber>44</ColumnNumber>
-          <TopLine>107</TopLine>
-          <CurrentLine>107</CurrentLine>
+          <ColumnNumber>2</ColumnNumber>
+          <TopLine>162</TopLine>
+          <CurrentLine>189</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>
