@@ -249,7 +249,22 @@ while ($row = $results->fetchArray())
 }
 $db->close();
 ?>
+	<li data-role="fieldcontain">
+		<div data-role="fieldcontain">
+			<label for="select-native-1">厨房收音机 *</label>
+			<select name="select-native-1" id="select-native-1">
+				<option value="0">关</option>
+				<option value="1">苏州台 91.1MHz</option>
+				<option value="2">苏州音乐台 94.8MHz</option>
+				<option value="3">苏州生活台 96.5MHz</option>
+				<option value="4">苏州台 100MHz</option>
+				<option value="5">苏州台 101.1MHz</option>
+				<option value="6">苏州台 102.8MHz</option>
+				<option value="7">苏州交通台 104.8MHz</option>
 
+			</select>
+		</div>
+	</li>
 	<li data-role="fieldcontain">
 		<fieldset data-role="controlgroup" data-type="horizontal">
 			<legend>防盗报警器 *</legend>
