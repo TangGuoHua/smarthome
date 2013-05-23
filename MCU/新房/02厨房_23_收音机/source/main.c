@@ -34,8 +34,10 @@ bit powerUp = 0; //是否上电
 
 //红外接收头
 sbit IR=P2^7;
-sbit RELAY1=P2^6;
-sbit RELAY2=P2^5;
+
+
+sbit RELAY_POWER=P2^6;
+sbit RELAY_SPEAKER=P2^5;
 
 void delay50us(void)
 {
@@ -43,22 +45,36 @@ void delay50us(void)
     for(a=135;a>0;a--);
 }
 
+void delay250ms(void)
+{
+    unsigned char a,b,c;
+    for(c=74;c>0;c--)
+        for(b=66;b>0;b--)
+            for(a=140;a>0;a--);
+}
+
+
 
 //播放指定的电台
 void playStation()
 {
 	if(! powerUp) //如果模块没有上电，则上电并初始化音量
 	{
+		//开继电器
+		RELAY_POWER=0;
+		
+		delay250ms();	//延时给模块上电，避免继电器的干扰造成模块工作异常
+		
 		//Power Up
 		RDA5802PowerUp(1);
 		powerUp=1;
+		delay250ms();
 
+		//开喇叭
+		RELAY_SPEAKER=0; //延时开喇叭，避免爆炸声
+		
 		//Init volume
 		RDA5802SetVolume(currentVol);
-		
-		//开继电器
-		RELAY1=0;
-		RELAY2=0;		
 	}
 	
 	//调谐到指定的电台
@@ -83,8 +99,8 @@ void main(void)
 	//初始化红外口
 	IR=1;
 	
-	RELAY1=1;//继电器关
-	RELAY2=1;
+	RELAY_SPEAKER=1;//继电器关
+	RELAY_POWER=1;
 
 	while(1)
 	{
@@ -210,10 +226,12 @@ void main(void)
 				case 0x906f: //EQ (Power Off)
 					if(powerUp)
 					{
-						RDA5802PowerUp(0); //关模块
+						RELAY_SPEAKER=1;
+						delay250ms();
+						delay250ms();
+						RELAY_POWER=1; //延时关电源，避免爆炸声
 						
-						RELAY1=1;//关继电器
-						RELAY2=1;
+						RDA5802PowerUp(0); //关模块
 						powerUp=0;
 					}
 					break;
