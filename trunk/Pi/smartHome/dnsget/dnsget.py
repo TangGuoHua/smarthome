@@ -4,8 +4,8 @@ from email.mime.text import MIMEText
 
 def getMyIp():
     try:
-        return urllib.urlopen("http://www.instrument.com.cn/ip.aspx").read()
-        #return urllib.urlopen("http://myip.dnsdynamic.org/").read()
+        #return urllib.urlopen("http://www.instrument.com.cn/ip.aspx").read()
+        return urllib.urlopen("http://myip.dnsdynamic.org/").read()
     except Exception, e:
         return "error"
 
