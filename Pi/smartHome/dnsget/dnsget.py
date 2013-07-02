@@ -10,12 +10,12 @@ def getMyIp():
         return "error"
 
 def sendEmail(ipAddr, result):
-    sender = 'hchanghao@163.com'
+    sender = 'haonotifier@yeah.net'
     receiver = 'hchanghao@163.com'
     subject = 'IP changed'
-    smtpserver = 'smtp.163.com'
-    username = 'hchanghao@163.com'
-    password = '3303272q'
+    smtpserver = 'smtp.yeah.net'
+    username = 'haonotifier@yeah.net'
+    password = 'ocdNew2'
     try:
         msg = MIMEText("<html>The result is [" + result + "].<br><br>The new IP is <a href='" + ipAddr + ":9033'>" + ipAddr + ":9033</a></html>", "html", "utf-8")
         msg['Subject'] = subject
