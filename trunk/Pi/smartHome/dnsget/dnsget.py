@@ -1,6 +1,13 @@
 # python /home/pi/smartHome/dnsget/dnsget.py
-import urllib,smtplib
-from email.mime.text import MIMEText
+
+#import urllib,smtplib
+#from email.mime.text import MIMEText
+
+import urllib
+
+from smtplib import SMTP_SSL as SMTP       # this invokes the secure SMTP protocol (port 465, uses SSL)
+#from smtplib import SMTP                  # use this for standard SMTP protocol   (port 25, no encryption)
+from email.MIMEText import MIMEText
 
 def getMyIp():
     try:
@@ -14,21 +21,39 @@ def sendEmail(ipAddr, result):
     receiver = 'hchanghao@163.com'
     subject = 'IP changed'
     smtpserver = 'smtp.yeah.net'
+	smtpport = 465
     username = 'haonotifier@yeah.net'
     password = 'ocdNew2'
+	
+	result = True
+	
     try:
-        msg = MIMEText("<html>The result is [" + result + "].<br><br>The new IP is <a href='" + ipAddr + ":9033'>" + ipAddr + ":9033</a></html>", "html", "utf-8")
+        #msg = MIMEText("<html>The result is [" + result + "].<br><br>The new IP is <a href='" + ipAddr + ":9033'>" + ipAddr + ":9033</a></html>", "html", "utf-8")
+		content = "The result is [" + result + "].\r\n\r\nThe new URL is http://" + ipAddr + ":9033"
+		msg = MIMEText(content, 'plain')
         msg['Subject'] = subject
-        smtp = smtplib.SMTP()
-        smtp.connect(smtpserver)
+		msg['From'] = sender
+		msg['To'] = receiver
+        #smtp = smtplib.SMTP()
+		#smtp.connect(smtpserver)
+		smtp = SMTP_SSL(smtpserver, smtpport )
+		smtp.set_debuglevel(False)
+		smtp.ehlo
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
-	#print 'a-'+ msg.as_string()
+		#print 'a-'+ msg.as_string()
         smtp.quit()
-        return True
+	finally:
+		smtp.close()
+		
+
     except Exception, e:
         print str(e)
-        return False
+        result=False
+	
+	return result
+
+
 
 myIp=getMyIp()
 if "error" in myIp:
