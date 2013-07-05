@@ -17,19 +17,19 @@ def sendEmail(ipAddr, result):
     smtpserver = 'smtp.yeah.net'
     username = 'haonotifier@yeah.net'
     password = 'ocdNew2'
-	
+    
     try:
         msg = MIMEText("The result is [" + result + "].\r\n\r\nThe new IP is http://" + ipAddr + ":9033", "plain", "utf-8")
         msg['Subject'] = subject
-	msg['To']= receiver
-	msg['From']=sender
+        msg['To']= receiver
+        msg['From']=sender
         smtp = smtplib.SMTP()
         smtp.connect(smtpserver)
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
-	#print 'a-'+ msg.as_string()
+        #print 'a-'+ msg.as_string()
         smtp.quit()
-	smtp.close()
+        smtp.close()
     except Exception, e:
         print str(e)
 
@@ -39,7 +39,7 @@ if "error" in myIp:
 else:
     try:
         result=urllib.urlopen("http://hchanghao:3303272@dynupdate.no-ip.com/nic/update?hostname=hao.myftp.org&myip=" + myIp).read()
-	#result=urllib.urlopen("https://hchanghao@163.com:3303272q@www.dnsdynamic.org/api/?hostname=hao.dnsget.org&myip=" + myIp).read()
+        #result=urllib.urlopen("https://hchanghao@163.com:3303272q@www.dnsdynamic.org/api/?hostname=hao.dnsget.org&myip=" + myIp).read()
     except Exception, e:
         result="Error happened when updating IP address."
 
