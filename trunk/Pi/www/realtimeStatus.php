@@ -95,6 +95,6 @@ while ($row = $results->fetchArray())
 $db->close();
 ?>
 </ul>
-<?
+<?php
 include "include/templateFooter.php";
 ?>
