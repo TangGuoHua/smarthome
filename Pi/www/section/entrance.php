@@ -21,6 +21,6 @@ include "../include/utils.php";
 	$db->close();
 	?>
 </ul>
-<?
+<?php
 include "../include/templateFooter.php";
 ?>
