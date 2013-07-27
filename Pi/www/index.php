@@ -17,6 +17,6 @@ include "include/templateHeader.php";
 
 		<li><a data-ajax="false" href="section/outdoor.php">室外</a></li-->
 </ul>
-<?
+<?php
 include "include/templateFooter.php";
 ?>

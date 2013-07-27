@@ -51,6 +51,6 @@ while ($row = $results->fetchArray())
 $db->close();
 ?>
 
-<?
+<?php
 include "include/templateFooter.php";
 ?>

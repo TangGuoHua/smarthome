@@ -296,6 +296,6 @@ $db->close();
 	</li>
 
 </ul>
-<?
+<?php
 include "include/templateFooter.php";
 ?>

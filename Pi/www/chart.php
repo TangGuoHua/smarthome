@@ -264,6 +264,6 @@ $db->close();
 		
 </script>
 
-<?
+<?php
 include "include/templateFooter.php";
 ?>
