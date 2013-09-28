@@ -38,5 +38,6 @@ void main(void)
 	while(1)
 	{
 		RELAY1=~PIR;
+		RELAY2=~PIR;
 	}
 }
