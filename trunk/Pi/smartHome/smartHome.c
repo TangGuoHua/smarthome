@@ -13,6 +13,7 @@ Todo:
 Date         Author      Remarks
 -------------------------------------------------------------------------------
 2013-FEB-25  Changhao    增加用于处理计划任务的功能函数checkScheduledTask()
+2013-SEP-30  Changhao    修改与MCU的通讯串口波特率为115200
 */
 
 #include <sys/types.h>
@@ -24,7 +25,8 @@ Date         Author      Remarks
 #include <sqlite3.h>
 #include <strings.h>
 
-#define BAUDRATE B57600
+//#define BAUDRATE B57600
+#define BAUDRATE B115200
 #define SERIAL_DEVICE "/dev/ttyAMA0"
 #define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
@@ -111,24 +113,23 @@ void initSerialPort()
 }
 
 
-// this procedure will be called when a frame of data is received
-// * data - the pointer to the data
-// dataLength - how many bytes of data received
-// for exmaple, to print all bytes received
-//    for( i=0; i<dataLength; i++ )
-//    {
-//        printf( "%x ", *(data+i) );
-//    }
+// 当串口收到一帧数据时，onFrameReceived()将会被调用
+//
+// 参数说明：
+//    * data - the pointer to the data
+//    dataLength - how many bytes of data received
+//    目前单片机通过串口发来的数据都是定长的，每帧16字节（除帧头帧尾之外）。
 void onFrameReceived( unsigned char * data, unsigned char dataLength )
 {
 	unsigned char i;
-	unsigned char sqlStr[300];
+	unsigned char sqlStr[400];
 	int tmp;
 	
 	//sqlite3_stmt * stmt;
 	//sqlite3_prepare ( g_dbHandle, "INSERT INTO tabDataHistory  ( fldNodeID1, fldNodeID2, fldData1, fldData2 ) VALUES( ?, ?, ?, ? )", -1, &stmt, 0 );
 	
-	sprintf( sqlStr, "INSERT INTO tabDataHistory (fldNodeID1,fldNodeID2,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data);
+	//sprintf( sqlStr, "INSERT INTO tabDataHistory (fldNodeID1,fldNodeID2,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data);
+	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data);
 	tmp = sqlite3_exec(g_dbHandle,sqlStr,0,0,0);
 	
 	if( tmp != SQLITE_OK )
@@ -154,12 +155,13 @@ void send2MCU( unsigned char sendRFChannel,
 	unsigned char buffer[dataLength+14];
 	unsigned char i=0, j=0;
 	
+	//frame header
 	buffer[i++] = PI2MCU_FRAME_HEADER0;
 	buffer[i++] = PI2MCU_FRAME_HEADER1;
 	buffer[i++] = PI2MCU_FRAME_HEADER2;
 	buffer[i++] = PI2MCU_FRAME_HEADER3;
-	buffer[i++] = 0; //nodeID0;
-	buffer[i++] = 0; //nodeID1;
+	
+	//frame content
 	buffer[i++] = sendRFChannel;
 	buffer[i++] = sendAddr1;
 	buffer[i++] = sendAddr2;
@@ -168,7 +170,9 @@ void send2MCU( unsigned char sendRFChannel,
 	for( ; j<dataLength; j++)
 	{
 		buffer[i++] = *(data++);
-	}	
+	}
+
+	//frame tailer
 	buffer[i++] = PI2MCU_FRAME_TAILER0;
 	buffer[i++] = PI2MCU_FRAME_TAILER1;
 	buffer[i++] = PI2MCU_FRAME_TAILER2;

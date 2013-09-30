@@ -170,12 +170,12 @@
       <GroupNumber>1</GroupNumber>
       <FileNumber>1</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>78</ColumnNumber>
+      <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>1</TopLine>
-      <CurrentLine>9</CurrentLine>
+      <CurrentLine>4</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -188,8 +188,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>1</TopLine>
+      <CurrentLine>12</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\nrf24L01.c</PathWithFileName>
       <FilenameWithoutPath>nrf24L01.c</FilenameWithoutPath>
@@ -197,9 +197,9 @@
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\智能家主机_与Pi串口通信\SOURCE\SERIALPORT.C</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\智能家主机_与Pi串口通信\SOURCE\SERIALPORT.C</PathWithFilename>
     <TopLine>1</TopLine>
-    <CurrentLine>1</CurrentLine>
+    <CurrentLine>8</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -223,9 +223,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\智能家主机_与Pi串口通信\SOURCE\NRF24L01NODE.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\智能家主机_与Pi串口通信\SOURCE\NRF24L01NODE.H</PathWithFilename>
     <TopLine>1</TopLine>
-    <CurrentLine>14</CurrentLine>
+    <CurrentLine>3</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -249,8 +249,8 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\智能家主机_与Pi串口通信\SOURCE\NRF24L01.H</PathWithFilename>
-    <TopLine>22</TopLine>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\智能家主机_与Pi串口通信\SOURCE\NRF24L01.H</PathWithFilename>
+    <TopLine>1</TopLine>
     <CurrentLine>51</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
@@ -1615,31 +1615,37 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>2</ActiveTab>
+      <ActiveTab>4</ActiveTab>
       <Documents>
         <Doc>
           <Name>SOURCE\NRF24L01.H</Name>
           <ColumnNumber>15</ColumnNumber>
-          <TopLine>22</TopLine>
+          <TopLine>1</TopLine>
           <CurrentLine>51</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\NRF24L01NODE.H</Name>
-          <ColumnNumber>48</ColumnNumber>
+          <ColumnNumber>0</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>14</CurrentLine>
+          <CurrentLine>3</CurrentLine>
         </Doc>
         <Doc>
           <Name>.\source\main.c</Name>
-          <ColumnNumber>78</ColumnNumber>
+          <ColumnNumber>0</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>9</CurrentLine>
+          <CurrentLine>4</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\SERIALPORT.C</Name>
-          <ColumnNumber>0</ColumnNumber>
+          <ColumnNumber>57</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>1</CurrentLine>
+          <CurrentLine>8</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\source\nrf24L01.c</Name>
+          <ColumnNumber>19</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>23</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

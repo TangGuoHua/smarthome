@@ -5,6 +5,7 @@ Please contact huangchanghao@gmail.com if any questions
 When        Who        Remarks
 --------------------------------------
 2011-OCT-05 Changhao   Initial version
+2013-SEP-30 Changhao   修改serialPortInit()的波特率115200
 */
 
 #include <reg52.h>
@@ -56,19 +57,36 @@ sfr AUXR   = 0x8E;
 /*-------------
 串口通讯初始化
 ----------------*/
-void serialPortInit(void)		//57600bps@3.6864MHz
+//void serialPortInit(void)		//57600bps@3.6864MHz
+//{
+//	PCON &= 0x7f;		//波特率不倍速
+//	SCON = 0x50;		//8位数据,可变波特率
+//	REN = 1;      //允许接收
+//	AUXR |= 0x40;		//定时器1时钟为Fosc,即1T
+//	AUXR &= 0xfe;		//串口1选择定时器1为波特率发生器
+//	TMOD &= 0x0f;		//清除定时器1模式位
+//	TMOD |= 0x20;		//设定定时器1为8位自动重装方式
+//	TL1 = 0xFE;		//设定定时初值
+//	TH1 = 0xFE;		//设定定时器重装值
+//	ET1 = 0;		//禁止定时器1中断
+//	ES=0;          //关闭串口中断
+//	TR1 = 1;		//启动定时器1
+//}
+
+
+void serialPortInit(void)	//115200bps@3.6864MHz
 {
 	PCON &= 0x7f;		//波特率不倍速
 	SCON = 0x50;		//8位数据,可变波特率
-	REN = 1;      //允许接收
+	REN = 1;      		//允许接收
 	AUXR |= 0x40;		//定时器1时钟为Fosc,即1T
 	AUXR &= 0xfe;		//串口1选择定时器1为波特率发生器
 	TMOD &= 0x0f;		//清除定时器1模式位
 	TMOD |= 0x20;		//设定定时器1为8位自动重装方式
-	TL1 = 0xFE;		//设定定时初值
-	TH1 = 0xFE;		//设定定时器重装值
+	TL1 = 0xFF;		//设定定时初值
+	TH1 = 0xFF;		//设定定时器重装值
 	ET1 = 0;		//禁止定时器1中断
-	ES=0;          //关闭串口中断
+	ES = 0;         //关闭串口中断
 	TR1 = 1;		//启动定时器1
 }
 
@@ -82,33 +100,22 @@ void serialPortSendByte( unsigned char dat )
 	//ES=1;  //开启串口中断
 }
 
-////发送一个字符串,以'\0'结束
-//void serialPortSendString( unsigned char *s )
-//{
-//	while(*s!='\0')
-//	{
-//		serialPortSendByte(*s);
-//		s++;
-//	}
-//}
 
-
-//通过查询方式，接收PC发来的一帧数据
+//通过查询方式，接收Pi发来的一帧数据
 //如果没收到就循环等待，直到收到一帧数据
 //返回接收到的数据指针
-//注意，接收到的数据长度计算：（介于7至38个字节之间）
-//设：字节6应等于LEN  (值为1至32）
-//接收到的数据总长度等于 LEN+6
 //
-//PC给MCU的每帧格式固定为：
-//字节0：节点ID字节0
-//字节1：节点ID字节1
-//字节2：节点24L01接收频道
-//字节3：节点24L01接收地址字节0
-//字节4：节点24L01接收地址字节1
-//字节5：节点24L01接收地址字节2
-//字节6：节点24L01接收数据字节数 (LEN=1至32，不应该出现1－32以外的值)
-//字节7至6+LEN：要发送给节点的数据
+//接收到的数据长度计算：
+//    设：字节4应等于LEN  (值为1至32）
+//    接收到的数据总长度等于(LEN+5)
+//
+//Pi发给MCU的每帧数据格式固定为：
+//字节0：节点24L01接收频道
+//字节1：节点24L01接收地址字节0
+//字节2：节点24L01接收地址字节1
+//字节3：节点24L01接收地址字节2
+//字节4：节点24L01接收数据字节数 (LEN=1至32，不应该出现1－32以外的值)
+//字节5至字节(4+LEN)：要发送给节点的数据
 unsigned char * serialPortReceive(void)
 {
 	bit stillLoop = 1;
@@ -120,14 +127,12 @@ unsigned char * serialPortReceive(void)
 	unsigned char bufferCount = 0;
 	static unsigned char buffer[PC2MCU_BUFFER_SIZE];
 	//PC给MCU的每帧格式固定为：（即buffer[]数组里面的内容如下：）
-	//字节0：节点ID字节0
-	//字节1：节点ID字节1
-	//字节2：节点24L01接收频道
-	//字节3：节点24L01接收地址字节0
-	//字节4：节点24L01接收地址字节1
-	//字节5：节点24L01接收地址字节2
-	//字节6：节点24L01接收数据字节数 (LEN=1至32，不应该出现1－32以外的值)
-	//字节7至6+LEN：要发送给节点的数据
+	//字节0：节点24L01接收频道
+	//字节1：节点24L01接收地址字节0
+	//字节2：节点24L01接收地址字节1
+	//字节3：节点24L01接收地址字节2
+	//字节4：节点24L01接收数据字节数 (LEN=1至32，不应该出现1－32以外的值)
+	//字节5至字节(4+LEN)：要发送给节点的数据
 	
 	do
 	{
@@ -137,10 +142,6 @@ unsigned char * serialPortReceive(void)
 		
 		//取出收到的一个字节
 		recvByte = SBUF;
-		
-		//serialPortSendByte( recvByte );
-		
-		//serialPortSendByte( comStatus );
 		
 		switch( comStatus )
 		{
@@ -262,15 +263,18 @@ unsigned char * serialPortReceive(void)
 	return buffer;
 }
 
-// 通过串口发送一帧数据给上位机
-void serialPortSendFrame( unsigned char nodeID0, unsigned char nodeID1, unsigned char* dataArr)
+// 通过串口一帧数据发送给Pi
+// 本子程序主要用于将nrf24L01接收到的一帧数据（16字节）发送给Pi
+// 参数说明：
+//     nodeID: 接收到数据来自nodeID这个节点
+//     *dataArr: 接收到的数据 （15个字节）
+void serialPortSendFrame( unsigned char nodeID, unsigned char* dataArr)
 {
 	serialPortSendByte( MCU2PC_FRAME_HEADER0 );
 	serialPortSendByte( MCU2PC_FRAME_HEADER1 );
 	serialPortSendByte( MCU2PC_FRAME_HEADER2 );
 	serialPortSendByte( MCU2PC_FRAME_HEADER3 );
-	serialPortSendByte( nodeID0 );
-	serialPortSendByte( nodeID1 );
+	serialPortSendByte( nodeID );
 	serialPortSendByte( *dataArr++ );
 	serialPortSendByte( *dataArr++ );
 	serialPortSendByte( *dataArr++ );
@@ -283,6 +287,8 @@ void serialPortSendFrame( unsigned char nodeID0, unsigned char nodeID1, unsigned
 	serialPortSendByte( *dataArr++ );
 	serialPortSendByte( *dataArr++ );
 	serialPortSendByte( *dataArr++ );
+	serialPortSendByte( *dataArr++ );
+	serialPortSendByte( *dataArr++ );	
 	serialPortSendByte( *dataArr );
 	
 	serialPortSendByte( MCU2PC_FRAME_TAILER0 );

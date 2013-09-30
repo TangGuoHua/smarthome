@@ -1,23 +1,27 @@
 /*****************************************
-1T STC11F04E 3.6864MHz
+作者保留一切权利。如有问题请联系huangchanghao@gmail.com
+
+All rights are reserved.
+Please contact huangchanghao@gmail.com if any questions
+
+硬件: 1T STC11F04E 3.6864MHz
+
+When        Who        Remarks
+--------------------------------------
+2011-OCT-05 Changhao   Initial version
+
 *****************************************/
+
 #include <reg52.h>
-#include <intrins.h>
 #include "nrf24L01.h"
 #include "nrf24L01Node.h"
 
-
-
+/*********状态标志************/
 //extern unsigned char bdata sta;
-/*********************************************************/
-
-
-
-/*****************状态标志****************/
-unsigned char bdata sta;   //状态标志
-sbit RX_DR=sta^6;
-sbit TX_DS=sta^5;
-sbit MAX_RT=sta^4;
+//unsigned char bdata sta;
+//sbit RX_DR=sta^6;
+//sbit TX_DS=sta^5;
+//sbit MAX_RT=sta^4;
 
 unsigned char nrfACK();
 unsigned char nrfCheckACK();
@@ -28,46 +32,39 @@ unsigned char nrfWriteReg( unsigned char regAddr, unsigned char writeData);
 unsigned char nrfReadRxData( unsigned char regAddr, unsigned char *rxData, unsigned char dataLen);
 unsigned char nrfWriteTxData(unsigned char regAddr, unsigned char *txData, unsigned char dataLen);
 
-
-/****************************************************
+/******************************
 函数功能:延时 15us
-晶振为内部RC 6.9MHz(STC-ISP显示的频率)  STC11F04E 1T
-*****************************************************/
-//void delayFor24L01()
-//{  
-//
-//    unsigned char a;
-//    for(a=24;a>0;a--);
-//    _nop_();  //if Keil,require use intrins.h
-//} 
-
-
+*******************************/
 void delayFor24L01( )
 {
 	unsigned int i;
 	unsigned int t;
 	for( t=1; t>0; t-- )
+		//for( i=530; i>0; i-- ); // 1T STC11F04E 内部RC 6.97MHz
+		//for( i=305; i>0; i-- ); // 1T STC11F04E 外部晶振4MHz
+		//for( i=841; i>0; i-- ); // 1T STC11F04E 外部晶振11.0592MHz
 		for( i=270; i>0; i-- ); // 1T STC11F04E 3.6864MHz
 }
-//********* 以下函数仅供本模块内部调用 **************
 
+
+//********* 以下函数仅供本模块内部调用 **************
 //SPI时序函数
 unsigned char nrfSPI( unsigned char spiData )
 {
-    unsigned char i;
-   	for(i=0;i<8;i++) //循环8次
-   	{
-	  if( spiData & 0x80 )
-	    MOSI=1;
-	  else
-	    MOSI=0; //byte最高位输出到MOSI
-   	  spiData<<=1; //低一位移位到最高位
-   	  SCLK=1; 
-	  if(MISO) //拉高SCK，nRF24L01从MOSI读入1位数据，同时从MISO输出1位数据
-   	    spiData|=0x01; //读MISO到byte最低位
-   	  SCLK=0; //SCK置低
-   	}
-    return(spiData); //返回读出的一字节
+	unsigned char i;
+	for(i=0;i<8;i++) //循环8次
+	{
+		if( spiData & 0x80 )
+			MOSI=1;
+		else
+			MOSI=0; //byte最高位输出到MOSI
+		spiData<<=1; //低一位移位到最高位
+		SCLK=1; 
+		if(MISO) //拉高SCK，nRF24L01从MOSI读入1位数据，同时从MISO输出1位数据
+			spiData|=0x01; //读MISO到byte最低位
+		SCLK=0; //SCK置低
+	}
+	return(spiData); //返回读出的一字节
 }
 
 //SPI读寄存器一字节函数
@@ -129,8 +126,9 @@ unsigned char nrfWriteTxData( unsigned char regAddr, unsigned char *txData, unsi
 void nrf24L01Init()
 {
 	delayFor24L01();//让系统什么都不干
+	delayFor24L01();//让系统什么都不干
 	CE=0; //待机模式1 (Standy-I)
-	CE=0;CE=0;CE=0;CE=0;CE=0;CE=0;
+	CE=0;CE=0;CE=0;CE=0;CE=0;CE=0; //实验得出 针对1T单片机
 	CSN=1;
 	SCLK=0;
 	IRQ=1;
@@ -149,26 +147,37 @@ void nrf24L01Init()
 // unsigned char rec_addr[3]= { 0x54, 0x53, 0x95 };  //接收方地址
 // unsigned char data_to_send[5] = {0x01, 0x02, 0x03, 0x04, 0x05 };　//要发送的数据
 // nrfSendData( rfChannel, 3, rec_addr, 5, data_to_send );  //发送
-void nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
+//
+// 返回值：
+// 255-表示大重发次数达到后仍然未收到ACK，发送失败
+// 0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
+//    0：没有重发，直接发送成功
+//    1: 重发了1次后成功收到ack
+//    2: 重发了2次后成功收到ack
+//    以此类推
+//    最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
+unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
 {
+	unsigned char ret = 0;
+	
 	CE=0;
 	//delayUS( 10 ); // 本条语句由实验得出 STC12c5608AD 1T 11.0592MHz
-	delayFor24L01();
-
+	//delayFor24L01();
+	
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth );//写寄存器指令+接收地址使能指令+接收地址+地址宽度
 	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth );//为了应答接收设备，接收通道0地址和发送地址相同
 	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth );//写入数据 
 
-	/******下面有关寄存器配置**************/
+	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
 	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );       // 使能接收通道0自动应答
 	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 );   // 使能接收通道0
-	
-	
-	//NRFWriteReg(W_REGISTER+SETUP_RETR,0x0a);  // 自动重发延时等待250us+86us，自动重发10次
-	nrfWriteReg( W_REGISTER+SETUP_RETR,0x7a );  // 自动重发延时等待2000us+86us，自动重发10次
-	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道0x64
-	
-	nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
+
+	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
+	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f );  // 自动重发延时等待1500us+86us，自动重发15次
+	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
+	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
+	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+
 	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	CE=1;
@@ -180,67 +189,103 @@ void nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned cha
 
 	CE=0; //待发送完毕后转为Standby-1模式
 
-	delayFor24L01(); //本条语句由实验得出 STC12c5608AD 1T 11.0592MHz
-	//delayFor24L01();
+	//delayFor24L01(); //本条语句由实验得出 STC12c5608AD 1T 11.0592MHz
 
+	do
+	{
+		ret=nrfCheckACK();
+	}while( ret==100);//检测是否发送完毕
 	
-	while(nrfCheckACK());	//检测是否发送完毕
+	return ret;
 }
 
 
-// 设置24L01为接收模式PRX准备接收数据
-// 本节点的接收射频通道、地址、地址宽度、数据宽度均在"nrf24L01Node.h"头文件里面设置
-void nrfSetRxMode( void )
+//设置24L01为接收模式PRX，准备接收数据
+//参数如下：
+//rfChannel：接收的频道号。取值范围是0－125
+//addrWidth: 地址宽度（3-5字节）
+//rxAddr：本节点接收的地址
+//本节点的接收数据宽度在"nrf24L01Node.h"头文件里面设置
+//例：
+//   unsigned char myAddr[3] = {53, 69, 160};
+//   nrfSetRxMode( 76, 3, myAddr);
+//那么节点将在76频道上接收数据。地址宽度为3字节，地址是：53/69/160。
+//一旦接收到数据，将触发INT0 (硬件接线提示：IRQ需连接到INT0上）
+void nrfSetRxMode(  unsigned char rfChannel, unsigned char addrWidth, unsigned char *rxAddr)
 {
     CE=0;
 
-	
-  	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, MY_ADDR, ADDRESS_WIDTH ); //接收设备接收通道0使用和发送设备相同的发送地址
+  	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, rxAddr, addrWidth ); //接收设备接收通道0使用和发送设备相同的发送地址
   	nrfWriteReg( W_REGISTER+EN_AA, 0x01 ); //使能接收通道0自动应答
   	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); //使能接收通道0
 
-	nrfWriteReg( W_REGISTER+RF_CH, RECEIVE_RF_CHANNEL ); //设置射频通道
+	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
 
-	nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
+	//nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
+	nrfWriteReg( W_REGISTER+RF_SETUP, 0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
 
   	CE = 1;	//设为接收模式 PRX
-
-
 }
 
-/****************************检测应答信号******************************/
+// 用于检查发送结果(Ack)
+// 返回值：100-表示还在发送中
+//         255-表示大重发次数达到后仍然未收到ACK，发送失败
+//         0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
+//           0：没有重发，直接发送成功
+//           1: 重发了1次后成功收到ack
+//           2: 重发了2次后成功收到ack
+//           以此类推
+//           最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
 unsigned char nrfCheckACK()
-{  //用于发射
-	sta=nrfReadReg(R_REGISTER+STATUS); // 返回状态寄存器
-	if(TX_DS||MAX_RT) //发送完毕中断
+{  
+	unsigned char status;
+	
+	status = nrfReadReg(R_REGISTER+STATUS); // 读取状态寄存器
+	
+	if( status & 0x20 ) //检查TX_DS位，置位则发送成功
 	{
-		nrfWriteReg(W_REGISTER+STATUS,0xff);  // 清除TX_DS或MAX_RT中断标志
-		CSN=0;
-		nrfSPI(FLUSH_TX);//用于清空FIFO ！！关键！！不然会出现意想不到的后果！！！大家记住！！  
-		CSN=1; 
-		return(0);
+		nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除TX_DS标志
+		
+		//发送成功后，FIFO自动清空，这里就不用再清了
+		
+		//返回自动重发次数
+		return( nrfReadReg(R_REGISTER+OBSERVE_TX) & 0x0f ); 
 	}
-	else
+	else if( status & 0x10) //检查MAX_RT位，置位则说明最大重发次数达到后仍然未收到ACK，发送失败
 	{
-		return(1);
+		nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除MAX_RT标志
+		
+		//发送失败，FIFO不会自动清空，必须手动清空 ！！
+		//关键！！不然会出现意想不到的后果！！！
+		CSN=0;
+		nrfSPI(FLUSH_TX);
+		CSN=1; 
+			
+		return 255;
+	}
+	else //还在发送中...
+	{
+		return 100;
 	}
 }
-
 
 //获取24L01接收到的数据。
 //当24L01收到数据触发中断后，调用本方法来取得24L01收到的数据
 unsigned char* nrfGetReceivedData()				 
 {
 	static unsigned char dataBuffer[RECEIVE_DATA_WIDTH];
+	unsigned char status;
 	
-	sta=nrfReadReg(R_REGISTER+STATUS);//发送数据后读取状态寄存器
-	if(RX_DR) // 判断是否接收到数据
+	//读取状态寄存器
+	status = nrfReadReg(R_REGISTER+STATUS);
+	if( status & 0x40 ) //检查RX_DR位，如果置位，则说明接收到数据
 	{
 		//CE=0;//进入Standby-I模式
 		
-		nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);// 从RXFIFO读取数据
+		// 从RX FIFO读取数据
+		nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);
 		
 		//接收到数据后RX_DR,TX_DS,MAX_PT都置高为1，通过写1来清除中断标
 		//nrfWriteReg(W_REGISTER+STATUS,0xff);
