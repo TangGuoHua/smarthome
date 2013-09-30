@@ -1,14 +1,20 @@
-/*****************************************
+/********************************************************
 1T STC11F04E 3.6864MHz
 PI与单片机串口通信
+
+作者保留一切权利。如有问题请联系huangchanghao@gmail.com
+
+All rights are reserved.
+Please contact huangchanghao@gmail.com if any questions
 
 Revision History
 Date         Author      Remarks
 -----------------------------------------------------------
 2013-FEB-27  Changhao    去掉了blinkLED （但还没有烧入单片机）
-                         （准备将串口速率提高到115200bps，Pi的程序也要相应改动）
+2013-SEP-30  Changhao    串口波特率提高到115200bps
+                         修改通讯协议：本主机节点固定每帧接收16字节，其中1个字节的NodeID，15个字节的数据。
 
-*****************************************/
+**********************************************************/
 
 #include <reg52.h>
 #include "nrf24L01Node.h"
@@ -30,8 +36,8 @@ Date         Author      Remarks
 
 
 //sfr AUXR   = 0x8E;
-sbit LED1=P1^7;
-sbit LED2=P1^6;
+sbit LED1=P1^7;  //Blue LED
+sbit LED2=P1^6;  //Red LED
 
 //初始化中断0，给NRF24L01用
 void initINT0(void)
@@ -45,37 +51,20 @@ void sendDataToNode( unsigned char* txData )
 {
 	//byte txData[2];
 	unsigned char sendRFChannel;
-	unsigned char sendAddr[ADDRESS_WIDTH]; //= { 0x61, 0x53, 0x95 }; //从节点地址
+	unsigned char sendAddr[ADDRESS_WIDTH];
 	unsigned char sendDataLen;
 
-	sendRFChannel = *(txData+2);
+	sendRFChannel = *(txData);
 	
-	sendAddr[0] = *(txData+3);
-	sendAddr[1] = *(txData+4);
-	sendAddr[2] = *(txData+5);
+	sendAddr[0] = *(txData+1);
+	sendAddr[1] = *(txData+2);
+	sendAddr[2] = *(txData+3);
 	
-	sendDataLen = *(txData+6);
+	sendDataLen = *(txData+4);
 	
-	nrfSendData( sendRFChannel, ADDRESS_WIDTH, sendAddr, sendDataLen, (txData+7) );//发送	
+	nrfSendData( sendRFChannel, ADDRESS_WIDTH, sendAddr, sendDataLen, (txData+5) );//发送	
 }
 
-
-//void delay1s(void)   //误差 -0.000000000023us
-//{
-//    unsigned char a,b,c;
-//    for(c=23;c>0;c--)
-//        for(b=216;b>0;b--)
-//            for(a=184;a>0;a--);
-//}
-
-
-//void delay100ms(void)   //误差 -0.000000000002us
-//{
-//    unsigned char a,b,c;
-//    for(c=131;c>0;c--)
-//        for(b=156;b>0;b--)
-//            for(a=3;a>0;a--);
-//}
 
 void delay50ms(void)   //误差 -0.000000000001us
 {
@@ -84,26 +73,32 @@ void delay50ms(void)   //误差 -0.000000000001us
         for(a=207;a>0;a--);
 }
 
-//void blinkLED( unsigned char c)
-//{
-//	if(c==1)
-//	{
-//		LED1=0;
-//		delay50ms();
-//		LED1=1;
-//	}
-//	else
-//	{
-//		LED2=0;
-//		delay50ms();
-//		LED2=1;
-//	}
-//}
+void blinkLED( unsigned char c)
+{
+	if(c==1)
+	{
+		LED1=0;
+		delay50ms();
+		LED1=1;
+	}
+	else
+	{
+		LED2=0;
+		delay50ms();
+		LED2=1;
+	}
+}
 
+
+//NRF24L01开始进入接收模式
+void startRecv()
+{
+	unsigned char myAddr[3]= {53, 69, 149 }; //本节点的接收地址
+	nrfSetRxMode( 96, 3, myAddr);  //96频道，3字节宽度的地址
+}
 
 void main(void)
 {
-
 	
 	delay50ms(); // 系统上电后稳定一下
 	delay50ms();
@@ -119,14 +114,14 @@ void main(void)
 	
 	nrf24L01Init();
 	
-	nrfSetRxMode(); //开始接收
+	startRecv(); //开始接收
 		
 	while(1)
 	{
 		sendDataToNode( serialPortReceive() );
-		//blinkLED(2);
+		blinkLED(2);  //blink RED LED
 
-		nrfSetRxMode();//设置为接收模式
+		startRecv();//设置为接收模式
 
 	}
 }
@@ -138,15 +133,14 @@ void interrupt24L01(void) interrupt 0
 {
 	unsigned char* receivedData;
 	
-	//blinkLED(1);  //blink GREEN LED
+	blinkLED(1);  //blink Blue LED
 	
 	//读取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
 	// 将数据组帧后通过串口发给主机
-	serialPortSendFrame( *receivedData++, *receivedData++, receivedData );
+	serialPortSendFrame( *receivedData++, receivedData );
 
 	//再次进入接收模式
-	nrfSetRxMode();
-
+	//startRecv();
 }
