@@ -208,6 +208,7 @@ void main()
 void interrupt24L01(void) interrupt 0
 {
 	unsigned char * receivedData;
+	unsigned char tmp;
 	
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
@@ -218,13 +219,18 @@ void interrupt24L01(void) interrupt 0
 	// *(receivedData+3): 灯控继电器2的工作模式
 	// *(receivedData+4): 热水器继电器工作模式
 	
-	lightOnThreshold = *(receivedData+1);
+	//开灯阈值
+	tmp = *(receivedData+1);
+	if( tmp!= lightOnThreshold )
+	{
+		//threshold changed, let's save it.
+		lightOnThreshold = tmp;
+		saveLightOnThreshold( lightOnThreshold );
+	}
+	
 	light1Mode = *(receivedData+2);
 	
 	RELAY_HEATER = (*(receivedData+4))==0?1:0;
-	
-	saveLightOnThreshold( lightOnThreshold );
-	
 }
 
 
