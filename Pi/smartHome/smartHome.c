@@ -187,7 +187,7 @@ void checkSendDataToNode()
 	int tmp;
 	unsigned char sqlStr[250];
 	sqlite3_stmt* stmt = NULL;
-	int fldID, fldNodeID1, fldNodeID2;
+	int fldID, fldNodeID;
 	unsigned char fldAddr1, fldAddr2, fldAddr3, fldRFChannel, fldDataLength;
 	unsigned char buf[10];
 	
@@ -207,24 +207,24 @@ void checkSendDataToNode()
 		//			sqlite3_column_text(stmt, 8));
 
 		fldID = sqlite3_column_int(stmt, 0);
-		fldNodeID1 = sqlite3_column_int(stmt, 1);
-		fldNodeID2 = sqlite3_column_int(stmt, 2);
-		fldAddr1 = sqlite3_column_int(stmt, 4);
-		fldAddr2 = sqlite3_column_int(stmt, 5);
-		fldAddr3 = sqlite3_column_int(stmt, 6);
-		fldRFChannel = sqlite3_column_int(stmt, 7);
-		fldDataLength = sqlite3_column_int(stmt, 8);
+		fldNodeID = sqlite3_column_int(stmt, 1);
+
+		fldAddr1 = sqlite3_column_int(stmt, 3);
+		fldAddr2 = sqlite3_column_int(stmt, 4);
+		fldAddr3 = sqlite3_column_int(stmt, 5);
+		fldRFChannel = sqlite3_column_int(stmt, 6);
+		fldDataLength = sqlite3_column_int(stmt, 7);
 		
-		buf[0] = sqlite3_column_int(stmt, 9);
-		buf[1] = sqlite3_column_int(stmt, 10);
-		buf[2] = sqlite3_column_int(stmt, 11);
-		buf[3] = sqlite3_column_int(stmt, 12);
-		buf[4] = sqlite3_column_int(stmt, 13);
-		buf[5] = sqlite3_column_int(stmt, 14);
-		buf[6] = sqlite3_column_int(stmt, 15);
-		buf[7] = sqlite3_column_int(stmt, 16);
-		buf[8] = sqlite3_column_int(stmt, 17);
-		buf[9] = sqlite3_column_int(stmt, 18);
+		buf[0] = sqlite3_column_int(stmt, 8);
+		buf[1] = sqlite3_column_int(stmt, 9);
+		buf[2] = sqlite3_column_int(stmt, 10);
+		buf[3] = sqlite3_column_int(stmt, 11);
+		buf[4] = sqlite3_column_int(stmt, 12);
+		buf[5] = sqlite3_column_int(stmt, 13);
+		buf[6] = sqlite3_column_int(stmt, 14);
+		buf[7] = sqlite3_column_int(stmt, 15);
+		buf[8] = sqlite3_column_int(stmt, 16);
+		buf[9] = sqlite3_column_int(stmt, 17);
 
 		send2MCU(fldRFChannel, fldAddr1, fldAddr2, fldAddr3, fldDataLength, buf);
 		
@@ -310,7 +310,7 @@ main()
         printf("Database connection failed.\n");
         exit( -1 );
     }
-    printf("Connection successfully got.\n");
+    printf("Database connected successfully.\n");
 	
 	// set timeout to 3000ms
 	sqlite3_busy_timeout(g_dbHandle, 3000);
