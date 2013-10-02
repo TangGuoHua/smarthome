@@ -2,14 +2,13 @@
 header('cache-control: no-cache'); // preventing page from being cached.
 include "../include/utils.php";
 
-if( isset($_POST["nodeID1"]) && isset($_POST["nodeID2"]))
+if( isset($_POST["nodeID"]))
 {
-	$nodeID1=$_POST["nodeID1"];
-	$nodeID2=$_POST["nodeID2"];
+	$nodeID=$_POST["nodeID"];
 
-	echo "received data:". $nodeID1." -- ". $nodeID2 ;
+	echo "received data:". $nodeID ;
 
-	if( $nodeID1<>"" && $nodeID2<>"" )
+	if( $nodeID<>"" )
 	{
 		$isFirstParam = true;
 		$sql = "UPDATE tabDataToNode SET ";
@@ -40,7 +39,7 @@ if( isset($_POST["nodeID1"]) && isset($_POST["nodeID2"]))
 		}
 		else
 		{
-			$sql = $sql . ", fldUpdatedBy='WEB_UI', fldUpdatedOn=datetime('now', 'localtime') WHERE fldNodeID1=".$nodeID1." AND fldNodeID2=".$nodeID2;
+			$sql = $sql . ", fldUpdatedBy='WEB_UI', fldUpdatedOn=datetime('now', 'localtime') WHERE fldNodeID=".$nodeID;
 			//$sql = $sql . ", fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime') WHERE fldNodeID1=".$nodeID1." AND fldNodeID2=".$nodeID2;
 			echo $sql;
 			
@@ -53,6 +52,6 @@ if( isset($_POST["nodeID1"]) && isset($_POST["nodeID2"]))
 }
 else
 {
-	echo "Error, nodeID1 and nodeID2 must be set";
+	echo "Error, [nodeID] must be set";
 }
 ?>
