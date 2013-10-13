@@ -133,7 +133,7 @@ void main()
 	
 	initPWM();
 	
-	setBrightness( 255); //初始状态为最亮
+	setBrightness( 100); //初始状态为最亮
 	workMode = 1; //常亮
 	
 	while(1)
