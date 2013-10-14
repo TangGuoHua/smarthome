@@ -71,8 +71,7 @@ function rdoBathroomHeaterClicked( val )
 }
 
 
-// study room lamp
-
+//书房调光台灯
 function rdoStudyRoomDeskLampClicked(val)
 {
 	//alert(val);
