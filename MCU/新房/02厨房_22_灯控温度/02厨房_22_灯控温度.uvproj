@@ -351,6 +351,26 @@
               <FileType>1</FileType>
               <FilePath>.\source\main.c</FilePath>
             </File>
+            <File>
+              <FileName>stcEEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\stcEEPROM.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrf24L01.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\nrf24L01.c</FilePath>
+            </File>
+            <File>
+              <FileName>ds18B20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\ds18B20.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
