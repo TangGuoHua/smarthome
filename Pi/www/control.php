@@ -37,12 +37,39 @@ function showButton( btnID, visible )
 $(document).ready(function() {
 	//隐藏设定按钮
 	showButton( "btnSetBathroomLightOnThreshold", false );
-	//showButton( "btnSetSecondaryBedTemp", false );
+	showButton( "btnSetKitchenLightOnThreshold", false );
 	showButton( "btnSetStudyroomLamp", false );
 });
 
 
 /***********各个区域控制***********/
+
+//厨房
+
+function rdoKitchenLightClicked( ind, val )
+{
+	if( ind == 1 ) //Light 1
+	{
+		$.post("/api/sendData.php", { nodeID: "22", data3: val } );
+	}
+	if( ind ==2 ) // Light 2
+	{
+		$.post("/api/sendData.php", { nodeID: "22", data4: val } );
+	}
+}
+
+function btnSetKitchenLightOnThresholdClicked()
+{
+	var setVal = document.getElementById('rangeKitchenLightOnThreshold').value;
+
+	if( setVal>=0 && setVal <=255 )
+	{
+		$.post("/api/sendData.php", { nodeID: "22", data2:setVal } );
+	}
+
+	showButton( 'btnSetKitchenLightOnThreshold', false );
+}
+
 
 //卫生间灯
 function rdoBathroomLightClicked( val )
@@ -109,8 +136,41 @@ $results = $db->query($sql);
 
 while ($row = $results->fetchArray()) 
 {
-	// 卫生间
-	if( $row["fldNodeID"]==91 )
+
+	if( $row["fldNodeID"]==22 )//厨房
+	{
+	?>
+		<!--li data-role="list-divider">厨房</li-->
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>厨房顶灯</legend>
+					<input type="radio" name="rdoKitchenLight1" id="rdoKitchenLight1_0" value="0" onclick="rdoKitchenLightClicked(1, '0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
+					<label for="rdoKitchenLight1_0">关</label>
+					<input type="radio" name="rdoKitchenLight1" id="rdoKitchenLight1_1" value="1" onclick="rdoKitchenLightClicked(1, '1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
+					<label for="rdoKitchenLight1_1">开</label>
+					<input type="radio" name="rdoKitchenLight1" id="rdoKitchenLight1_2" value="2" onclick="rdoKitchenLightClicked(1, '2');" <?php echo $row["fldData3"]==2?"checked":"";?> />
+					<label for="rdoKitchenLight1_2">自动</label>
+			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>厨房吊柜灯</legend>
+					<input type="radio" name="rdoKitchenLight2" id="rdoKitchenLight2_0" value="0" onclick="rdoKitchenLightClicked(2, '0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
+					<label for="rdoKitchenLight2_0">关</label>
+					<input type="radio" name="rdoKitchenLight2" id="rdoKitchenLight2_1" value="1" onclick="rdoKitchenLightClicked(2, '1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
+					<label for="rdoKitchenLight2_1">开</label>
+					<input type="radio" name="rdoKitchenLight2" id="rdoKitchenLight2_2" value="2" onclick="rdoKitchenLightClicked(2, '2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
+					<label for="rdoKitchenLight2_2">自动</label>
+			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="rangeKitchenLightOnThreshold">厨房开灯阈值</label>
+			<input type="range" name="rangeKitchenLightOnThreshold" id="rangeKitchenLightOnThreshold" onchange="showButton( 'btnSetKitchenLightOnThreshold', true );" value="<?php echo $row["fldData2"];?>" min="0" max="255" step="1" data-highlight="true" />
+			<button id="btnSetKitchenLightOnThreshold" data-icon="check" onclick="btnSetKitchenLightOnThresholdClicked();">设定</button>
+		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==91 )	// 卫生间
 	{
 	?>
 		<!--li data-role="list-divider">卫生间</li-->
@@ -126,7 +186,7 @@ while ($row = $results->fetchArray())
 			</fieldset>
 		</li>
 		<li data-role="fieldcontain">
-			<label for="rangeBathroomLightOnThreshold">卫生间灯亮阈值</label>
+			<label for="rangeBathroomLightOnThreshold">卫生间开灯阈值</label>
 			<input type="range" name="rangeBathroomLightOnThreshold" id="rangeBathroomLightOnThreshold" onchange="showButton( 'btnSetBathroomLightOnThreshold', true );" value="<?php echo $row["fldData2"];?>" min="0" max="255" step="1" data-highlight="true" />
 			<button id="btnSetBathroomLightOnThreshold" data-icon="check" onclick="btnSetBathroomLightOnThresholdClicked();">设定</button>
 		</li>
