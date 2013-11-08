@@ -6,6 +6,7 @@
 2013-APR-29 黄长浩  修改蓝绿调光LED为主卧台灯，并增加延时关功能
 2013-MAY-17 黄长浩  主卧调光台灯移到书房
 2013-OCT-02 黄长浩  根据新家schema做相应修改
+2013-Nov-08 黄长浩  增加餐厅顶射灯控制开关
 */
 
 $gPageTitle = "控制";
@@ -50,11 +51,11 @@ function rdoKitchenLightClicked( ind, val )
 {
 	if( ind == 1 ) //Light 1
 	{
-		$.post("/api/sendData.php", { nodeID: "22", data3: val } );
-	}
-	if( ind ==2 ) // Light 2
-	{
 		$.post("/api/sendData.php", { nodeID: "22", data4: val } );
+	}
+	if( ind == 2 ) // Light 2
+	{
+		$.post("/api/sendData.php", { nodeID: "22", data3: val } );
 	}
 }
 
@@ -68,6 +69,33 @@ function btnSetKitchenLightOnThresholdClicked()
 	}
 
 	showButton( 'btnSetKitchenLightOnThreshold', false );
+}
+
+// 餐厅
+function chkDinningRoomLightclicked( val, obj )
+{
+	//alert( val + ' obj.selected=' + obj.checked );
+
+	//开，tmp=1；关，tmp=0
+	var tmp;
+	tmp = obj.checked?1:0;
+
+	if( val == 'E' ) //East
+	{
+		$.post("/api/sendData.php", { nodeID: "41", data1: tmp } );
+	}
+	else if( val == 'S' )
+	{
+		$.post("/api/sendData.php", { nodeID: "41", data2: tmp } );
+	}
+	else if( val == 'W' )
+	{
+		$.post("/api/sendData.php", { nodeID: "41", data3: tmp } );
+	}
+	else if( val == 'N' )
+	{
+		$.post("/api/sendData.php", { nodeID: "41", data4: tmp } );
+	}
 }
 
 
@@ -167,6 +195,24 @@ while ($row = $results->fetchArray())
 			<label for="rangeKitchenLightOnThreshold">厨房开灯阈值</label>
 			<input type="range" name="rangeKitchenLightOnThreshold" id="rangeKitchenLightOnThreshold" onchange="showButton( 'btnSetKitchenLightOnThreshold', true );" value="<?php echo $row["fldData2"];?>" min="0" max="255" step="1" data-highlight="true" />
 			<button id="btnSetKitchenLightOnThreshold" data-icon="check" onclick="btnSetKitchenLightOnThresholdClicked();">设定</button>
+		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==41 )	// 餐厅
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>餐厅顶射灯</legend>
+		    	<input type="checkbox" name="chkDinningLightEast" id="chkDinningLightEast" onclick="chkDinningRoomLightclicked('E', this);" <?php echo $row["fldData1"]==1?"checked":"";?> />
+				<label for="chkDinningLightEast">东</label>
+				<input type="checkbox" name="chkDinningLightSouth" id="chkDinningLightSouth" onclick="chkDinningRoomLightclicked('S', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
+				<label for="chkDinningLightSouth">南</label>
+				<input type="checkbox" name="chkDinningLightWest" id="chkDinningLightWest" onclick="chkDinningRoomLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
+				<label for="chkDinningLightWest">西</label>
+				<input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkDinningLightNorth">北</label>
+		    </fieldset>
 		</li>
 	<?php
 	}
