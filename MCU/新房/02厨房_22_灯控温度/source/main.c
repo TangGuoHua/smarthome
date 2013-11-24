@@ -27,6 +27,8 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #include "stcEEPROM.h"
 #include "ds18B20.h"
 
+// Node ID
+#define NODE_ID 22
 
 sfr AUXR   = 0x8E;
 
@@ -48,6 +50,17 @@ unsigned int timerSendData = 0;
 // Flag for sending data to Pi
 bit sendDataNow = 0;
 
+
+//开机延时
+//根据NodeID，进行约为50*NodeID毫秒的延时
+//作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
+void initDelay(void)
+{
+    unsigned char a,b,c;
+    for(c=NODE_ID;c>0;c--)
+        for(b=250;b>0;b--)
+            for(a=250;a>0;a--);
+}
 
 
 void initINT0(void)
@@ -97,7 +110,7 @@ void sendDataToHost( )
 	float temperature;
 	int intTemperature;
 		
-	sendData[0]= 22;//Node ID
+	sendData[0] = NODE_ID;//Node ID
 
 	sendData[1] = PIR;
 	sendData[2] = getBrightness(); //亮度
@@ -147,6 +160,9 @@ void main()
 	bit thisPIR=0;
 	
 	AUXR = AUXR|0x80;  // T0, 1T Mode
+	
+	//初始化延时
+	initDelay();
 	
 	//初始化中断0
 	initINT0();
