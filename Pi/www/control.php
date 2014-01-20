@@ -125,6 +125,12 @@ function rdoBathroomHeaterClicked( val )
 	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
 }
 
+//书房LED灯带
+function rdoStudyLEDStripeClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "200", data2: val } );
+}
+
 
 //书房调光台灯
 function rdoStudyRoomDeskLampClicked(val)
@@ -246,6 +252,22 @@ while ($row = $results->fetchArray())
 			</fieldset>
 		</li>
 	<?php
+	}
+	elseif( $row["fldNodeID"]==200 )//书房
+	{
+	?>
+		<!--li data-role="list-divider">书房</li-->
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>书房灯带</legend>
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_0" value="0" onclick="rdoStudyLEDStripeClicked('0');" <?php echo $row["fldData2"]==0?"checked":"";?> />
+					<label for="rdoStudyLEDStripe_0">关</label>
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_1" value="1" onclick="rdoStudyLEDStripeClicked('1');" <?php echo $row["fldData2"]==1?"checked":"";?> />
+					<label for="rdoStudyLEDStripe_1">开</label>
+
+			</fieldset>
+		</li>
+	<?
 	}
 	elseif( $row["fldNodeID"]==201)
 	{
