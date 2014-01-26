@@ -24,13 +24,13 @@ switch($param)
 {
 
 	
-	case "5-1": //餐厅温湿度
-		$query = "select fldData10||'.'||fldData11 as s1, fldData8 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=5";
-		$chartTitle = "餐厅温湿度";
+	case "22": //厨房温度亮度
+		$query = "select fldData7||'.'||fldData8 as s1, fldData2 as s2, fldCreatedOn from tabDataRecved where fldNodeID=22";
+		$chartTitle = "厨房温度亮度";
 		$s1Title="温度";
 		$s1Unit="度";
-		$s2Title="湿度";
-		$s2Unit="%";
+		$s2Title="亮度";
+		$s2Unit="";
 		break;
 	case "5-2": //室外温度亮度
 		$query = "select CASE WHEN fldData7 = 1 THEN '-'||fldData5||'.'||fldData6 ELSE fldData5||'.'||fldData6 END as s1, fldData1 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=5";
@@ -49,8 +49,8 @@ switch($param)
 		$s2Unit="";
 		break;
 		
-	case "7-1": //客厅温湿度
-		$query = "select fldData4||'.'||fldData5 as s1, fldData2 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=7 and fldData1=0";
+	case "54": //客厅温湿度
+		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=54";
 		$chartTitle = "客厅温湿度";
 		$s1Title="温度";
 		$s1Unit="度";
