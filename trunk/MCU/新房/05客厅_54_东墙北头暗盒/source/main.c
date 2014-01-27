@@ -4,6 +4,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年01月26日  黄长浩  初始版本
+2014年01月27日  黄长浩  增加initDelay()
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -29,6 +30,21 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 //unsigned char relay1DelayOffTimerCount = 0; //1号继电器延时关 10s计数器
 //unsigned char tUpper, tLower; //温度上下限
 
+
+//开机延时 
+//根据NodeID，进行约为500*NodeID毫秒的延时
+//作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
+void initDelay(void)
+{
+	//4MHz Crystal, 1T STC11F04E
+    unsigned char a,b,c,d;
+    for(d=NODE_ID;d>0;d--)
+	    for(c=167;c>0;c--)
+	        for(b=171;b>0;b--)
+	            for(a=16;a>0;a--);
+}
+
+
 void initINT0(void)
 {
 	EA=1;
@@ -38,22 +54,12 @@ void initINT0(void)
 
 void delay10s(void) 
 {
-//	// 6.38MHz RC internal, 1T STC11F04E
-//    unsigned char a,b,c;
-//    for(c=217;c>0;c--) //5s
-//        for(b=252;b>0;b--)
-//            for(a=143;a>0;a--);
-//
-//    for(c=217;c>0;c--) //5s
-//        for(b=252;b>0;b--)
-//            for(a=143;a>0;a--); 
 
-	//4Mhz Crystal, 1T STC11F04E
+	//4MHz Crystal, 1T STC11F04E
     unsigned char a,b,c;
     for(c=191;c>0;c--)
         for(b=209;b>0;b--)
             for(a=249;a>0;a--);
-
 }
 
 //
@@ -125,6 +131,9 @@ void main()
 	
 	//24L01开始接收数据
 	//startRecv(); 
+	
+	//初始化延时
+	initDelay();
 			
 	while(1)
 	{
@@ -175,7 +184,7 @@ void main()
 		
 		
 		//向主机发送数据
-		if( ++sendDataTimerCount >= 60 )  //如果设置为30，则每30*10＝300秒发送一次数据
+		if( ++sendDataTimerCount >= 60 )  //如果设置为60，则每60*10＝600秒发送一次数据
 		{
 			sendDataToHost( readAm2321Result );	
 			sendDataTimerCount=0;

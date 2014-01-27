@@ -12,6 +12,7 @@ DS18B20温度探头
 日期            作者    备注
 ----------------------------------------------------------------------
 2013年09月26日  黄长浩  初始版本
+2014年01月27日  黄长浩  增加initDelay()
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -51,17 +52,18 @@ unsigned int timerSendData = 0;
 bit sendDataNow = 0;
 
 
-//开机延时
-//根据NodeID，进行约为50*NodeID毫秒的延时
+//开机延时 
+//根据NodeID，进行约为500*NodeID毫秒的延时
 //作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
 void initDelay(void)
 {
-    unsigned char a,b,c;
-    for(c=NODE_ID;c>0;c--)
-        for(b=250;b>0;b--)
-            for(a=250;a>0;a--);
+	//4MHz Crystal, 1T STC11F04E
+    unsigned char a,b,c,d;
+    for(d=NODE_ID;d>0;d--)
+	    for(c=167;c>0;c--)
+	        for(b=171;b>0;b--)
+	            for(a=16;a>0;a--);
 }
-
 
 void initINT0(void)
 {
