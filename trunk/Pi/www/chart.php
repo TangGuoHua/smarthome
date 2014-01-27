@@ -1,4 +1,11 @@
 <?php
+/*
+日期        作者    备注
+------------------------------------------
+2014-JAN-27 黄长浩  增加卫生间亮度
+
+*/
+
 $gPageTitle = "图";
 include "include/templateHeader.php";
 include "include/utils.php";
@@ -32,6 +39,26 @@ switch($param)
 		$s2Title="亮度";
 		$s2Unit="";
 		break;
+	case "54": //客厅温湿度
+		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=54";
+		$chartTitle = "客厅温湿度";
+		$s1Title="温度";
+		$s1Unit="度";
+		$s2Title="湿度";
+		$s2Unit="%";
+		break;
+	case "91": //卫生间亮度
+		$query = "select fldData2 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=91";
+		$chartTitle = "卫生间亮度";
+		$s1Title="亮度";
+		$s1Unit="";
+		$s2Title="";
+		$s2Unit="";
+		break;
+
+
+
+
 	case "5-2": //室外温度亮度
 		$query = "select CASE WHEN fldData7 = 1 THEN '-'||fldData5||'.'||fldData6 ELSE fldData5||'.'||fldData6 END as s1, fldData1 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=5";
 		$chartTitle = "室外温度亮度";
@@ -49,14 +76,7 @@ switch($param)
 		$s2Unit="";
 		break;
 		
-	case "54": //客厅温湿度
-		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=54";
-		$chartTitle = "客厅温湿度";
-		$s1Title="温度";
-		$s1Unit="度";
-		$s2Title="湿度";
-		$s2Unit="%";
-		break;
+
 		
 	case "7-2": //客厅耗电量
 		$query = "select (fldData7*16777216+fldData8*65536+fldData9*256+fldData10)/1600.0 as s1, 0 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=7";
