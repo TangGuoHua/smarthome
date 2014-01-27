@@ -11,6 +11,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2013年10月01日  黄长浩  初始版本
+2014年01月27日  黄长浩  增加initDelay()
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -24,6 +25,9 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #include "nrf24L01Node.h"
 #include "adc.h"
 #include "stcEEPROM.h"
+
+// Node ID
+#define NODE_ID 91
 
 sfr AUXR   = 0x8E;
 
@@ -45,6 +49,19 @@ unsigned int timerSendData = 0;
 // Flag for sending data to Pi
 bit sendDataNow = 0;
 
+
+//开机延时 
+//根据NodeID，进行约为500*NodeID毫秒的延时
+//作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
+void initDelay(void)
+{
+	//4MHz Crystal, 1T STC11F04E
+    unsigned char a,b,c,d;
+    for(d=NODE_ID;d>0;d--)
+	    for(c=167;c>0;c--)
+	        for(b=171;b>0;b--)
+	            for(a=16;a>0;a--);
+}
 
 
 void initINT0(void)
@@ -93,7 +110,7 @@ void sendDataToHost( )
 	//unsigned char toAddr[3]= {97, 83, 175}; //
 	unsigned char tmp;
 	
-	sendData[0]= 91;//Node ID
+	sendData[0]= NODE_ID;//Node ID
 
 	sendData[1] = PIR;
 	sendData[2] = getBrightness(); //亮度
@@ -156,6 +173,9 @@ void main()
 	
 	//初始化timer0
 	initTimer0();
+	
+	//初始化延时
+	initDelay();
 	
 	
 	
