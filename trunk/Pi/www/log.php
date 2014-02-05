@@ -35,7 +35,7 @@ $db = new MyDB();
 
 //$result = $db->query('SELECT bar FROM foo');
 //var_dump($result->fetchArray());
-$query = "select * from tabDataToNode order by fldID";
+$query = "select * from tabDataToNode order by fldNodeID";
 $results = $db->query($query);
 
 echo("tabDataToNode<br>");
