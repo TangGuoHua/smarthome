@@ -42,11 +42,11 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\</OutputDirectory>
+          <OutputDirectory>.\obj\</OutputDirectory>
           <OutputName>09卫生间_92_南墙暗盒</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\</ListingPath>
@@ -213,7 +213,7 @@
               <RCB>
                 <Type>0</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x0</Size>
+                <Size>0x10000</Size>
               </RCB>
               <RXB>
                 <Type>0</Type>
@@ -345,6 +345,23 @@
       <Groups>
         <Group>
           <GroupName>Source Group 1</GroupName>
+          <Files>
+            <File>
+              <FileName>nrf24L01.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\nrf24L01.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>ds18B20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\ds18B20.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>
