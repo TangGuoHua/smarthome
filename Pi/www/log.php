@@ -38,7 +38,8 @@ $db = new MyDB();
 $query = "select * from tabDataToNode order by fldID";
 $results = $db->query($query);
 
-echo ("<table border='1'>");
+echo("tabDataToNode<br>");
+echo("<table border='1'>");
 echo( "<tr><td>ID</td><td>NodeID</td><td>Channel</td><td>Addr1</td><td>Addr2</td><td>Addr3</td><td>Len</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>Updated By</td><td>Updated On</td><td>Remarks</td></tr>");
 while ($row = $results->fetchArray()) {  
     //var_dump($row);
@@ -52,7 +53,8 @@ echo ("</table><br><br>");
 $query = "select * from tabDataRecved order by fldID desc limit 50";
 $results = $db->query($query);
 
-echo ("<table border='1'>");
+echo("tabDataRecved<br>" );
+echo("<table border='1'>");
 echo( "<tr><td>ID</td><td>NodeID</td><td>DATA1</td><td>DATA2</td><td>DATA3</td><td>DATA4</td><td>DATA5</td><td>DATA6</td><td>DATA7</td><td>DATA8</td><td>DATA9</td><td>DATA10</td><td>DATA11</td><td>DATA12</td><td>DATA13</td><td>DATA14</td><td>DATA15</td><td>Created On</td></tr>");
 while ($row = $results->fetchArray()) {  
     //var_dump($row);

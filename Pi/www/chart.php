@@ -3,6 +3,8 @@
 日期        作者    备注
 ------------------------------------------
 2014-JAN-27 黄长浩  增加卫生间亮度
+2014-FEB-05 黄长浩  增加卫生间温度
+                    画图的点数由30增加到35
 
 */
 
@@ -56,7 +58,14 @@ switch($param)
 		$s2Unit="";
 		break;
 
-
+	case "92": //卫生间温度
+		$query = "select fldData3||'.'||fldData4 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=92";
+		$chartTitle = "卫生间温度";
+		$s1Title="温度";
+		$s1Unit="度";
+		$s2Title="";
+		$s2Unit="";
+		break;
 
 
 	case "5-2": //室外温度亮度
@@ -124,7 +133,7 @@ switch($param)
 		break;
 }
 
-$query = $query." and fldID%3=0 order by fldID desc limit 30";
+$query = $query." and fldID%3=0 order by fldID desc limit 35";
 
 $results = $db->query($query);
 
