@@ -4,7 +4,7 @@
 ------------------------------------------
 2014-JAN-27 黄长浩  增加卫生间亮度
 2014-FEB-05 黄长浩  增加卫生间温度
-
+                    增加南卧温湿度
 */
 
 $gPageTitle = "全家实况";
@@ -38,6 +38,16 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=22'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=22'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $row["fldData7"], $row["fldData8"], $row["fldCreatedOn"]);
 }
+
+$query = "select * from tabDataRecved where fldNodeID=82 order by fldID desc limit 1";
+$results = $db->query($query);
+if ($row = $results->fetchArray()) 
+{
+	echo "<li data-role='list-divider'>南卧</li>";
+	printf( "<li><a href='chart.php?param=82'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $row["fldData4"], $row["fldData5"], $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=82'>湿度 %d.%d%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldData3"], $row["fldCreatedOn"]);
+}
+
 
 $query = "select * from tabDataRecved where fldNodeID=91 order by fldID desc limit 1";
 $results = $db->query($query);

@@ -8,6 +8,7 @@
 2013-OCT-02 黄长浩  根据新家schema做相应修改
 2013-Nov-08 黄长浩  增加餐厅顶射灯控制开关
 2014-FEB-05 黄长浩  增加卫生间小厨宝控制开关
+                    增加南卧油汀控制开关及温度设定
 */
 
 $gPageTitle = "控制";
@@ -41,6 +42,7 @@ $(document).ready(function() {
 	showButton( "btnSetBathroomLightOnThreshold", false );
 	showButton( "btnSetKitchenLightOnThreshold", false );
 	showButton( "btnSetStudyroomLamp", false );
+	showButton( "btnSetSouthBedroomTemp", false );
 });
 
 
@@ -145,6 +147,31 @@ function rdoStudyRoomDeskLampClicked(val)
 	$.post("/api/sendData.php", { nodeID: "201", data1: val } );
 }
 
+//南卧油汀插座
+function rdoSouthBedroomHeaterClicked(val)
+{
+	$.post("/api/sendData.php", { nodeID: "82", data1: val } );
+}
+
+//南卧温度设定按钮
+function btnSetSouthBedroomTempClicked()
+{
+	var setVal = document.getElementById('sliderSouthBedroomTemp').value;
+	setVal *= 10;
+	
+	if( setVal>=30 && setVal <=200 ) 
+	{
+		$.post("/api/sendData.php", { nodeID: "82", data2:setVal } );
+	}
+	else //温度在3度以下时，关闭油汀
+	{
+		$.post("/api/sendData.php", { nodeID: "82", data1: '0', data2: setVal } );
+	}
+
+	showButton( 'btnSetSouthBedroomTemp', false );
+}
+
+
 function btnSetStudyroomLampClicked()
 {
 	var setVal = document.getElementById('rangeStudyroomLamp').value;
@@ -227,6 +254,27 @@ while ($row = $results->fetchArray())
 		    </fieldset>
 		</li>
 	<?php
+	}
+	else if( $row["fldNodeID"]==82 ) //南卧
+	{
+	?>
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>南卧油汀</legend>
+					<input type="radio" name="rdoSouthBedroomHeater" id="rdoSouthBedroomHeater0" value="0" onclick="rdoSouthBedroomHeaterClicked('0');" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<label for="rdoSouthBedroomHeater0">关</label>
+					<input type="radio" name="rdoSouthBedroomHeater" id="rdoSouthBedroomHeater1" value="1" onclick="rdoSouthBedroomHeaterClicked('1');" <?php echo $row["fldData1"]==1?"checked":"";?> />
+					<label for="rdoSouthBedroomHeater1">开</label>
+					<input type="radio" name="rdoSouthBedroomHeater" id="rdoSouthBedroomHeater2" value="2" onclick="rdoSouthBedroomHeaterClicked('2');" <?php echo $row["fldData1"]==2?"checked":"";?> />
+					<label for="rdoSouthBedroomHeater2">温控</label>
+			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderSouthBedroomTemp">南卧温度</label>
+			<input type="range" name="sliderSouthBedroomTemp" id="sliderSouthBedroomTemp" onchange="showButton( 'btnSetSouthBedroomTemp', true );" value="<?php echo $row["fldData2"]/10;?>" min="0" max="20" step="0.5" data-highlight="true" />
+			<button id="btnSetSouthBedroomTemp" data-icon="check" onclick="btnSetSouthBedroomTempClicked();">设定</button>
+		</li>
+	<?php	
 	}
 	elseif( $row["fldNodeID"]==91 )	// 卫生间
 	{
