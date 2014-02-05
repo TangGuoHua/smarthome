@@ -7,6 +7,7 @@
 2013-MAY-17 黄长浩  主卧调光台灯移到书房
 2013-OCT-02 黄长浩  根据新家schema做相应修改
 2013-Nov-08 黄长浩  增加餐厅顶射灯控制开关
+2014-FEB-05 黄长浩  增加卫生间小厨宝控制开关
 */
 
 $gPageTitle = "控制";
@@ -106,7 +107,6 @@ function rdoBathroomLightClicked( val )
 }
 
 //卫生间灯亮阈值
-
 function btnSetBathroomLightOnThresholdClicked()
 {
 	var setVal = document.getElementById('rangeBathroomLightOnThreshold').value;
@@ -123,6 +123,12 @@ function btnSetBathroomLightOnThresholdClicked()
 function rdoBathroomHeaterClicked( val )
 {
 	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
+}
+
+//卫生间小厨宝
+function rdoBathroomXiaoChuBaoClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "92", data1: val } );
 }
 
 //书房LED灯带
@@ -165,7 +171,7 @@ function rdoTestMobileLightClicked( val )
 <ul data-role="listview" data-inset="true">
 <?php
 $db = new DBHelper();
-$sql = "select * from tabDataToNode";
+$sql = "select * from tabDataToNode order by fldNodeID";
 $results = $db->query($sql);
 
 while ($row = $results->fetchArray()) 
@@ -249,6 +255,22 @@ while ($row = $results->fetchArray())
 					<label for="rdoBathroomHeater0">关</label>
 					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater1" value="1" onclick="rdoBathroomHeaterClicked('1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
 					<label for="rdoBathroomHeater1">开</label>
+			</fieldset>
+		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==92 )	// 卫生间南墙
+	{
+	?>
+		<!--li data-role="list-divider">卫生间</li-->
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>卫生间小厨宝</legend>
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao0" value="0" onclick="rdoBathroomXiaoChuBaoClicked('0');" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<label for="rdoBathroomXiaoChuBao0">关</label>
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao1" value="1" onclick="rdoBathroomXiaoChuBaoClicked('1');" <?php echo $row["fldData1"]==1?"checked":"";?> />
+					<label for="rdoBathroomXiaoChuBao1">开</label>
+
 			</fieldset>
 		</li>
 	<?php

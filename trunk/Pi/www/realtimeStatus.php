@@ -3,6 +3,7 @@
 日期        作者    备注
 ------------------------------------------
 2014-JAN-27 黄长浩  增加卫生间亮度
+2014-FEB-05 黄长浩  增加卫生间温度
 
 */
 
@@ -45,6 +46,13 @@ if ($row = $results->fetchArray())
 	echo "<li data-role='list-divider'>卫生间</li>";
 	printf( "<li><a href='chart.php?param=91'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);
 	//printf( "<li><a href='chart.php?param=91'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $row["fldData7"], $row["fldData8"], $row["fldCreatedOn"]);
+}
+
+$query = "select * from tabDataRecved where fldNodeID=92 order by fldID desc limit 1";
+$results = $db->query($query);
+if ($row = $results->fetchArray()) 
+{
+	printf( "<li><a href='chart.php?param=92'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"-":"", $row["fldData3"], $row["fldData4"], $row["fldCreatedOn"]);
 }
 
 $db->close();
