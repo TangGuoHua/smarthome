@@ -4,6 +4,7 @@
 ------------------------------------------
 2014-JAN-27 黄长浩  增加卫生间亮度
 2014-FEB-05 黄长浩  增加卫生间温度
+                    增加南卧温湿度
                     画图的点数由30增加到35
 
 */
@@ -44,6 +45,14 @@ switch($param)
 	case "54": //客厅温湿度
 		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=54";
 		$chartTitle = "客厅温湿度";
+		$s1Title="温度";
+		$s1Unit="度";
+		$s2Title="湿度";
+		$s2Unit="%";
+		break;
+	case "82": //南卧温湿度
+		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=82";
+		$chartTitle = "南卧温湿度";
 		$s1Title="温度";
 		$s1Unit="度";
 		$s2Title="湿度";
