@@ -13,6 +13,7 @@ DS18B20温度探头
 ----------------------------------------------------------------------
 2013年09月26日  黄长浩  初始版本
 2014年01月27日  黄长浩  增加initDelay()
+2014年02月09日  黄长浩  1号、2号灯分别设置开灯阈值
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -42,8 +43,8 @@ sbit RELAY_LIGHT2 = P1^4; //灯控继电器2
 
 unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
 unsigned char light2Mode = 2; //0：常关，1：常开，2：自动
-unsigned char lightOnThreshold = 60; // 开灯的阈值
-
+unsigned char light1OnThreshold = 60; // 开1号灯的阈值
+unsigned char light2OnThreshold = 60; // 开2号灯的阈值
 
 unsigned char timerCounter10ms = 0;
 unsigned int timerSendData = 0;
@@ -91,17 +92,18 @@ unsigned char getBrightness()
 
 
 //将开灯阈值存入片内eeprom
-void saveLightOnThreshold( unsigned char x )
+void saveLightOnThreshold( unsigned char threshold1, unsigned char threshold2 )
 {
 	eepromEraseSector( 0x0000 );
-	eepromWrite( 0x0000, x );
+	eepromWrite( 0x0000, threshold1 );
+	eepromWrite( 0x0002, threshold2 );
 }
 
-//从片内eeprom取得开灯阈值
-unsigned char getLightOnThreshold()
-{
-	return eepromRead(0x0000);
-}
+////从片内eeprom取得开灯阈值
+//unsigned char getLightOnThreshold()
+//{
+//	return eepromRead(0x0000);
+//}
 
 
 void sendDataToHost( )
@@ -116,10 +118,11 @@ void sendDataToHost( )
 
 	sendData[1] = PIR;
 	sendData[2] = getBrightness(); //亮度
-	sendData[3] = lightOnThreshold; 
+	sendData[3] = light1OnThreshold; 
+	sendData[4] = light2OnThreshold; 
 		
-	sendData[4] = ~RELAY_LIGHT1;
-	sendData[5] = ~RELAY_LIGHT2;
+	sendData[5] = ~RELAY_LIGHT1;
+	sendData[6] = ~RELAY_LIGHT2;
 
 	// DS18B20取得温度值
 	temperature = readTemperature(1);
@@ -163,9 +166,6 @@ void main()
 	
 	AUXR = AUXR|0x80;  // T0, 1T Mode
 	
-	//初始化延时
-	initDelay();
-	
 	//初始化中断0
 	initINT0();
     
@@ -179,13 +179,17 @@ void main()
 	initADC();
 	
 	//取得开灯阈值
-	lightOnThreshold = getLightOnThreshold();
+	light1OnThreshold = eepromRead(0x0000);
+	light2OnThreshold = eepromRead(0x0002);
 
 	//初始化24L01
 	nrf24L01Init();
 	
 	//24L01开始接收数据
 	startRecv(); 
+	
+	//初始化延时
+	initDelay();
 	
 	//初始化timer0
 	initTimer0();
@@ -217,7 +221,7 @@ void main()
 		{
 			if(RELAY_LIGHT1) //当前灯是灭的
 			{
-				if( thisPIR && getBrightness()<=lightOnThreshold ) //有人，且环境亮度在阈值以下
+				if( thisPIR && getBrightness()<=light1OnThreshold ) //有人，且环境亮度在阈值以下
 				{
 					RELAY_LIGHT1 = 0; //开灯
 				}
@@ -242,7 +246,7 @@ void main()
 		{
 			if(RELAY_LIGHT2) //当前灯是灭的
 			{
-				if( thisPIR && getBrightness()<=lightOnThreshold ) //有人，且环境亮度在阈值以下
+				if( thisPIR && getBrightness()<=light2OnThreshold ) //有人，且环境亮度在阈值以下
 				{
 					RELAY_LIGHT2 = 0; //开灯
 				}
@@ -266,24 +270,26 @@ void main()
 void interrupt24L01(void) interrupt 0
 {
 	unsigned char * receivedData;
-	unsigned char tmp;
+	unsigned char tmp1, tmp2;
 	
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
-	// *(receivedData+0): 固定为1
-	// *(receivedData+1): 开灯的亮度阈值
+	// *(receivedData+0): 开1号灯的亮度阈值
+	// *(receivedData+1): 开2号灯的亮度阈值
 	// *(receivedData+2): 灯控继电器1的工作模式
 	// *(receivedData+3): 灯控继电器2的工作模式
 
 	
 	//开灯阈值
-	tmp = *(receivedData+1);
-	if( tmp!= lightOnThreshold )
+	tmp1 = *(receivedData+0);
+	tmp2 = *(receivedData+1);
+	if( tmp1 != light1OnThreshold || tmp2 != light2OnThreshold)
 	{
 		//threshold changed, let's save it.
-		lightOnThreshold = tmp;
-		saveLightOnThreshold( lightOnThreshold );
+		light1OnThreshold = tmp1;
+		light2OnThreshold = tmp2;
+		saveLightOnThreshold( tmp1, tmp2 );
 	}
 	
 	light1Mode = *(receivedData+2);
@@ -303,7 +309,7 @@ void timer0Interrupt(void) interrupt 1
 	{
 		timerCounter10ms=0;
 		
-		if( ++timerSendData == 300 ) //每300秒向Pi发送一次数据
+		if( ++timerSendData == 600 ) //每600秒向Pi发送一次数据
 		{
 			timerSendData = 0;
 			sendDataNow = 1;
