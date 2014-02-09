@@ -4,6 +4,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2011年10月06日  黄长浩  初始版本
+2014年02月09日  黄长浩  修改ENABLE_IAP为0x83（if SYSCLK<12MHz）
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -23,8 +24,8 @@ sfr isp_contr=0xe7;
 //#define ENABLE_IAP 0x80  //if SYSCLK<30MHz
 //#define ENABLE_IAP 0x81  //if SYSCLK<24MHz
 //#define ENABLE_IAP 0x82  //if SYSCLK<20MHz
-//#define ENABLE_IAP 0x83  //if SYSCLK<12MHz
-#define ENABLE_IAP 0x84  //if SYSCLK<6MHz
+#define ENABLE_IAP 0x83  //if SYSCLK<12MHz
+//#define ENABLE_IAP 0x84  //if SYSCLK<6MHz
 //#define ENABLE_IAP 0x85  //if SYSCLK<3MHz
 //#define ENABLE_IAP 0x86  //if SYSCLK<2MHz
 //#define ENABLE_IAP 0x87  //if SYSCLK<1MHz
