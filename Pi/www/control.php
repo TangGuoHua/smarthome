@@ -9,6 +9,7 @@
 2013-Nov-08 黄长浩  增加餐厅顶射灯控制开关
 2014-FEB-05 黄长浩  增加卫生间小厨宝控制开关
                     增加南卧油汀控制开关及温度设定
+2014-FEB-09 黄长浩  厨房1、2号灯改为分别设定阈值
 */
 
 $gPageTitle = "控制";
@@ -40,7 +41,8 @@ function showButton( btnID, visible )
 $(document).ready(function() {
 	//隐藏设定按钮
 	showButton( "btnSetBathroomLightOnThreshold", false );
-	showButton( "btnSetKitchenLightOnThreshold", false );
+	showButton( "btnSetKitchenLight1OnThreshold", false );
+	showButton( "btnSetKitchenLight2OnThreshold", false );
 	showButton( "btnSetStudyroomLamp", false );
 	showButton( "btnSetSouthBedroomTemp", false );
 });
@@ -54,24 +56,38 @@ function rdoKitchenLightClicked( ind, val )
 {
 	if( ind == 1 ) //Light 1
 	{
-		$.post("/api/sendData.php", { nodeID: "22", data4: val } );
+		$.post("/api/sendData.php", { nodeID: "22", data3: val } );
 	}
 	if( ind == 2 ) // Light 2
 	{
-		$.post("/api/sendData.php", { nodeID: "22", data3: val } );
+		$.post("/api/sendData.php", { nodeID: "22", data4: val } );
 	}
 }
 
-function btnSetKitchenLightOnThresholdClicked()
+function btnSetKitchenLightOnThresholdClicked( ind )
 {
-	var setVal = document.getElementById('rangeKitchenLightOnThreshold').value;
-
-	if( setVal>=0 && setVal <=255 )
+	if( ind == 1)
 	{
-		$.post("/api/sendData.php", { nodeID: "22", data2:setVal } );
-	}
+		var setVal = document.getElementById('rangeKitchenLight1OnThreshold').value;
 
-	showButton( 'btnSetKitchenLightOnThreshold', false );
+		if( setVal>=0 && setVal <=255 )
+		{
+			$.post("/api/sendData.php", { nodeID: "22", data1:setVal } );
+		}
+
+		showButton( 'btnSetKitchenLight1OnThreshold', false );
+	}
+	else if( ind ==2 )
+	{
+		var setVal = document.getElementById('rangeKitchenLight2OnThreshold').value;
+
+		if( setVal>=0 && setVal <=255 )
+		{
+			$.post("/api/sendData.php", { nodeID: "22", data2:setVal } );
+		}
+
+		showButton( 'btnSetKitchenLight2OnThreshold', false );
+	}
 }
 
 // 餐厅
@@ -210,7 +226,7 @@ while ($row = $results->fetchArray())
 		<!--li data-role="list-divider">厨房</li-->
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
-				<legend>厨房顶灯</legend>
+				<legend>厨房吊柜灯</legend>
 					<input type="radio" name="rdoKitchenLight1" id="rdoKitchenLight1_0" value="0" onclick="rdoKitchenLightClicked(1, '0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
 					<label for="rdoKitchenLight1_0">关</label>
 					<input type="radio" name="rdoKitchenLight1" id="rdoKitchenLight1_1" value="1" onclick="rdoKitchenLightClicked(1, '1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
@@ -220,8 +236,13 @@ while ($row = $results->fetchArray())
 			</fieldset>
 		</li>
 		<li data-role="fieldcontain">
+			<label for="rangeKitchenLight1OnThreshold">厨房吊柜灯开灯阈值</label>
+			<input type="range" name="rangeKitchenLight1OnThreshold" id="rangeKitchenLight1OnThreshold" onchange="showButton( 'btnSetKitchenLight1OnThreshold', true );" value="<?php echo $row["fldData1"];?>" min="0" max="255" step="1" data-highlight="true" />
+			<button id="btnSetKitchenLight1OnThreshold" data-icon="check" onclick="btnSetKitchenLightOnThresholdClicked(1);">设定</button>
+		</li>
+		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
-				<legend>厨房吊柜灯</legend>
+				<legend>厨房顶灯</legend>
 					<input type="radio" name="rdoKitchenLight2" id="rdoKitchenLight2_0" value="0" onclick="rdoKitchenLightClicked(2, '0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoKitchenLight2_0">关</label>
 					<input type="radio" name="rdoKitchenLight2" id="rdoKitchenLight2_1" value="1" onclick="rdoKitchenLightClicked(2, '1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
@@ -231,9 +252,9 @@ while ($row = $results->fetchArray())
 			</fieldset>
 		</li>
 		<li data-role="fieldcontain">
-			<label for="rangeKitchenLightOnThreshold">厨房开灯阈值</label>
-			<input type="range" name="rangeKitchenLightOnThreshold" id="rangeKitchenLightOnThreshold" onchange="showButton( 'btnSetKitchenLightOnThreshold', true );" value="<?php echo $row["fldData2"];?>" min="0" max="255" step="1" data-highlight="true" />
-			<button id="btnSetKitchenLightOnThreshold" data-icon="check" onclick="btnSetKitchenLightOnThresholdClicked();">设定</button>
+			<label for="rangeKitchenLight2OnThreshold">厨房顶灯开灯阈值</label>
+			<input type="range" name="rangeKitchenLight2OnThreshold" id="rangeKitchenLight2OnThreshold" onchange="showButton( 'btnSetKitchenLight2OnThreshold', true );" value="<?php echo $row["fldData2"];?>" min="0" max="255" step="1" data-highlight="true" />
+			<button id="btnSetKitchenLight2OnThreshold" data-icon="check" onclick="btnSetKitchenLightOnThresholdClicked(2);">设定</button>
 		</li>
 	<?php
 	}
