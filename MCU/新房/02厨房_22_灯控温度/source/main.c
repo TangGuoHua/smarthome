@@ -130,9 +130,9 @@ void sendDataToHost( )
 	//四舍五入到十分位
 	intTemperature = temperature<0? (temperature*(-10)+0.5) : temperature*10+0.5; 
 	
-	sendData[6]= temperature<0 ? 1 : 0; //如果是零下则此位置1
-	sendData[7]= intTemperature/10; //温度的整数部分
-	sendData[8]= intTemperature%10; //温度的小数部分
+	sendData[7]= temperature<0 ? 1 : 0; //如果是零下则此位置1
+	sendData[8]= intTemperature/10; //温度的整数部分
+	sendData[9]= intTemperature%10; //温度的小数部分
 
 	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//向Pi发送, 96频道，3字节地址，16字节数据
 	
@@ -225,7 +225,6 @@ void main()
 				{
 					RELAY_LIGHT1 = 0; //开灯
 				}
-				
 			}
 			else //当前灯是亮的
 			{
@@ -250,7 +249,6 @@ void main()
 				{
 					RELAY_LIGHT2 = 0; //开灯
 				}
-				
 			}
 			else //当前灯是亮的
 			{
