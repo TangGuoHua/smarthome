@@ -5,7 +5,7 @@
 2014-JAN-27 黄长浩  增加卫生间亮度
 2014-FEB-05 黄长浩  增加卫生间温度
                     增加南卧温湿度
-                    画图的点数由30增加到35
+                    画图的点数由30增加到33
 
 */
 
@@ -142,7 +142,8 @@ switch($param)
 		break;
 }
 
-$query = $query." and fldID%3=0 order by fldID desc limit 35";
+//$query = $query." and fldID%3=0 order by fldID desc limit 33";
+$query = $query." order by fldID desc limit 33";
 
 $results = $db->query($query);
 
