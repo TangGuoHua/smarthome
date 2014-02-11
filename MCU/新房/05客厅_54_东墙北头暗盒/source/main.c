@@ -10,6 +10,7 @@
 ----------------------------------------------------------------------
 2014年01月26日  黄长浩  初始版本
 2014年01月27日  黄长浩  增加initDelay()
+2014年02月11日  黄长浩  修正AM2321读数全零的bug
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -147,8 +148,8 @@ void main()
 		readAm2321Result = readAM2321();
 
 
-//		if( readAm2321Result == 0 ) //读取am2321成功
-//		{
+		if( readAm2321Result == 0 ) //读取am2321成功
+		{
 //			//获得当前温度 10倍数
 //			temperatureX10 = getAM2321Data(2)*10 + getAM2321Data(3);
 //			if( getAM2321Data(4) == 1 )
@@ -185,17 +186,15 @@ void main()
 //			{
 //				RELAY_1 = 1; //关继电器1
 //			}
-//		}
-		
-		
-		//向主机发送数据
-		if( ++sendDataTimerCount >= 60 )  //如果设置为60，则每60*10＝600秒发送一次数据
-		{
-			sendDataToHost( readAm2321Result );	
-			sendDataTimerCount=0;
+
+			//向主机发送数据
+			if( ++sendDataTimerCount >= 60 )  //如果设置为60，则每60*10＝600秒发送一次数据
+			{
+				sendDataToHost( readAm2321Result );	
+				sendDataTimerCount=0;
+			}
 		}
-		
-		
+				
 		delay10s(); //延时约10秒
 	}
 }
