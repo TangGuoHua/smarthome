@@ -138,16 +138,7 @@ while ($row = $results->fetchArray())
 
 		    </fieldset>
 		</li>
-		<li data-role="fieldcontain">
-		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>客厅落地灯旁插座</legend>
-					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp0" value="0" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '0');" <?php echo $row["fldData2"]==0?"checked":"";?> />
-					<label for="rdoLivingRoomSocketNext2FloorLamp0">关</label>
-					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '1');" <?php echo $row["fldData2"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomSocketNext2FloorLamp1">开</label>
 
-		    </fieldset>
-		</li>
 	<?php
 	}
 	elseif( $row["fldNodeID"]==200 )//书房
