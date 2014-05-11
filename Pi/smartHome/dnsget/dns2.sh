@@ -1,7 +1,6 @@
 #!/bin/bash
 cd /home/pi/smartHome/dnsget
-echo '**' >> log.txt
-echo $(date) >> log.txt
+
 
 old_ip_file="./old_ip.txt"
 new_ip_file="./new_ip.txt"
@@ -20,10 +19,13 @@ then
 elif [ -n "$old_ip" ] && [ "$old_ip" != "$new_ip" ] 
 then
 	echo $new_ip > $old_ip_file
+	
+	echo '**' >> log.txt
+	echo $(date) >> log.txt
 	echo "IP is changed." >> log.txt
 	wget -q --http-user='hchanghao' --http-password='X260APA' http://dynupdate.no-ip.com/nic/update?hostname=haohome.myftp.org&myip=$new_ip
 else
-	echo "Same IP." >> log.txt
+	#echo "Same IP." >> log.txt
 fi
 
-echo "Done." >> log.txt
+#echo "Done." >> log.txt
