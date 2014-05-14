@@ -23,7 +23,9 @@ then
 	echo '**' >> log.txt
 	echo $(date) >> log.txt
 	echo "IP is changed." >> log.txt
-	wget -q --http-user='hchanghao' --http-password='X260APA' http://dynupdate.no-ip.com/nic/update?hostname=haohome.myftp.org&myip=$new_ip
+	#wget -q --http-user='hchanghao' --http-password='X260APA' --output-file=result.txt http://dynupdate.no-ip.com/nic/update?hostname=haohome.myftp.org&myip=$new_ip
+	curl --user hchanghao:X260APA http://dynupdate.no-ip.com/nic/update?hostname=haohome.myftp.org&myip=$new_ip
+	echo "Done." >> log.txt
 
 fi
 
