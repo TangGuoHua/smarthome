@@ -11,6 +11,7 @@
                     增加南卧油汀控制开关及温度设定
 2014-FEB-09 黄长浩  厨房1、2号灯改为分别设定阈值
 2014-MAR-29 黄长浩  增加客厅东墙南头控制器（落地灯及插座）
+2014-JUN-29 黄长浩  增加客厅电视背景墙控制器
 */
 
 $gPageTitle = "控制";
@@ -101,6 +102,43 @@ function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
 	if( ind == 2 ) //插座
 	{
 		$.post("/api/sendData.php", { nodeID: "53", data2: val } );
+	}
+}
+
+//客厅西墙（电视墙）插座
+function chkLivingTVWallSocketClicked( socketNum, obj )
+{
+		//开，tmp=1；关，tmp=0
+	var tmp;
+	tmp = obj.checked?1:0;
+
+	if( socketNum == 2 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data2: tmp } );
+	}
+	else if( socketNum == 3 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data3: tmp } );
+	}
+	else if( socketNum == 4 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data4: tmp } );
+	}
+	else if( socketNum == 5 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data5: tmp } );
+	}
+	else if( socketNum == 6 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data6: tmp } );
+	}
+	else if( socketNum == 7 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data7: tmp } );
+	}
+	else if( socketNum == 8 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data8: tmp } );
 	}
 }
 
@@ -286,6 +324,28 @@ while ($row = $results->fetchArray())
 				<label for="chkDinningLightWest">西</label>
 				<input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
 				<label for="chkDinningLightNorth">北</label>
+		    </fieldset>
+		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==51 )	// 客厅电视背景墙
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>电视背景墙</legend>
+	    	
+				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket4">台灯</label>
+		    	<input type="checkbox" name="chkLivingTVWallSocket5" id="chkLivingTVWallSocket5" onclick="chkLivingTVWallSocketClicked( 5, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket5">天猫盒子</label>
+		    	<input type="checkbox" name="chkLivingTVWallSocket6" id="chkLivingTVWallSocket6" onclick="chkLivingTVWallSocketClicked( 6, this);" <?php echo $row["fldData6"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket6">功放</label>		    	
+				<input type="checkbox" name="chkLivingTVWallSocket" id="chkLivingTVWallSocket7" onclick="chkLivingTVWallSocketClicked( 7, this);" <?php echo $row["fldData7"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket7">熔岩灯</label>
+
+				<input type="checkbox" name="chkLivingTVWallSocket8" id="chkLivingTVWallSocket8" onclick="chkLivingTVWallSocketClicked( 8, this);" <?php echo $row["fldData8"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket8">风扇</label>
 		    </fieldset>
 		</li>
 	<?php
