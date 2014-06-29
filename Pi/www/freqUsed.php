@@ -3,6 +3,7 @@
 日期        作者    备注
 ------------------------------------------
 2014-MAR-30 黄长浩  初始版本
+2014-JUN-29 黄长浩  增加客厅电视背景墙控制器
 */
 
 $gPageTitle = "常用";
@@ -43,6 +44,21 @@ $(document).ready(function() {
 
 /***********各个区域控制***********/
 
+function rdoLivingRoomTVWallControllerClicked(ind, val) //客厅电视墙控制器
+{
+	if( ind == 4 ) //台灯
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data4: val } );
+	}
+	else if( ind == 5 ) //天猫盒子
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data5: val } );
+	}
+	else if( ind == 8 ) //风扇
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data8: val } );
+	}
+}
 
 //客厅东墙南头控制器  （落地灯、插座）
 function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
@@ -123,6 +139,42 @@ while ($row = $results->fetchArray())
 				<label for="chkDinningLightNorth">北</label>
 		    </fieldset>
 		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==51 )	// 客厅电视墙
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>客厅台灯</legend>
+					<input type="radio" name="rdoLivingRoomDeskLamp" id="rdoLivingRoomDeskLamp0" value="0" onclick="rdoLivingRoomTVWallControllerClicked(4, '0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
+					<label for="rdoLivingRoomDeskLamp0">关</label>
+					<input type="radio" name="rdoLivingRoomDeskLamp" id="rdoLivingRoomDeskLamp1" value="1" onclick="rdoLivingRoomTVWallControllerClicked(4, '1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
+					<label for="rdoLivingRoomDeskLamp1">开</label>
+		    </fieldset>
+		</li>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>客厅天猫盒子</legend>
+					<input type="radio" name="rdoLivingRoomTMallBox" id="rdoLivingRoomTMallBox0" value="0" onclick="rdoLivingRoomTVWallControllerClicked(5, '0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
+					<label for="rdoLivingRoomTMallBox0">关</label>
+					<input type="radio" name="rdoLivingRoomTMallBox" id="rdoLivingRoomTMallBox1" value="1" onclick="rdoLivingRoomTVWallControllerClicked(5, '1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
+					<label for="rdoLivingRoomTMallBox1">开</label>
+		    </fieldset>
+		</li>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>客厅风扇</legend>
+					<input type="radio" name="rdoLivingRoomFan" id="rdoLivingRoomFan0" value="0" onclick="rdoLivingRoomTVWallControllerClicked(8, '0');" <?php echo $row["fldData8"]==0?"checked":"";?> />
+					<label for="rdoLivingRoomFan0">关</label>
+					<input type="radio" name="rdoLivingRoomFan" id="rdoLivingRoomFan1" value="1" onclick="rdoLivingRoomTVWallControllerClicked(8, '1');" <?php echo $row["fldData8"]==1?"checked":"";?> />
+					<label for="rdoLivingRoomFan1">开</label>
+		    </fieldset>
+		</li>
+
+
+
+
 	<?php
 	}
 	elseif( $row["fldNodeID"]==53 )	// 客厅东墙南头（落地灯）
