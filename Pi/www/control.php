@@ -12,6 +12,7 @@
 2014-FEB-09 黄长浩  厨房1、2号灯改为分别设定阈值
 2014-MAR-29 黄长浩  增加客厅东墙南头控制器（落地灯及插座）
 2014-JUN-29 黄长浩  增加客厅电视背景墙控制器
+2014-JUL-01 黄长浩  去掉餐厅射灯（北）
 */
 
 $gPageTitle = "控制";
@@ -322,8 +323,8 @@ while ($row = $results->fetchArray())
 				<label for="chkDinningLightSouth">南</label>
 				<input type="checkbox" name="chkDinningLightWest" id="chkDinningLightWest" onclick="chkDinningRoomLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
 				<label for="chkDinningLightWest">西</label>
-				<input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
-				<label for="chkDinningLightNorth">北</label>
+				<!--input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkDinningLightNorth">北</label-->
 		    </fieldset>
 		</li>
 	<?php
