@@ -37,8 +37,8 @@ sfr AUXR   = 0x8E;
 //sbit LDR = P1^7;  //光敏电阻 （10K上拉）
 sbit PIR = P1^3;  //热释电红外传感器
 
-sbit RELAY_LIGHT1 = P1^5; //灯控继电器1
-sbit RELAY_LIGHT2 = P1^4; //灯控继电器2
+sbit RELAY_LIGHT1 = P1^5; //灯控继电器1 （柜灯）
+sbit RELAY_LIGHT2 = P1^4; //灯控继电器2 （顶灯）
 
 
 unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
