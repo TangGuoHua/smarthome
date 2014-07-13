@@ -5,6 +5,7 @@
 2014-MAR-30 黄长浩  初始版本
 2014-JUN-29 黄长浩  增加客厅电视背景墙控制器
 2014-JUL-01 黄长浩  去掉餐厅射灯（北）
+2014-JUL-13 黄长浩  增加卫生间热水器
 */
 
 $gPageTitle = "常用";
@@ -108,7 +109,11 @@ function rdoStudyLEDStripeClicked( val )
 	$.post("/api/sendData.php", { nodeID: "200", data2: val } );
 }
 
-
+//卫生间热水器
+function rdoBathroomHeaterClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
+}
 
 </script>
 
@@ -192,6 +197,21 @@ while ($row = $results->fetchArray())
 		    </fieldset>
 		</li>
 
+	<?php
+	}
+	elseif( $row["fldNodeID"]==91 )	// 卫生间
+	{
+	?>
+		<!--li data-role="list-divider">卫生间</li-->
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>卫生间热水器</legend>
+					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater0" value="0" onclick="rdoBathroomHeaterClicked('0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
+					<label for="rdoBathroomHeater0">关</label>
+					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater1" value="1" onclick="rdoBathroomHeaterClicked('1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
+					<label for="rdoBathroomHeater1">开</label>
+			</fieldset>
+		</li>
 	<?php
 	}
 	elseif( $row["fldNodeID"]==200 )//书房
