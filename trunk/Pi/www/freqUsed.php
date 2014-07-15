@@ -6,6 +6,7 @@
 2014-JUN-29 黄长浩  增加客厅电视背景墙控制器
 2014-JUL-01 黄长浩  去掉餐厅射灯（北）
 2014-JUL-13 黄长浩  增加卫生间热水器
+2014-JUL-15 黄长浩  增加餐厅灯带
 */
 
 $gPageTitle = "常用";
@@ -141,8 +142,8 @@ while ($row = $results->fetchArray())
 				<label for="chkDinningLightSouth">南</label>
 				<input type="checkbox" name="chkDinningLightWest" id="chkDinningLightWest" onclick="chkDinningRoomLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
 				<label for="chkDinningLightWest">西</label>
-				<!--input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
-				<label for="chkDinningLightNorth">北</label-->
+				<input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkDinningLightNorth">灯带</label>
 		    </fieldset>
 		</li>
 	<?php
