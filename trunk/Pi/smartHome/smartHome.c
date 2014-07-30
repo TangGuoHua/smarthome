@@ -14,6 +14,7 @@ Date         Author      Remarks
 -------------------------------------------------------------------------------
 2013-FEB-25  Changhao    增加用于处理计划任务的功能函数checkScheduledTask()
 2013-SEP-30  Changhao    修改与MCU的通讯串口波特率为115200
+2014-JUL-31  Changhao    优化sqlite的synchronous/journal_mode/temp_store三个参数
 */
 
 #include <sys/types.h>
@@ -314,8 +315,12 @@ main()
 	
 	// set timeout to 3000ms
 	sqlite3_busy_timeout(g_dbHandle, 3000);
+
+	sqlite3_exec(g_dbHandle, "PRAGMA synchronous = OFF; ", 0,0,0);
+	sqlite3_exec(g_dbHandle, "PRAGMA journal_mode = OFF; ", 0,0,0);	
+	sqlite3_exec(g_dbHandle, "PRAGMA temp_store = MEMORY; ", 0,0,0);	
 	
-	
+
 	// initialize serial port
 	initSerialPort();
 	
