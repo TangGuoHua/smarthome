@@ -35,12 +35,14 @@ sfr AUXR   = 0x8E;
 //sbit LDR = P1^7;  //光敏电阻 （10K上拉）
 
 
-sbit RELAY1 = P1^5; //继电器1，控制电源
-sbit RELAY2 = P1^4; //继电器2，控制方向
+sbit RELAY_POWER = P1^5; //继电器1，控制电源
+sbit RELAY_DIRECTION = P1^4; //继电器2，控制方向，常闭-上升，常开-下降
 
 
 unsigned char curtainMode = 1; //1:手动，2：自动
-
+unsigned char curtainOpenPercent
+bit motorDirection = 0; //马达运动方向，1：上升（开卷帘），0：下降（关卷帘）
+bit motorOn = 0; //马达开关, 1：开， 0：关
 
 unsigned char timerCounter10ms = 0;
 unsigned int timerSendData = 0;
@@ -48,6 +50,31 @@ unsigned int timerSendData = 0;
 // Flag for sending data to Pi
 bit sendDataNow = 0;
 
+
+void delay200ms()
+{
+	//todo
+}
+
+void stopMotor()
+{
+	//停马达电源
+	RELAY_POWER = 1;
+	
+	delay200ms();
+	
+	//方向选择继电器断电
+	RELAY_DIRECTION = 1;
+}
+
+void startMotor()
+{
+	//设定方向
+	RELAY_DIRECTION = motorDirection;
+	
+	//通电
+	RELAY_POWER = 0;
+}
 
 //开机延时 
 //根据NodeID，进行约为500*NodeID毫秒的延时
@@ -194,66 +221,11 @@ void main()
 	
 	while(1)
 	{
-		//取得传感器的当前值
-		thisPIR = PIR;
+		if( motorOn && (RELAY_POWER==1) ) //说明电机当前不在工作
+		{
+			startMotor( 
+		}
 
-		//Send data to Pi
-		if( sendDataNow )
-		{
-			sendDataNow = 0;
-			sendDataToHost();
-		}
-		
-		// 灯控1
-		if( light1Mode == 0 ) //常关
-		{
-			RELAY_LIGHT1=1;
-		}
-		else if( light1Mode ==1 ) //常开
-		{
-			RELAY_LIGHT1=0;
-		}
-		else if( light1Mode ==2 ) //自动
-		{
-			if(RELAY_LIGHT1) //当前灯是灭的
-			{
-				if( thisPIR && getBrightness()<=light1OnThreshold ) //有人，且环境亮度在阈值以下
-				{
-					RELAY_LIGHT1 = 0; //开灯
-				}
-			}
-			else //当前灯是亮的
-			{
-				RELAY_LIGHT1 = ~thisPIR; //继续亮，或关灯
-			}
-		}
-		
-		// 灯控2
-		if( light2Mode == 0 ) //常关
-		{
-			RELAY_LIGHT2=1;
-		}
-		else if( light2Mode ==1 ) //常开
-		{
-			RELAY_LIGHT2=0;
-		}
-		else if( light2Mode ==2 ) //自动
-		{
-			if(RELAY_LIGHT2) //当前灯是灭的
-			{
-				if( thisPIR && getBrightness()<=light2OnThreshold ) //有人，且环境亮度在阈值以下
-				{
-					RELAY_LIGHT2 = 0; //开灯
-				}
-			}
-			else //当前灯是亮的
-			{
-				RELAY_LIGHT2 = ~thisPIR; //继续亮，或关灯
-			}
-		}		
-		
-		//记录当前值
-		lastPIR = thisPIR;
 
 	}
 }
@@ -264,30 +236,39 @@ void main()
 void interrupt24L01(void) interrupt 0
 {
 	unsigned char * receivedData;
-	unsigned char tmp1, tmp2;
+	unsigned char rMode, rOpenPercent;
 	
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
-	// *(receivedData+0): 开1号灯的亮度阈值
-	// *(receivedData+1): 开2号灯的亮度阈值
-	// *(receivedData+2): 灯控继电器1的工作模式
-	// *(receivedData+3): 灯控继电器2的工作模式
+	// *(receivedData+0): 发送者NodeID
+	// *(receivedData+1): 功能号
+	// *(receivedData+2): 卷帘工作模式
+	// *(receivedData+3): 开度
 
 	
 	//开灯阈值
-	tmp1 = *(receivedData+0);
-	tmp2 = *(receivedData+1);
-	if( tmp1 != light1OnThreshold || tmp2 != light2OnThreshold)
+	rMode = *(receivedData+0);
+	rOpenPercent = *(receivedData+1);
+	
+	
+	if( rOpenPercent != curtainOpenPercent )
 	{
-		//threshold changed, let's save it.
-		light1OnThreshold = tmp1;
-		light2OnThreshold = tmp2;
-		saveLightOnThreshold( tmp1, tmp2 );
+		if( rOpenPercent > curtainOpenPercent )
+		{
+			//开窗帘
+			motorDirection = 1;
+			motorOn = 1;
+		}
+		else
+		{
+			//关窗帘
+			motorDirection = 0;
+			motorOn = 1;
+		}
 	}
 	
-	light1Mode = *(receivedData+2);
-	light2Mode = *(receivedData+3);
+
 	
 
 }
