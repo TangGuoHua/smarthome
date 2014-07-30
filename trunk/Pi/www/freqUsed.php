@@ -7,6 +7,7 @@
 2014-JUL-01 黄长浩  去掉餐厅射灯（北）
 2014-JUL-13 黄长浩  增加卫生间热水器
 2014-JUL-15 黄长浩  增加餐厅灯带
+2014-JUL-30 黄长浩  增加阳台卷帘
 */
 
 $gPageTitle = "常用";
@@ -116,6 +117,12 @@ function rdoBathroomHeaterClicked( val )
 	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
 }
 
+//阳台卷帘
+function rdoBalconyCurtainClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "62", data1: val } );
+}
+
 </script>
 
 <a href="index.php" data-role="button" data-icon="arrow-l">返回</a>
@@ -194,6 +201,24 @@ while ($row = $results->fetchArray())
 					<label for="rdoLivingRoomFloorLamp0">关</label>
 					<input type="radio" name="rdoLivingRoomFloorLamp" id="rdoLivingRoomFloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(1, '1');" <?php echo $row["fldData1"]==1?"checked":"";?> />
 					<label for="rdoLivingRoomFloorLamp1">开</label>
+
+		    </fieldset>
+		</li>
+
+	<?php
+	}
+	elseif( $row["fldNodeID"]==62 )	// 阳台卷帘
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>阳台卷帘</legend>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" value="0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<label for="rdoBalconyCurtain0">停</label>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain1" value="1" onclick="rdoBalconyCurtainClicked(1);" <?php echo $row["fldData1"]==1?"checked":"";?> />
+					<label for="rdoBalconyCurtain1">升</label>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain2" value="2" onclick="rdoBalconyCurtainClicked(2);" <?php echo $row["fldData1"]==2?"checked":"";?> />
+					<label for="rdoBalconyCurtain2">降</label>
 
 		    </fieldset>
 		</li>
