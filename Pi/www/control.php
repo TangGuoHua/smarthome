@@ -14,6 +14,7 @@
 2014-JUN-29 黄长浩  增加客厅电视背景墙控制器
 2014-JUL-01 黄长浩  去掉餐厅射灯（北）
 2014-JUL-15 黄长浩  增加餐厅灯带
+2014-JUL-15 黄长浩  修改书房台灯控制器ID
 */
 
 $gPageTitle = "控制";
@@ -214,7 +215,19 @@ function rdoStudyLEDStripeClicked( val )
 function rdoStudyRoomDeskLampClicked(val)
 {
 	//alert(val);
-	$.post("/api/sendData.php", { nodeID: "201", data1: val } );
+	$.post("/api/sendData.php", { nodeID: "31", data1: val } );
+}
+
+function btnSetStudyroomLampClicked()
+{
+	var setVal = document.getElementById('rangeStudyroomLamp').value;
+
+	if( setVal>=0 && setVal <=255 )
+	{
+		$.post("/api/sendData.php", { nodeID: "31", data1:setVal } );
+	}
+
+	showButton( 'btnSetStudyroomLamp', false );
 }
 
 //南卧油汀插座
@@ -242,17 +255,7 @@ function btnSetSouthBedroomTempClicked()
 }
 
 
-function btnSetStudyroomLampClicked()
-{
-	var setVal = document.getElementById('rangeStudyroomLamp').value;
 
-	if( setVal>=0 && setVal <=255 )
-	{
-		$.post("/api/sendData.php", { nodeID: "201", data1:setVal } );
-	}
-
-	showButton( 'btnSetStudyroomLamp', false );
-}
 
 // 测试移动节点
 function rdoTestMobileLightClicked( val )
@@ -461,7 +464,7 @@ while ($row = $results->fetchArray())
 		</li>
 	<?
 	}
-	elseif( $row["fldNodeID"]==201)
+	elseif( $row["fldNodeID"]==31)
 	{
 	?>
 		<li data-role="fieldcontain">
