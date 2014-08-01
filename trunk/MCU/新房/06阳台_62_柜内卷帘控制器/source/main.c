@@ -11,6 +11,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年07月30日  黄长浩  初始版本
+2014年08月01日  黄长浩  实现指定覆盖度，消除累积误差
 
 
 【版权声明】
@@ -30,6 +31,28 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 // Node ID
 #define NODE_ID 62
 
+//#define MAX_TICKS 4150 //最大运行时间（10ms计数值，即，最大运行时间为 MAX_TICKS*10毫秒 ）
+#define POS_BOTTOM 4650
+#define POS_TOP 500
+#define CALIBRATION_LIMIT_TOP 200
+#define CALIBRATION_LIMIT_BOTTOM 4950
+/*
+行程说明:
+最大行程时间为 4650-500=4150 ticks， 即4150*10=41500ms=41.5s
+但是，当用户选择全开（0%覆盖）或者全关（100%覆盖）时，系统将多运行300*10ms，以消除累计误差
+各种位置限制值如下图所示：
+
+              底                   顶
+（最下） |_____|____________________|_____|___| （最上）
+       4950   4650                 500   200  0
+         ^                                ^
+  底校正余量                              顶校正余量
+  
+*/
+
+#define DIRECTION_UP 1;
+#define DIRECTION_DOWN 0;
+
 sfr AUXR   = 0x8E;
 
 //sbit LDR = P1^7;  //光敏电阻 （10K上拉）
@@ -38,20 +61,18 @@ sfr AUXR   = 0x8E;
 sbit RELAY_POWER = P2^1; //继电器1，控制电源
 sbit RELAY_DIRECTION = P2^0; //继电器2，控制方向，常闭-上升，常开-下降
 
-sbit K1=P1^7; //升
-sbit K2=P1^6; //降
+//unsigned char curtainMode = 1; //1:手动，2：自动
+unsigned char curtainCoverPercent; //卷帘覆盖度百分比
 
-unsigned char curtainMode = 1; //1:手动，2：自动
-unsigned char curtainOpenPercent;
 bit motorDirection = 0; //马达运动方向，1：上升（开卷帘），0：下降（关卷帘）
-bit motorOn = 0; //马达开关, 1：开， 0：关
+//bit motorOn = 0; //马达开关, 1：开， 0：关
 
-unsigned char timerCounter10ms = 0;
-unsigned char timerCounter1s = 0;
-//unsigned int timerSendData = 0;
 
-// Flag for sending data to Pi
-//bit sendDataNow = 0;
+//卷帘当前位置 10ms ticks
+unsigned int currentPosTicks = 0;
+
+//目标位置 10ms ticks
+unsigned int targetPosTicks = 0;
 
 
 void delay200ms()
@@ -67,6 +88,7 @@ void stopMotor()
 	//停马达电源
 	RELAY_POWER = 1;
 	
+	//停止timer0
 	TR0=0;
 	
 	delay200ms();
@@ -85,6 +107,7 @@ void startMotor()
 	//通电
 	RELAY_POWER = 0;
 	
+	//打开timer0
 	TR0 = 1;
 }
 
@@ -106,8 +129,6 @@ void initINT0(void)
 	EA=1;
 	EX0=1; // Enable int0 interrupt.
 }
-
-
 
 
 //NRF24L01开始进入接收模式
@@ -141,29 +162,45 @@ void startRecv()
 ////}
 //
 //
-void sendDataToHost( unsigned char a, unsigned char b, unsigned char c, unsigned char d )
-{
-	unsigned char sendData[16];
-	unsigned char toAddr[3]= {53, 69, 149}; //Pi, 96频道，3字节地址，接收16字节
-	unsigned char tmp;
 
-		
-	sendData[0] = NODE_ID;//Node ID
+//void delay10s(void)   //误差 0us
+//{
+//    unsigned char a,b,c,n;
+//    for(c=191;c>0;c--)
+//        for(b=209;b>0;b--)
+//            for(a=249;a>0;a--);
+//    for(n=4;n>0;n--);
+//
+//}
+//
+//
+//void sendDataToHost( unsigned int tar, unsigned int cur, unsigned char c)
+//{
+//	unsigned char sendData[16];
+//	unsigned char toAddr[3]= {53, 69, 149}; //Pi, 96频道，3字节地址，接收16字节
+//	unsigned char tmp;
+//
+//		
+//	sendData[0] = NODE_ID;//Node ID
+//
+//	sendData[1] = 11;
+//	sendData[2] = 22;
+//	sendData[3] = 33; 
+//	sendData[4] = (tar >> 8); 
+//	sendData[5] = (tar & 0x00ff); 
+//	sendData[6] = (cur >> 8); 
+//	sendData[7] = (cur & 0x00ff); 
+//	sendData[8] = c ; 
+//
+//
+//	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//向Pi发送, 96频道，3字节地址，16字节数据
+//	
+//	//24L01开始接收数据
+//	startRecv(); 
+//}
 
-	sendData[1] = a;
-	sendData[2] = b;
-	sendData[3] = c; 
-	sendData[4] = d; 
 
-
-	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//向Pi发送, 96频道，3字节地址，16字节数据
-	
-	//24L01开始接收数据
-	startRecv(); 
-}
-
-
-// 初始化Timer0
+// 初始化Timer0, 4MHz, 每10ms触发中断
 void initTimer0(void)
 {
     TMOD = 0x01;
@@ -171,18 +208,34 @@ void initTimer0(void)
     TL0 = 0xC0;
     EA = 1;
     ET0 = 1;
-    //TR0 = 1;
+    //TR0 = 1; //start timer 0
 }
 
+//初始化继电器
 void initRelays()
 {
 	RELAY_POWER=1;
 	RELAY_DIRECTION=1;
 }
 
+//初始化卷帘位置
+void initCurtain()
+{
+	//假设卷帘当前是在最下面，所以要全部卷上去，且要运行到顶校正余量位，以消除误差
+	
+	currentPosTicks = POS_BOTTOM ; //假设当前在最底部，即全关(100%覆盖)
+	motorDirection = DIRECTION_UP;
+	targetPosTicks = CALIBRATION_LIMIT_TOP; //目标设为顶校正余量位
+	curtainCoverPercent = 0; //全开，覆盖0%
+	
+	//启动电机
+	startMotor();
+}
+
+
+
 void main()
 {
-
 
 	
 	AUXR = AUXR|0x80;  // T0, 1T Mode
@@ -193,84 +246,23 @@ void main()
 	//初始化继电器
 	initRelays();
 	
-	//初始化DS18B20
-	//initDS18B20();
-	
-	//初始化ADC
-	//initADC();
-	
-	//取得开灯阈值
-	//light1OnThreshold = eepromRead(0x0000);
-	//light2OnThreshold = eepromRead(0x0002);
-
 	//初始化24L01
 	nrf24L01Init();
 	
 	//24L01开始接收数据
 	startRecv(); 
 	
-	//初始化延时
-	//initDelay();
-	
 	//初始化timer0
 	initTimer0();
 	
+	//初始化卷帘位置
+	initCurtain();
 	
 	
 	while(1)
 	{
-//		if( motorOn && (RELAY_POWER==1) ) //说明电机当前不在工作
-//		{
-//			startMotor();
-//		}
-
-		if( K1==0 && RELAY_POWER == 1 )
-		{
-			timerCounter10ms = 0;
-			timerCounter1s = 0;
-			motorDirection=1;
-			//TR0 = 1;
-			startMotor();
-			
-			sendDataToHost( 1, 100, 0, 0 );
-			
-			delay200ms();
-			delay200ms();
-			
-		}
-		else if( K1==0 && RELAY_POWER == 0 )
-		{
-			//TR0 = 0;
-			stopMotor();
-			
-			sendDataToHost( 1, 200, timerCounter1s, timerCounter10ms );
-			delay200ms();
-			delay200ms();
-		}
-
-		if( K2==0 && RELAY_POWER == 1 )
-		{
-			timerCounter10ms = 0;
-			timerCounter1s = 0;
-			motorDirection=0;
-			//TR0 = 1;
-			startMotor();
-			
-			sendDataToHost( 0, 100, 0, 0 );
-			
-			delay200ms();
-			delay200ms();
-			
-		}
-		else if( K2==0 && RELAY_POWER == 0 )
-		{
-			//TR0 = 0;
-			stopMotor();
-			
-			sendDataToHost( 0, 200, timerCounter1s, timerCounter10ms );
-			delay200ms();
-			delay200ms();
-		}
+//		sendDataToHost(targetPosTicks, currentPosTicks , curtainCoverPercent);
+//		delay10s();
 	}
 }
 
@@ -280,56 +272,55 @@ void main()
 void interrupt24L01(void) interrupt 0
 {
 	unsigned char * receivedData;
-	unsigned char rMode, rOpenPercent;
+	unsigned char rCoverPercent;
 	
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
-	// *(receivedData+0): 发送者NodeID
-	// *(receivedData+1): 功能号
-	// *(receivedData+2): 卷帘工作模式
-	// *(receivedData+3): 开度
+	// *(receivedData+0): 发送者NodeID （目前忽略该参数）
+	// *(receivedData+1): 功能号 （目前忽略该参数）
+	// *(receivedData+2): 卷帘工作模式 （目前忽略该参数）
+	// *(receivedData+3): 卷帘覆盖度百分比。例如要覆盖30%，则该值为30
 
-	
-	//开灯阈值
-	rMode = *(receivedData+0);
-	rOpenPercent = *(receivedData+1);
-	
-	if( rMode == 0)
-	{
-		stopMotor();
-	}
-	else if( rMode == 1) //升
-	{
-		motorDirection=1;
-		startMotor();
-	}
-	else if( rMode ==2 ) //降
-	{
-		motorDirection=0;
-		startMotor();
-	}
-	
-	
-//	if( rOpenPercent != curtainOpenPercent )
-//	{
-//		if( rOpenPercent > curtainOpenPercent )
-//		{
-//			//开窗帘
-//			motorDirection = 1;
-//			motorOn = 1;
-//		}
-//		else
-//		{
-//			//关窗帘
-//			motorDirection = 0;
-//			motorOn = 1;
-//		}
-//	}
+	rCoverPercent = *(receivedData+3);
 	
 
-	
+	if( rCoverPercent< 101 ) //rCoverPercent应该是[0,100]区间里面的一个数
+	{
+		if (curtainCoverPercent != rCoverPercent ) //如果收到的覆盖度与当前的覆盖度不同
+		{
+			curtainCoverPercent = rCoverPercent;
+			
+			if( rCoverPercent== 0 ) 
+			{
+				//如果用户选择“全开”，则利用这个机会进行校正
+				//设置电机运行到顶校正余量位
+				targetPosTicks = CALIBRATION_LIMIT_TOP ;
+			}
+			else if( rCoverPercent== 100 ) 
+			{
+				//如果用户选择“全关”，则利用这个机会进行校正
+				//设置电机运行到底校正余量位			
+				targetPosTicks = CALIBRATION_LIMIT_BOTTOM ;
+			}
+			else
+			{
+				//如果是介于(1%,100%)之间的覆盖度，则根据百分比计算电机运行目标位置
+				targetPosTicks = POS_TOP + rCoverPercent /100.0 *(POS_BOTTOM - POS_TOP);
+				//targetPosTicks = POS_TOP + 4150* rCoverPercent /100 ;
+			}
+			
+			if( targetPosTicks != currentPosTicks)
+			{
+				//如果目标开度小于当前开度，则窗帘向上
+				motorDirection = targetPosTicks<currentPosTicks?1:0;
+				
+				//启动马达
+				startMotor();
+			}
 
+		}
+	}
 }
 
 
@@ -338,14 +329,33 @@ void timer0Interrupt(void) interrupt 1
 {
     TH0 = 0x63;
     TL0 = 0xC0;
-    
-	if( ++timerCounter10ms == 100 ) //100个10ms，即1秒
+	
+	if(motorDirection) //相当于 if( motorDirection == DIRECTION_UP ), 窗帘向上运行
 	{
-		timerCounter10ms=0;
-		timerCounter1s++;
-		
-
-		
-
+		if( (--currentPosTicks <= targetPosTicks) || ( currentPosTicks < CALIBRATION_LIMIT_TOP  ) )
+		{
+			stopMotor();
+			
+			//如果电机运行到校正余量，则调回最上位置
+			if( currentPosTicks <= CALIBRATION_LIMIT_TOP )
+			{
+				currentPosTicks = POS_TOP;
+			}
+		}
 	}
+	else //相当于 else if( motorDirection == DIRECTION_DOWN )，窗帘向下运行
+	{
+		if( ( ++currentPosTicks >= targetPosTicks ) || ( currentPosTicks > CALIBRATION_LIMIT_BOTTOM  ) )
+		{
+			stopMotor();
+			
+			//如果电机运行到校正余量，则调回最下位置
+			if(currentPosTicks >= CALIBRATION_LIMIT_BOTTOM)
+			{
+				currentPosTicks = POS_BOTTOM;
+			}
+		}
+	}
+    
+
 }
