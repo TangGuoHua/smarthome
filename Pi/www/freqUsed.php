@@ -142,7 +142,7 @@ function rdoBathroomHeaterClicked( val )
 //阳台卷帘
 function rdoBalconyCurtainClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "62", data1: val } );
+	$.post("/api/sendData.php", { nodeID: "62", data4: val } );
 }
 
 </script>
@@ -234,13 +234,29 @@ while ($row = $results->fetchArray())
 	?>
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>阳台卷帘</legend>
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" value="0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData1"]==0?"checked":"";?> />
-					<label for="rdoBalconyCurtain0">停</label>
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain1" value="1" onclick="rdoBalconyCurtainClicked(1);" <?php echo $row["fldData1"]==1?"checked":"";?> />
-					<label for="rdoBalconyCurtain1">升</label>
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain2" value="2" onclick="rdoBalconyCurtainClicked(2);" <?php echo $row["fldData1"]==2?"checked":"";?> />
-					<label for="rdoBalconyCurtain2">降</label>
+		    	<legend>阳台卷帘覆盖度</legend>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" value="0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData4"]==0?"checked":"";?> />
+					<label for="rdoBalconyCurtain0">全开</label>
+					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain1" value="10" onclick="rdoBalconyCurtainClicked(10);" <?php echo $row["fldData4"]==10?"checked":"";?> />
+					<label for="rdoBalconyCurtain1">10%</label> -->
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain2" value="20" onclick="rdoBalconyCurtainClicked(20);" <?php echo $row["fldData4"]==20?"checked":"";?> />
+					<label for="rdoBalconyCurtain2">20%</label>
+					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain3" value="30" onclick="rdoBalconyCurtainClicked(30);" <?php echo $row["fldData4"]==30?"checked":"";?> />
+					<label for="rdoBalconyCurtain3">30%</label> -->
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain4" value="40" onclick="rdoBalconyCurtainClicked(40);" <?php echo $row["fldData4"]==40?"checked":"";?> />
+					<label for="rdoBalconyCurtain4">40%</label>
+					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain5" value="50" onclick="rdoBalconyCurtainClicked(50);" <?php echo $row["fldData4"]==50?"checked":"";?> />
+					<label for="rdoBalconyCurtain5">50%</label> -->
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain6" value="60" onclick="rdoBalconyCurtainClicked(60);" <?php echo $row["fldData4"]==60?"checked":"";?> />
+					<label for="rdoBalconyCurtain6">60%</label>
+					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain7" value="70" onclick="rdoBalconyCurtainClicked(70);" <?php echo $row["fldData4"]==70?"checked":"";?> />
+					<label for="rdoBalconyCurtain7">70%</label> -->
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain8" value="80" onclick="rdoBalconyCurtainClicked(80);" <?php echo $row["fldData4"]==80?"checked":"";?> />
+					<label for="rdoBalconyCurtain8">80%</label>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain9" value="90" onclick="rdoBalconyCurtainClicked(90);" <?php echo $row["fldData4"]==90?"checked":"";?> />
+					<label for="rdoBalconyCurtain9">90%</label>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain10" value="100" onclick="rdoBalconyCurtainClicked(100);" <?php echo $row["fldData4"]==100?"checked":"";?> />
+					<label for="rdoBalconyCurtain10">全关</label>
 
 		    </fieldset>
 		</li>
