@@ -9,6 +9,7 @@
 2014-JUL-15 黄长浩  增加餐厅灯带
 2014-JUL-30 黄长浩  增加阳台卷帘
 2014-JUL-31 黄长浩  增加书房调光台灯
+2014-AUG-02 黄长浩  阳台卷帘覆盖度支持20%、40%等值
 */
 
 $gPageTitle = "常用";
@@ -235,28 +236,23 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>阳台卷帘覆盖度</legend>
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" value="0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData4"]==0?"checked":"";?> />
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoBalconyCurtain0">全开</label>
-					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain1" value="10" onclick="rdoBalconyCurtainClicked(10);" <?php echo $row["fldData4"]==10?"checked":"";?> />
-					<label for="rdoBalconyCurtain1">10%</label> -->
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain2" value="20" onclick="rdoBalconyCurtainClicked(20);" <?php echo $row["fldData4"]==20?"checked":"";?> />
-					<label for="rdoBalconyCurtain2">20%</label>
-					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain3" value="30" onclick="rdoBalconyCurtainClicked(30);" <?php echo $row["fldData4"]==30?"checked":"";?> />
-					<label for="rdoBalconyCurtain3">30%</label> -->
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain4" value="40" onclick="rdoBalconyCurtainClicked(40);" <?php echo $row["fldData4"]==40?"checked":"";?> />
-					<label for="rdoBalconyCurtain4">40%</label>
-					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain5" value="50" onclick="rdoBalconyCurtainClicked(50);" <?php echo $row["fldData4"]==50?"checked":"";?> />
-					<label for="rdoBalconyCurtain5">50%</label> -->
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain6" value="60" onclick="rdoBalconyCurtainClicked(60);" <?php echo $row["fldData4"]==60?"checked":"";?> />
-					<label for="rdoBalconyCurtain6">60%</label>
-					<!-- <input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain7" value="70" onclick="rdoBalconyCurtainClicked(70);" <?php echo $row["fldData4"]==70?"checked":"";?> />
-					<label for="rdoBalconyCurtain7">70%</label> -->
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain8" value="80" onclick="rdoBalconyCurtainClicked(80);" <?php echo $row["fldData4"]==80?"checked":"";?> />
-					<label for="rdoBalconyCurtain8">80%</label>
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain9" value="90" onclick="rdoBalconyCurtainClicked(90);" <?php echo $row["fldData4"]==90?"checked":"";?> />
-					<label for="rdoBalconyCurtain9">90%</label>
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain10" value="100" onclick="rdoBalconyCurtainClicked(100);" <?php echo $row["fldData4"]==100?"checked":"";?> />
-					<label for="rdoBalconyCurtain10">全关</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain20" onclick="rdoBalconyCurtainClicked(20);" <?php echo $row["fldData4"]==20?"checked":"";?> />
+					<label for="rdoBalconyCurtain20">20%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain40" onclick="rdoBalconyCurtainClicked(40);" <?php echo $row["fldData4"]==40?"checked":"";?> />
+					<label for="rdoBalconyCurtain40">40%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain60" onclick="rdoBalconyCurtainClicked(60);" <?php echo $row["fldData4"]==60?"checked":"";?> />
+					<label for="rdoBalconyCurtain60">60%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain85" onclick="rdoBalconyCurtainClicked(85);" <?php echo $row["fldData4"]==85?"checked":"";?> />
+					<label for="rdoBalconyCurtain85">85%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain100" onclick="rdoBalconyCurtainClicked(100);" <?php echo $row["fldData4"]==100?"checked":"";?> />
+					<label for="rdoBalconyCurtain100">全关</label>
 
 		    </fieldset>
 		</li>
