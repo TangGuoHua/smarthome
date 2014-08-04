@@ -1,4 +1,4 @@
-/***************************************************************************
+/***********************************************************************
 【硬件信息】
 单片机型号: STC12C5616AD
 工作频率: 4MHz 外部晶振
@@ -20,7 +20,7 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 未经作者书面授权，不可以将本程序此程序用于任何商业目的。
 用于学习与参考目的，请在引用处注明版权和作者信息。
-****************************************************************************/
+************************************************************************/
 
 #include <reg52.h>
 #include "nrf24L01Node.h"
@@ -28,18 +28,23 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 //#include "stcEEPROM.h"
 //#include "ds18B20.h"
 
+sfr AUXR   = 0x8E;
+
 // Node ID
 #define NODE_ID 62
 
-//#define MAX_TICKS 4150 //最大运行时间（10ms计数值，即，最大运行时间为 MAX_TICKS*10毫秒 ）
-#define POS_BOTTOM 4650
-#define POS_TOP 500
-#define CALIBRATION_LIMIT_TOP 200
-#define CALIBRATION_LIMIT_BOTTOM 4950
 /*
-行程说明:
+行程控制说明:
+系统通过控制电机运行时间（即ticks计数）来控制窗帘的位置。
+系统设定timer0每10ms中断一次，产生一个tick，通过数ticks就可以知道运行时间。
+通过实验，卷帘从最上到最下（下行）运行约41.5秒，上行全程运行约40.5秒。
+在计算的时候，上下行程都按全程41.5秒计算。每10ms一个tick，则全程4150个ticks。
+
+考虑到使用unsigned int来计数ticks，为避免出现0及负数，我们以500做为顶位置计数，4650最为最底位置计数
+
 最大行程时间为 4650-500=4150 ticks， 即4150*10=41500ms=41.5s
-但是，当用户选择全开（0%覆盖）或者全关（100%覆盖）时，系统将多运行300*10ms，以消除累计误差
+
+当用户选择全开（0%覆盖）或者全关（100%覆盖）时，系统将多运行300*10ms，以消除累计误差
 各种位置限制值如下图所示：
 
               底                   顶
@@ -49,14 +54,19 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
   底校正余量                              顶校正余量
   
 */
+//#define MAX_TICKS 4150 //最大运行时间（10ms计数值，即，最大运行时间为 MAX_TICKS*10毫秒 ）
+#define POS_BOTTOM 4650
+#define POS_TOP 500
+#define CALIBRATION_LIMIT_TOP 200
+#define CALIBRATION_LIMIT_BOTTOM 4950
 
-#define DIRECTION_UP 1;
+//马达运动方向
+//1：上升（开卷帘），0：下降（关卷帘）
+#define DIRECTION_UP   1;
 #define DIRECTION_DOWN 0;
 
-sfr AUXR   = 0x8E;
 
 //sbit LDR = P1^7;  //光敏电阻 （10K上拉）
-
 
 sbit RELAY_POWER = P2^1; //继电器1，控制电源
 sbit RELAY_DIRECTION = P2^0; //继电器2，控制方向，常闭-上升，常开-下降
@@ -64,8 +74,8 @@ sbit RELAY_DIRECTION = P2^0; //继电器2，控制方向，常闭-上升，常开-下降
 //unsigned char curtainMode = 1; //1:手动，2：自动
 unsigned char curtainCoverPercent; //卷帘覆盖度百分比
 
-bit motorDirection = 0; //马达运动方向，1：上升（开卷帘），0：下降（关卷帘）
-//bit motorOn = 0; //马达开关, 1：开， 0：关
+//马达运动方向
+bit motorDirection = DIRECTION_UP; 
 
 
 //卷帘当前位置 10ms ticks
@@ -74,15 +84,33 @@ unsigned int currentPosTicks = 0;
 //目标位置 10ms ticks
 unsigned int targetPosTicks = 0;
 
-
-void delay200ms()
+//继电器延时
+void delayRelay()
 {
-    unsigned char a,b,c;
+	//4Mhz, 1T, 约200ms
+    unsigned char a,b,c;  
     for(c=29;c>0;c--)
         for(b=70;b>0;b--)
             for(a=97;a>0;a--);
 }
 
+//启动电机
+//启动电机按照motorDirection设定的方向运转，同时开启timer0计数，
+void startMotor()
+{
+	//设定方向
+	RELAY_DIRECTION = motorDirection;
+	
+	delayRelay();
+	
+	//通电
+	RELAY_POWER = 0;
+	
+	//打开timer0
+	TR0 = 1;
+}
+
+//关闭电机，同时停止timer0
 void stopMotor()
 {
 	//停马达电源
@@ -91,25 +119,12 @@ void stopMotor()
 	//停止timer0
 	TR0=0;
 	
-	delay200ms();
+	delayRelay();
 	
 	//方向选择继电器断电
 	RELAY_DIRECTION = 1;
 }
 
-void startMotor()
-{
-	//设定方向
-	RELAY_DIRECTION = motorDirection;
-	
-	delay200ms();
-	
-	//通电
-	RELAY_POWER = 0;
-	
-	//打开timer0
-	TR0 = 1;
-}
 
 ////开机延时 
 ////根据NodeID，进行约为500*NodeID毫秒的延时
@@ -200,7 +215,7 @@ void startRecv()
 //}
 
 
-// 初始化Timer0, 4MHz, 每10ms触发中断
+// 初始化Timer0, 4MHz, 每10ms触发一次中断
 void initTimer0(void)
 {
     TMOD = 0x01;
@@ -221,11 +236,13 @@ void initRelays()
 //初始化卷帘位置
 void initCurtain()
 {
+	//系统上电初始化时，我们要把卷帘全部卷上去。
+	//为了让假设卷帘当前是在最下面，所以要全部卷上去，且要运行到顶校正余量位，以消除误差
 	//假设卷帘当前是在最下面，所以要全部卷上去，且要运行到顶校正余量位，以消除误差
 	
 	currentPosTicks = POS_BOTTOM ; //假设当前在最底部，即全关(100%覆盖)
-	motorDirection = DIRECTION_UP;
 	targetPosTicks = CALIBRATION_LIMIT_TOP; //目标设为顶校正余量位
+	motorDirection = DIRECTION_UP;
 	curtainCoverPercent = 0; //全开，覆盖0%
 	
 	//启动电机
@@ -307,7 +324,6 @@ void interrupt24L01(void) interrupt 0
 			{
 				//如果是介于(1%,100%)之间的覆盖度，则根据百分比计算电机运行目标位置
 				targetPosTicks = POS_TOP + rCoverPercent /100.0 *(POS_BOTTOM - POS_TOP);
-				//targetPosTicks = POS_TOP + 4150* rCoverPercent /100 ;
 			}
 			
 			if( targetPosTicks != currentPosTicks)
@@ -334,9 +350,10 @@ void timer0Interrupt(void) interrupt 1
 	{
 		if( (--currentPosTicks <= targetPosTicks) || ( currentPosTicks < CALIBRATION_LIMIT_TOP  ) )
 		{
+			//停止马达
 			stopMotor();
 			
-			//如果电机运行到校正余量，则调回最上位置
+			//如果电机运行到校正余量，则调回顶位置
 			if( currentPosTicks <= CALIBRATION_LIMIT_TOP )
 			{
 				currentPosTicks = POS_TOP;
@@ -347,9 +364,10 @@ void timer0Interrupt(void) interrupt 1
 	{
 		if( ( ++currentPosTicks >= targetPosTicks ) || ( currentPosTicks > CALIBRATION_LIMIT_BOTTOM  ) )
 		{
+			//停止马达
 			stopMotor();
 			
-			//如果电机运行到校正余量，则调回最下位置
+			//如果电机运行到校正余量，则调回底位置
 			if(currentPosTicks >= CALIBRATION_LIMIT_BOTTOM)
 			{
 				currentPosTicks = POS_BOTTOM;
