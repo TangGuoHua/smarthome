@@ -12,9 +12,9 @@
       <ToolsetName>MCS-51</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STC12C5608AD</Device>
+          <Device>STC12C5616AD</Device>
           <Vendor>STC12C5616AD Series</Vendor>
-          <Cpu>IRAM(0-0xFF) XRAM(0-0x1FF) IROM(0-0x1FFF) CLOCK(45000000)</Cpu>
+          <Cpu>IRAM(0-0xFF) XRAM(0-0x1FF) IROM(0-0x3FFF) CLOCK(45000000)</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"LIB\STARTUP.A51" ("Standard 8051 Startup Code")</StartupFile>
           <FlashDriverDll></FlashDriverDll>
@@ -253,7 +253,7 @@
               <IRO>
                 <Type>1</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x2000</Size>
+                <Size>0x4000</Size>
               </IRO>
               <IRA>
                 <Type>0</Type>
