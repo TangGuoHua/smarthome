@@ -62,14 +62,17 @@ sfr AUXR   = 0x8E;
 
 //马达运动方向
 //1：上升（开卷帘），0：下降（关卷帘）
-#define DIRECTION_UP   1;
-#define DIRECTION_DOWN 0;
+#define DIRECTION_UP 1
+#define DIRECTION_DOWN 0
 
 
 //sbit LDR = P1^7;  //光敏电阻 （10K上拉）
 
-sbit RELAY_POWER = P2^1; //继电器1，控制电源
-sbit RELAY_DIRECTION = P2^0; //继电器2，控制方向，常闭-上升，常开-下降
+sbit RELAY_POWER = P1^3; //继电器1，控制电源
+sbit RELAY_DIRECTION = P3^5; //继电器2，控制方向，常闭-上升，常开-下降
+
+//sbit RELAY_POWER = P2^1; //继电器1，控制电源
+//sbit RELAY_DIRECTION = P2^0; //继电器2，控制方向，常闭-上升，常开-下降
 
 //unsigned char curtainMode = 1; //1:手动，2：自动
 unsigned char curtainCoverPercent; //卷帘覆盖度百分比
@@ -87,11 +90,11 @@ unsigned int targetPosTicks = 0;
 //继电器延时
 void delayRelay()
 {
-	//4Mhz, 1T, 约200ms
-    unsigned char a,b,c;  
-    for(c=29;c>0;c--)
-        for(b=70;b>0;b--)
-            for(a=97;a>0;a--);
+	//4Mhz, 1T, 约300ms
+    unsigned char a,b,c;
+    for(c=244;c>0;c--)
+        for(b=8;b>0;b--)
+            for(a=152;a>0;a--);
 }
 
 //启动电机
