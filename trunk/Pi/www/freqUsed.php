@@ -296,15 +296,15 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>书房台灯</legend>
-					<input type="radio" name="radioLEDGreen" id="radioLEDGreen0" value="0" onclick="rdoStudyRoomDeskLampClicked(0);" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<input type="radio" name="radioLEDGreen" id="radioLEDGreen0" onclick="rdoStudyRoomDeskLampClicked(0);" <?php echo $row["fldData1"]==0?"checked":"";?> />
 					<label for="radioLEDGreen0">关</label>
-					<input type="radio" name="radioLEDGreen" id="radioLEDGreen3" value="3" onclick="rdoStudyRoomDeskLampClicked(3);" <?php echo $row["fldData1"]==3?"checked":"";?> />
+					<input type="radio" name="radioLEDGreen" id="radioLEDGreen3" onclick="rdoStudyRoomDeskLampClicked(5);" <?php echo $row["fldData1"]==5?"checked":"";?> />
 					<label for="radioLEDGreen3">弱</label>
-					<input type="radio" name="radioLEDGreen" id="radioLEDGreen6" value="6" onclick="rdoStudyRoomDeskLampClicked(6);" <?php echo $row["fldData1"]==6?"checked":"";?> />
+					<input type="radio" name="radioLEDGreen" id="radioLEDGreen6" onclick="rdoStudyRoomDeskLampClicked(7);" <?php echo $row["fldData1"]==7?"checked":"";?> />
 					<label for="radioLEDGreen6">中</label>
-					<input type="radio" name="radioLEDGreen" id="radioLEDGreen10" value="10" onclick="rdoStudyRoomDeskLampClicked(10);" <?php echo $row["fldData1"]==10?"checked":"";?> />
+					<input type="radio" name="radioLEDGreen" id="radioLEDGreen10" onclick="rdoStudyRoomDeskLampClicked(10);" <?php echo $row["fldData1"]==10?"checked":"";?> />
 					<label for="radioLEDGreen10">强</label>
-					<input type="radio" name="radioLEDGreen" id="radioLEDGreen20" value="20" onclick="rdoStudyRoomDeskLampClicked(20);" <?php echo $row["fldData1"]==20?"checked":"";?> />
+					<input type="radio" name="radioLEDGreen" id="radioLEDGreen20" onclick="rdoStudyRoomDeskLampClicked(20);" <?php echo $row["fldData1"]==20?"checked":"";?> />
 					<label for="radioLEDGreen20">延时关</label>
 			</fieldset>
 		</li>
