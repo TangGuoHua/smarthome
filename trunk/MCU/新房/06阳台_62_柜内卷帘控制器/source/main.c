@@ -35,8 +35,9 @@ sfr AUXR   = 0x8E;
 
 /*
 行程控制说明:
+
 系统通过控制电机运行时间（即ticks计数）来控制窗帘的位置。
-系统设定timer0每10ms中断一次，产生一个tick，通过数ticks就可以知道运行时间。
+系统设定timer0每10ms中断一次，产生一个tick，通过对ticks计数就可以知道电机运行时间。
 通过实验，卷帘从最上到最下（下行）运行约41.5秒，上行全程运行约40.5秒。
 在计算的时候，上下行程都按全程41.5秒计算。每10ms一个tick，则全程4150个ticks。
 
@@ -44,7 +45,7 @@ sfr AUXR   = 0x8E;
 
 最大行程时间为 4650-500=4150 ticks， 即4150*10=41500ms=41.5s
 
-当用户选择全开（0%覆盖）或者全关（100%覆盖）时，系统将多运行300*10ms，以消除累计误差
+当用户选择全开（0%覆盖）或者全关（100%覆盖）时，系统将多运行300*10ms（即3秒），以消除累计误差
 各种位置限制值如下图所示：
 
               底                   顶
@@ -70,9 +71,6 @@ sfr AUXR   = 0x8E;
 
 sbit RELAY_POWER = P1^3; //继电器1，控制电源
 sbit RELAY_DIRECTION = P3^5; //继电器2，控制方向，常闭-上升，常开-下降
-
-//sbit RELAY_POWER = P2^1; //继电器1，控制电源
-//sbit RELAY_DIRECTION = P2^0; //继电器2，控制方向，常闭-上升，常开-下降
 
 //unsigned char curtainMode = 1; //1:手动，2：自动
 unsigned char curtainCoverPercent; //卷帘覆盖度百分比
@@ -240,8 +238,9 @@ void initRelays()
 void initCurtain()
 {
 	//系统上电初始化时，我们要把卷帘全部卷上去。
-	//为了让假设卷帘当前是在最下面，所以要全部卷上去，且要运行到顶校正余量位，以消除误差
-	//假设卷帘当前是在最下面，所以要全部卷上去，且要运行到顶校正余量位，以消除误差
+	//由于刚上电,系统不知道当前卷帘的位置,而卷帘可以在任何位置。
+	//为了让卷帘全部卷上去，且要运行到顶校正余量位（以消除误差），我们要假设卷帘位置在最下面
+	//系统按最长时间给电，以便让卷帘走完整个行程
 	
 	currentPosTicks = POS_BOTTOM ; //假设当前在最底部，即全关(100%覆盖)
 	targetPosTicks = CALIBRATION_LIMIT_TOP; //目标设为顶校正余量位
@@ -326,13 +325,13 @@ void interrupt24L01(void) interrupt 0
 			else
 			{
 				//如果是介于(1%,100%)之间的覆盖度，则根据百分比计算电机运行目标位置
-				targetPosTicks = POS_TOP + rCoverPercent /100.0 *(POS_BOTTOM - POS_TOP);
+				targetPosTicks = POS_TOP + rCoverPercent/100.0 *(POS_BOTTOM - POS_TOP);
 			}
 			
 			if( targetPosTicks != currentPosTicks)
 			{
 				//如果目标开度小于当前开度，则窗帘向上
-				motorDirection = targetPosTicks<currentPosTicks?1:0;
+				motorDirection = targetPosTicks<currentPosTicks ? DIRECTION_UP : DIRECTION_DOWN;
 				
 				//启动马达
 				startMotor();
@@ -351,6 +350,7 @@ void timer0Interrupt(void) interrupt 1
 	
 	if(motorDirection) //相当于 if( motorDirection == DIRECTION_UP ), 窗帘向上运行
 	{
+		//如果已经到达了目标位置或者超过了顶校正余量限位，则停止马达
 		if( (--currentPosTicks <= targetPosTicks) || ( currentPosTicks < CALIBRATION_LIMIT_TOP  ) )
 		{
 			//停止马达
@@ -365,6 +365,7 @@ void timer0Interrupt(void) interrupt 1
 	}
 	else //相当于 else if( motorDirection == DIRECTION_DOWN )，窗帘向下运行
 	{
+		//如果已经到达了目标位置或者超过了底校正余量限位，则停止马达
 		if( ( ++currentPosTicks >= targetPosTicks ) || ( currentPosTicks > CALIBRATION_LIMIT_BOTTOM  ) )
 		{
 			//停止马达
