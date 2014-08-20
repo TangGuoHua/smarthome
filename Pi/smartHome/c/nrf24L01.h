@@ -42,11 +42,19 @@
 #define  FEATURE         0x1D// Additional features register, needed to enable the additional commands
 
 /**
- * Define Hardware wirings
+ * Define Hardware wiring
+ *
+ *    NRF24L01+      RPi PIN #    WiringPi
+ *----------------------------------------
+ *    CE PIN 3 ------ PIN 7  ------ 7
+ *   CSN PIN 4 ------ PIN 13 ------ 2
+ *  SCLK PIN 5 ------ PIN 15 ------ 3
+ *  MOSI PIN 6 ------ PIN 19 ------ 12
+ *  MISO PIN 7 ------ PIN 21 ------ 13
+ *   IRQ PIN 8 (NOT CONNECTED)
  * 
- * 
- * */
- 
+ **/
+
 #define CE 7
 #define CSN 2
 #define SCLK 3
