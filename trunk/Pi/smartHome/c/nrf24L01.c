@@ -11,6 +11,9 @@ unsigned char nrfACK();
 unsigned char nrfCheckACK();
 unsigned char nrfSPI( unsigned char spiData );
 
+void nrfFlushTx();
+void nrfFlushRx();
+
 unsigned char nrfReadReg(  unsigned char regAddr );
 unsigned char nrfWriteReg( unsigned char regAddr, unsigned char writeData);
 unsigned char nrfReadRxData( unsigned char regAddr, unsigned char *rxData, unsigned char dataLen);
@@ -112,6 +115,26 @@ unsigned char nrfWriteTxData( unsigned char regAddr, unsigned char *txData, unsi
 }
 
 
+//Flush Tx Buffer
+void nrfFlushTx()
+{
+	//CSN=0;
+	digitalWrite( CSN, LOW );
+	nrfSPI(FLUSH_TX);
+	//CSN=1; 
+	digitalWrite( CSN, HIGH );
+}
+
+//Flush Rx Buffer
+void nrfFlushRx()
+{
+	//CSN=0;
+	digitalWrite( CSN, LOW );
+	nrfSPI(FLUSH_RX); 
+	//CSN=1;
+	digitalWrite( CSN, HIGH );
+}
+
 
 //******* 以下函数供外部模块调用 ************
 
@@ -121,7 +144,7 @@ void nrf24L01Init()
 	// initialize wiringPi lib
 	wiringPiSetup();
 	
-	// set pin mode
+	//Set pin mode
 	pinMode( CE, OUTPUT );
 	pinMode( CSN, OUTPUT );
 	pinMode( SCLK, OUTPUT );
@@ -129,10 +152,9 @@ void nrf24L01Init()
 	pinMode( MISO, INPUT );
 	//pinMode( IRQ, INPUT );
 	
+	//Set pull-ups
 	pullUpDnControl( MISO, PUD_UP );
 	//pullUpDnControl( IRQ, PUD_UP );
-	
-	
 	
 	//delayFor24L01();//让系统什么都不干
 	//delayFor24L01();//让系统什么都不干
@@ -146,9 +168,17 @@ void nrf24L01Init()
 	//SCLK=0;
 	digitalWrite( SCLK, LOW );
 	
+	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
+	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );     // 使能接收通道0自动应答
+	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); // 使能接收通道0
+
+	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us+86us，自动重发15次
+	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
+	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 );   // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
 	
-	//IRQ=1;
-	//wiringPiISR( IRQ, INT_EDGE_FALLING, &dataReceived );
+	//flush buffers
+	nrfFlushTx();
+	nrfFlushRx();
 }
 
 
@@ -179,28 +209,16 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, uns
 	
 	digitalWrite( CE, LOW );
 	
-	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth );//写寄存器指令+接收地址使能指令+接收地址+地址宽度
-	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth );//为了应答接收设备，接收通道0地址和发送地址相同
-	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth );//写入数据 
+	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth ); //写寄存器指令+接收地址使能指令+接收地址+地址宽度
+	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
+	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据 
 
-	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
-	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );       // 使能接收通道0自动应答
-	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 );   // 使能接收通道0
-
-	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
-	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f );  // 自动重发延时等待1500us+86us，自动重发15次
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
-	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
-	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
-
 	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	digitalWrite( CE, HIGH );
 	delayFor24L01();
-
-
-	//CE=0; //待发送完毕后转为Standby-1模式
-	digitalWrite( CE, LOW );
+	digitalWrite( CE, LOW ); //待发送完毕后转为Standby-1模式
 
 	do
 	{
@@ -222,24 +240,18 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, uns
 //   nrfSetRxMode( 76, 3, myAddr);
 //那么节点将在76频道上接收数据。地址宽度为3字节，地址是：53/69/160。
 //一旦接收到数据，将触发INT0 (硬件接线提示：IRQ需连接到INT0上）
-void nrfSetRxMode(  unsigned char rfChannel, unsigned char addrWidth, unsigned char *rxAddr)
+void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned char *rxAddr )
 {
-    //CE=0;
     digitalWrite( CE, LOW );
 
   	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, rxAddr, addrWidth ); //接收设备接收通道0使用和发送设备相同的发送地址
-  	nrfWriteReg( W_REGISTER+EN_AA, 0x01 ); //使能接收通道0自动应答
-  	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); //使能接收通道0
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
 
-	//nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
-	nrfWriteReg( W_REGISTER+RF_SETUP, 0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
 
-  	//CE = 1;	//设为接收模式 PRX
-  	digitalWrite( CE, HIGH);
+  	digitalWrite( CE, HIGH ); //设为接收模式 PRX
 }
 
 
@@ -256,7 +268,7 @@ unsigned char nrfCheckACK()
 {  
 	unsigned char status;
 	
-	status = nrfReadReg(R_REGISTER+STATUS); // 读取状态寄存器
+	status = nrfReadReg(R_REGISTER+STATUS); //读取状态寄存器
 	
 	if( status & 0x20 ) //检查TX_DS位，置位则发送成功
 	{
@@ -273,12 +285,8 @@ unsigned char nrfCheckACK()
 		
 		//发送失败，FIFO不会自动清空，必须手动清空 ！！
 		//关键！！不然会出现意想不到的后果！！！
-		//CSN=0;
-		digitalWrite( CSN, LOW );
-		nrfSPI(FLUSH_TX);
-		//CSN=1; 
-		digitalWrite( CSN, HIGH );
-			
+		nrfFlushTx();
+
 		return 255;
 	}
 	else //还在发送中...
@@ -286,6 +294,9 @@ unsigned char nrfCheckACK()
 		return 100;
 	}
 }
+
+
+
 
 //获取24L01接收到的数据。
 //当24L01收到数据触发中断后，调用本方法来取得24L01收到的数据
@@ -310,11 +321,7 @@ unsigned char* nrfGetReceivedData()
 		
 		//用于清空FIFO ！！关键！！不然会出现意想不到的后果！！！大家记住！！
 		//我经过试验发现，不清FIFO的话，发送方有时候会出现收不到ACK的现象
-		//CSN=0;
-		digitalWrite( CSN, LOW );
-		nrfSPI(FLUSH_RX); 
-		//CSN=1;
-		digitalWrite( CSN, HIGH );
+		nrfFlushRx();
 	}
 	return dataBuffer;
 } 
