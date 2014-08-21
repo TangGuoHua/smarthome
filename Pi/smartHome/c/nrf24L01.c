@@ -1,11 +1,23 @@
+/***************************************************************************
+【修改历史】
+
+日期            作者    备注
+----------------------------------------------------------------------
+2014年08月20日  黄长浩  初始版本
+
+【版权声明】
+Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
+版权所有者：黄长浩 HuangChangHao@gmail.com
+
+未经作者书面授权，不可以将本程序此程序用于任何商业目的。
+用于学习与参考目的，请在引用处注明版权和作者信息。
+*****************************************************************************/
 
 
 #include <wiringPi.h>
-#include <stdio.h>
-//#include <unistd.h>
+//#include <stdio.h>
+#include <unistd.h>
 #include "nrf24L01Def.h"
-//#include "nrf24L01Node.h"
-
 
 unsigned char nrfACK();
 unsigned char nrfCheckACK();
@@ -19,13 +31,13 @@ unsigned char nrfWriteReg( unsigned char regAddr, unsigned char writeData);
 unsigned char nrfReadRxData( unsigned char regAddr, unsigned char *rxData, unsigned char dataLen);
 unsigned char nrfWriteTxData(unsigned char regAddr, unsigned char *txData, unsigned char dataLen);
 
-/****************************************************
+/******************
 函数功能:延时 15us
-*****************************************************/
+*******************/
 void delayFor24L01( )
 {
-	//usleep(15);
-	delayMicroseconds(15);
+	usleep(15); // needs #include <unistd.h>
+	//delayMicroseconds(15); // needs #include <wiringPi.h>
 }
 
 
@@ -118,21 +130,17 @@ unsigned char nrfWriteTxData( unsigned char regAddr, unsigned char *txData, unsi
 //Flush Tx Buffer
 void nrfFlushTx()
 {
-	//CSN=0;
-	digitalWrite( CSN, LOW );
+	digitalWrite( CSN, LOW );//CSN=0;
 	nrfSPI(FLUSH_TX);
-	//CSN=1; 
-	digitalWrite( CSN, HIGH );
+	digitalWrite( CSN, HIGH );//CSN=1; 
 }
 
 //Flush Rx Buffer
 void nrfFlushRx()
 {
-	//CSN=0;
-	digitalWrite( CSN, LOW );
+	digitalWrite( CSN, LOW );//CSN=0;
 	nrfSPI(FLUSH_RX); 
-	//CSN=1;
-	digitalWrite( CSN, HIGH );
+	digitalWrite( CSN, HIGH );//CSN=1;
 }
 
 

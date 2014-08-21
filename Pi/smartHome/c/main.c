@@ -1,27 +1,20 @@
-/*
- * untitled.c
- * 
- * Copyright 2014  <pi@pi2>
- * 
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- * MA 02110-1301, USA.
- * 
- * 
- * gcc -Wall -lwiringPi -o "main" "main.c" "nrf24L01.c"
- * 
- */
+/***************************************************************************
+【修改历史】
+
+日期            作者    备注
+----------------------------------------------------------------------
+2014年08月20日  黄长浩  初始版本
+
+【版权声明】
+Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
+版权所有者：黄长浩 HuangChangHao@gmail.com
+
+未经作者书面授权，不可以将本程序此程序用于任何商业目的。
+用于学习与参考目的，请在引用处注明版权和作者信息。
+
+编译命令行 gcc -Wall -lwiringPi -o "main" "main.c" "nrf24L01.c"
+
+*****************************************************************************/
 
 
 #include <stdio.h>
