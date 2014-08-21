@@ -27,28 +27,24 @@
 #include <stdio.h>
 #include <unistd.h>
 //#include <wiringPi.h>
-#include "nrf24L01Node.h"
+#include "nrf24L01.h"
 
 
 void sendDataToHost( )
 {
-	unsigned char sendData[8];
-	unsigned char toAddr[3]= {97, 83, 51}; //Pi's address is {53, 69, 149};
+	unsigned char sendData[4];
+	unsigned char toAddr[3]= {97, 83, 41}; //Pi's address is {53, 69, 149};
 	unsigned char tmp;
 
 		
-	sendData[0] = 0;
+	sendData[0] = 1;
 	sendData[1] = 0;
 	sendData[2] = 0;
 	sendData[3] = 0; 
-	sendData[4] = 0; 
-	sendData[5] = 0;
-	sendData[6] = 0;
-	sendData[7]= 0;
-	sendData[8]= 0;
+
 
 	//tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
-	tmp = nrfSendData( 92, 3, toAddr, 8, sendData);
+	tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
 	
 	printf( "\n\rSend Result=%d\n\r", tmp);
 	
