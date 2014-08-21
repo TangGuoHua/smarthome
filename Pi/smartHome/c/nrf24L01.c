@@ -3,8 +3,8 @@
 #include <wiringPi.h>
 #include <stdio.h>
 //#include <unistd.h>
-#include "nrf24L01.h"
-#include "nrf24L01Node.h"
+#include "nrf24L01Def.h"
+//#include "nrf24L01Node.h"
 
 
 unsigned char nrfACK();
