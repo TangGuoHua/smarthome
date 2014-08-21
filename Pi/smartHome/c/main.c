@@ -39,7 +39,70 @@ void sendDataToHost( )
 	//tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
 	tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
 	
-	printf( "\n\rSend Result=%d\n\r", tmp);
+	printf( "Send Data Result=%d\n\r\n\r\n\r", tmp);
+	
+
+}
+
+void sendDataToPi( )
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[3]= {53, 69, 149};
+	unsigned char tmp;
+
+		
+	sendData[0] = 88;
+	sendData[1] = 0;
+	sendData[2] = 88;
+	sendData[3] = 0; 
+
+
+	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
+	//tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
+	
+	printf( "Send to Pi Result=%d\n\r\n\r\n\r", tmp);
+	
+
+}
+
+void sendDataToPi3( int cnt )
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[3]= {53, 69, 149};
+	unsigned char tmp;
+
+		
+	sendData[0] = 88;
+	sendData[1] = cnt;
+	sendData[2] = 88;
+	sendData[3] = 0; 
+
+
+	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
+	//tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
+	
+	printf( "Send to Pi Result=%d\n\r\n\r\n\r", tmp);
+	
+
+}
+
+void sendDataToPi2( )
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[3]= {153, 169, 49};
+	unsigned char tmp;
+
+		
+	sendData[0] = 88;
+	sendData[1] = 0;
+	sendData[2] = 88;
+	sendData[3] = 0; 
+
+
+	tmp = nrfSendData( 66, 3, toAddr, 16, sendData);
+	//tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
+	
+	printf( "Send to Pi2 Result=%d\n\r\n\r\n\r", tmp);
 	
 
 }
@@ -56,6 +119,7 @@ void startRecv( void )
 int main(int argc, char **argv)
 {
 	unsigned char *receivedData;
+	unsigned int cnt = 0;
 	
 	printf( "Test NRF24L01+ ... \n\r" );
 	
@@ -63,15 +127,27 @@ int main(int argc, char **argv)
 	
 	sendDataToHost();
 	
+	sendDataToHost();
+	
+	sendDataToPi();
+	
+	sendDataToPi2();
+	
 	startRecv();
 	
 	while(1)
 	{
 		if( nrfIsDataReceived() )
 		{
-			printf( "Data Received. " );
+			printf( "Data Received. [%d]", ++cnt );
 			receivedData = nrfGetReceivedData();
 			printf( "D1=%d, D2=%d, D3=%d, D4=%d, D5=%d D6=%d\n\r", *(receivedData++), *(receivedData++),*(receivedData++),*(receivedData++),*(receivedData++),*(receivedData++) );
+			
+			if( cnt%5==0)
+			{
+				sendDataToPi3(cnt);
+				startRecv();
+			}
 			
 		}
 			

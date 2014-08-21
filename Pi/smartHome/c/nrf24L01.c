@@ -15,9 +15,10 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 
 #include <wiringPi.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include <unistd.h>
 #include "nrf24L01Def.h"
+
 
 unsigned char nrfACK();
 unsigned char nrfCheckACK();
@@ -158,22 +159,25 @@ void nrf24L01Init()
 	pinMode( SCLK, OUTPUT );
 	pinMode( MOSI, OUTPUT );
 	pinMode( MISO, INPUT );
-	//pinMode( IRQ, INPUT );
+	pinMode( IRQ, INPUT );
 	
 	//Set pull-ups
 	pullUpDnControl( MISO, PUD_UP );
-	//pullUpDnControl( IRQ, PUD_UP );
+	pullUpDnControl( IRQ, PUD_UP );
 	
-	//delayFor24L01();//让系统什么都不干
-	//delayFor24L01();//让系统什么都不干
+	delayFor24L01();//让系统什么都不干
+	delayFor24L01();//让系统什么都不干
 	
 	//CE=0; //待机模式1 (Standy-I)
+	digitalWrite( CE, LOW );
 	digitalWrite( CE, LOW );
 	
 	//CSN=1;
 	digitalWrite( CSN, HIGH );
+	digitalWrite( CSN, HIGH );
 	
 	//SCLK=0;
+	digitalWrite( SCLK, LOW );
 	digitalWrite( SCLK, LOW );
 	
 	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
@@ -183,6 +187,9 @@ void nrf24L01Init()
 	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us+86us，自动重发15次
 	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
 	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 );   // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+	
+	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //clear bit for RX_DR, TX_DS, MAX_RT
+	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	//flush buffers
 	nrfFlushTx();
@@ -214,24 +221,36 @@ void nrf24L01Init()
 unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
 {
 	unsigned char ret = 0;
+	unsigned long timeoutCnt=0;
 	
 	digitalWrite( CE, LOW );
+
 	
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth ); //写寄存器指令+接收地址使能指令+接收地址+地址宽度
 	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
 	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据 
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
-	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
+	
+	nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
+	
+	//nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
+	nrfWriteReg( W_REGISTER+CONFIG,0x4e ); //Mask interrup for RX_DR, Enable interrupt for TX_DS and MAX_RT，CRC使能，2字节CRC校验，上电，PTX
 	
 	digitalWrite( CE, HIGH );
 	delayFor24L01();
 	digitalWrite( CE, LOW ); //待发送完毕后转为Standby-1模式
+	
 
+	printf( "sending...\n\r");
+	
 	do
 	{
 		ret=nrfCheckACK();
-	}while( ret==100);//检测是否发送完毕
+	}while( ret==100 && ++timeoutCnt < 200000L );//检测是否发送完毕 Test value: when timeoutCnt=173000, it reaches max re-transmit
+	printf( "cnt=%ld\n\r", timeoutCnt );
+	
+	printf( "sending done.\n\r");
 	
 	return ret;
 }
@@ -257,6 +276,7 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
 
+	nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
 
   	digitalWrite( CE, HIGH ); //设为接收模式 PRX
@@ -273,7 +293,8 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 //           以此类推
 //           最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
 unsigned char nrfCheckACK()
-{  
+{
+	/*  
 	unsigned char status;
 	
 	status = nrfReadReg(R_REGISTER+STATUS); //读取状态寄存器
@@ -300,6 +321,39 @@ unsigned char nrfCheckACK()
 	else //还在发送中...
 	{
 		return 100;
+	}
+	* */
+	
+	unsigned char status;
+	
+	if( digitalRead( IRQ ))
+	{
+		return 100;
+	}
+	else
+	{
+		status = nrfReadReg(R_REGISTER+STATUS); //读取状态寄存器
+	
+		if( status & 0x20 ) //检查TX_DS位，置位则发送成功
+		{
+			nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除TX_DS标志
+			
+			//发送成功后，FIFO自动清空，这里就不用再清了
+			
+			//返回自动重发次数
+			return( nrfReadReg(R_REGISTER+OBSERVE_TX) & 0x0f ); 
+		}
+		else if( status & 0x10 ) //检查MAX_RT位，置位则说明最大重发次数达到后仍然未收到ACK，发送失败
+		{
+			nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除MAX_RT标志
+			
+			//发送失败，FIFO不会自动清空，必须手动清空 ！！
+			//关键！！不然会出现意想不到的后果！！！
+			nrfFlushTx();
+
+			return 255;
+		}
+		else return 200;
 	}
 }
 
@@ -336,6 +390,7 @@ unsigned char* nrfGetReceivedData()
 
 unsigned char nrfIsDataReceived()
 {
+	/*
 	unsigned char status;
 	
 	//读取状态寄存器
@@ -344,4 +399,7 @@ unsigned char nrfIsDataReceived()
 		return 1;
 	else
 		return 0;
+	* */
+	
+	return (! digitalRead( IRQ ) );
 }
