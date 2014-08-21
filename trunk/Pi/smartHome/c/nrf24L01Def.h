@@ -1,17 +1,30 @@
+/***************************************************************************
+【修改历史】
 
+日期            作者    备注
+----------------------------------------------------------------------
+2014年08月20日  黄长浩  初始版本
+
+【版权声明】
+Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
+版权所有者：黄长浩 HuangChangHao@gmail.com
+
+未经作者书面授权，不可以将本程序此程序用于任何商业目的。
+用于学习与参考目的，请在引用处注明版权和作者信息。
+****************************************************************************/
 
 #ifndef __NRF24L01DEF_H__
 #define __NRF24L01DEF_H__
 
-/******************************/
-#define  R_REGISTER      0x00
-#define  W_REGISTER      0x20
-#define  R_RX_PAYLOAD 	 0x61
-#define  W_TX_PAYLOAD	 0xa0
-#define  FLUSH_TX		 0xe1
-#define  FLUSH_RX		 0xe2
-#define  REUSE_TX_PL     0xe3
-#define  NOP             0xff
+/*******************命令寄存器***************************/
+#define  R_REGISTER      0x00//读取配置寄存器
+#define  W_REGISTER      0x20//写配置寄存器
+#define  R_RX_PAYLOAD 	 0x61//读取RX有效数据
+#define  W_TX_PAYLOAD	 0xa0//写TX有效数据
+#define  FLUSH_TX		 0xe1//清除TXFIFO寄存器
+#define  FLUSH_RX		 0xe2//清除RXFIFO寄存器
+#define  REUSE_TX_PL     0xe3//重新使用上一包有效数据
+#define  NOP             0xff//空操作
 #define  W_TX_PAYLOAD_NOACK 0xB0	// Used in TX mode, Disable AUTOACK on this specific packet
 
 /******************寄存器地址****************************/
@@ -44,12 +57,13 @@
 //本节点的接收的数据宽度 (1-32字节)
 #define RECEIVE_DATA_WIDTH 16
 
+
 /**
  * Define Hardware wiring
  *
  *    NRF24L01+      RPi引脚号     WiringPi
  *----------------------------------------
- *   GND PIN 1 ------ PIN 6  ------ N.A.
+ *   GND PIN 1 ------ PIN 9  ------ N.A.
  *  3.3v PIN 2 ------ PIN 1  ------ N.A.
  *    CE PIN 3 ------ PIN 7  ------ 7
  *   CSN PIN 4 ------ PIN 13 ------ 2
