@@ -170,14 +170,11 @@ void nrf24L01Init()
 	
 	//CE=0; //待机模式1 (Standy-I)
 	digitalWrite( CE, LOW );
-	digitalWrite( CE, LOW );
 	
 	//CSN=1;
 	digitalWrite( CSN, HIGH );
-	digitalWrite( CSN, HIGH );
 	
 	//SCLK=0;
-	digitalWrite( SCLK, LOW );
 	digitalWrite( SCLK, LOW );
 	
 	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
@@ -188,8 +185,8 @@ void nrf24L01Init()
 	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
 	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 );   // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
 	
-	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //clear bit for RX_DR, TX_DS, MAX_RT
-	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
+	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
+	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	//flush buffers
 	nrfFlushTx();
@@ -212,6 +209,7 @@ void nrf24L01Init()
 //
 // 返回值：
 // 255-表示大重发次数达到后仍然未收到ACK，发送失败
+// 100或200-都是系统异常情况。（其实这两个值都不应出现。目前200没有出现过，100在系统上电后第一次发送数据会出现）
 // 0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
 //    0：没有重发，直接发送成功
 //    1: 重发了1次后成功收到ack
@@ -225,31 +223,28 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, uns
 	
 	digitalWrite( CE, LOW );
 
-	
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth ); //写寄存器指令+接收地址使能指令+接收地址+地址宽度
 	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
 	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据 
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
-	
-	nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
-	
-	//nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
-	nrfWriteReg( W_REGISTER+CONFIG,0x4e ); //Mask interrup for RX_DR, Enable interrupt for TX_DS and MAX_RT，CRC使能，2字节CRC校验，上电，PTX
+	nrfWriteReg( W_REGISTER+STATUS, 0x7f );  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
+	//nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
+	nrfWriteReg( W_REGISTER+CONFIG, 0x4e ); //屏蔽RX_DR中断, 使能TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	digitalWrite( CE, HIGH );
 	delayFor24L01();
 	digitalWrite( CE, LOW ); //待发送完毕后转为Standby-1模式
 	
-
-	printf( "sending...\n\r");
-	
 	do
 	{
 		ret=nrfCheckACK();
-	}while( ret==100 && ++timeoutCnt < 200000L );//检测是否发送完毕 Test value: when timeoutCnt=173000, it reaches max re-transmit
+	}while( ret==100 && ++timeoutCnt < 250000L );//检测是否发送完毕或者超时
+	//实验发现：一般重发15次后，timeoutCnt的值在172000左右
+	//这里取250000作为超时的值，够了。
+
+
 	printf( "cnt=%ld\n\r", timeoutCnt );
-	
 	printf( "sending done.\n\r");
 	
 	return ret;
@@ -276,7 +271,7 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
 
-	nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
+	nrfWriteReg( W_REGISTER+STATUS, 0x7f );  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
 
   	digitalWrite( CE, HIGH ); //设为接收模式 PRX
@@ -285,6 +280,7 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 
 // 用于检查发送结果(Ack)
 // 返回值：100-表示还在发送中
+//         200-不应该出现的返回值。（中断触发了，但既不是TX_DS也不是MAX_RT）
 //         255-表示大重发次数达到后仍然未收到ACK，发送失败
 //         0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
 //           0：没有重发，直接发送成功
@@ -388,6 +384,9 @@ unsigned char* nrfGetReceivedData()
 	return dataBuffer;
 } 
 
+
+//获取是否收到数据
+//返回值: 1-收到数据， 0-未收到数据
 unsigned char nrfIsDataReceived()
 {
 	/*
