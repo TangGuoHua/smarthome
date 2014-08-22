@@ -4,6 +4,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年08月20日  黄长浩  初始版本
+2014年08月23日  黄长浩  新的板焊好了，调整了nrf24l01+与Pi的连接引脚
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
