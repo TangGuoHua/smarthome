@@ -67,16 +67,16 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
  *  3.3v PIN 2 ------ PIN 1  ------ N.A.
  *    CE PIN 3 ------ PIN 7  ------ 7
  *   CSN PIN 4 ------ PIN 13 ------ 2
- *  SCLK PIN 5 ------ PIN 15 ------ 3
- *  MOSI PIN 6 ------ PIN 19 ------ 12
+ *  SCLK PIN 5 ------ PIN 23 ------ 14
+ *  MOSI PIN 6 ------ PIN 15 ------ 3
  *  MISO PIN 7 ------ PIN 21 ------ 13
- *   IRQ PIN 8 ------ PIN 23 ------ 14
+ *   IRQ PIN 8 ------ PIN 19 ------ 12
  **/
 #define CE 7
 #define CSN 2
-#define SCLK 3
-#define MOSI 12
+#define SCLK 14
+#define MOSI 3
 #define MISO 13
-#define IRQ 14
+#define IRQ 12
 
 #endif
