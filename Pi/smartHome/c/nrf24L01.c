@@ -245,8 +245,8 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, uns
 	//这里取250000作为超时的值，够了。
 
 
-	printf( "cnt=%ld\n\r", timeoutCnt );
-	printf( "sending done.\n\r");
+	//printf( "cnt=%ld\n\r", timeoutCnt );
+	//printf( "sending done.\n\r");
 	
 	return ret;
 }

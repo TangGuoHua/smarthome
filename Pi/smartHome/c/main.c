@@ -23,136 +23,73 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #include "nrf24L01.h"
 
 
-void sendDataToHost( )
+void testChannel( unsigned char rfChannel )
 {
-	unsigned char sendData[4];
-	unsigned char toAddr[3]= {97, 83, 41}; //Pi's address is {53, 69, 149};
+	unsigned char sendData[10];
+	unsigned char toAddr[3]= {97,83,175};
 	unsigned char tmp;
 
 		
-	sendData[0] = 1;
-	sendData[1] = 0;
-	sendData[2] = 0;
-	sendData[3] = 0; 
+	sendData[0] = 2; //From
+	sendData[1] = 1; //function
+	sendData[2] = rfChannel; //channel
+	sendData[3] = 100; //qty
 
 
-	//tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
-	tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
+	tmp = nrfSendData( 125, 3, toAddr, 10, sendData);
 	
-	printf( "Send Data Result=%d\n\r\n\r\n\r", tmp);
+	printf( "\n\rTesting Channel [%d]. Trigger sent. Result=%d\n\r", rfChannel, tmp);
 	
 
 }
 
-void sendDataToPi( )
-{
-	unsigned char sendData[16];
-	unsigned char toAddr[3]= {53, 69, 149};
-	unsigned char tmp;
-
-		
-	sendData[0] = 88;
-	sendData[1] = 0;
-	sendData[2] = 88;
-	sendData[3] = 0; 
-
-
-	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
-	//tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
-	
-	printf( "Send to Pi Result=%d\n\r\n\r\n\r", tmp);
-	
-
-}
-
-void sendDataToPi3( int cnt )
-{
-	unsigned char sendData[16];
-	unsigned char toAddr[3]= {53, 69, 149};
-	unsigned char tmp;
-
-		
-	sendData[0] = 88;
-	sendData[1] = cnt;
-	sendData[2] = 88;
-	sendData[3] = 0; 
-
-
-	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);
-	//tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
-	
-	printf( "Send to Pi Result=%d\n\r\n\r\n\r", tmp);
-	
-
-}
-
-void sendDataToPi2( )
-{
-	unsigned char sendData[16];
-	unsigned char toAddr[3]= {153, 169, 49};
-	unsigned char tmp;
-
-		
-	sendData[0] = 88;
-	sendData[1] = 0;
-	sendData[2] = 88;
-	sendData[3] = 0; 
-
-
-	tmp = nrfSendData( 66, 3, toAddr, 16, sendData);
-	//tmp = nrfSendData( 92, 3, toAddr, 4, sendData);
-	
-	printf( "Send to Pi2 Result=%d\n\r\n\r\n\r", tmp);
-	
-
-}
-
-void startRecv( void )
+void startRecv( unsigned char rfChannel )
 {
 	unsigned char myAddr[3] = {53,70, 132};
-	nrfSetRxMode( 99, 3, myAddr );
+	nrfSetRxMode( rfChannel, 3, myAddr );
 	
-	printf( "Starting listening... \n\r" );
+	printf( "Starting listening on channel [%d]... \n\r" , rfChannel);
 	
 }
 
 int main(int argc, char **argv)
 {
 	unsigned char *receivedData;
-	unsigned int cnt = 0;
+	unsigned char cnt = 0;
+	
+	unsigned int timeout=10000;
+	
+	unsigned char rfChannel=0;
 	
 	printf( "Test NRF24L01+ ... \n\r" );
 	
 	nrf24L01Init();
 	
-	sendDataToHost();
-	
-	sendDataToHost();
-	
-	sendDataToPi();
-	
-	sendDataToPi2();
-	
-	startRecv();
-	
-	while(1)
+	for( ;rfChannel<=124; rfChannel++)
 	{
-		if( nrfIsDataReceived() )
+
+
+		testChannel( rfChannel);
+		
+		startRecv(rfChannel);
+		timeout=10000;
+		cnt=0;
+		while(--timeout>10)
 		{
-			printf( "Data Received. [%d]", ++cnt );
-			receivedData = nrfGetReceivedData();
-			printf( "D1=%d, D2=%d, D3=%d, D4=%d, D5=%d D6=%d\n\r", *(receivedData++), *(receivedData++),*(receivedData++),*(receivedData++),*(receivedData++),*(receivedData++) );
-			
-			if( cnt%5==0)
+			if( nrfIsDataReceived() )
 			{
-				sendDataToPi3(cnt);
-				startRecv();
+				printf( "Channel [%03d] received data #[%3d] - ", rfChannel, ++cnt );
+				receivedData = nrfGetReceivedData();
+				receivedData++; //skip Sender
+				receivedData++; //skip Function #
+				printf( "SN:%3d, Last ReTxn:%2d, ReTxn0:%2d, ReTxn5:%2d, ReTxn10:%2d, ReTxn15:%2d, TxFailed:%2d\n\r", *(receivedData++),*(receivedData++),*(receivedData++),*(receivedData++), *(receivedData++), *(receivedData++), *(receivedData++) );
+				timeout=10000;
 			}
-			
+				
+			usleep(1);
 		}
-			
-		usleep(10000);
 	}
+
 
 	return 0;
 
