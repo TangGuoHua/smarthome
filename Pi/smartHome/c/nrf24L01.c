@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 【修改历史】
 
 日期            作者    备注
@@ -343,36 +343,6 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 //           最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
 unsigned char nrfCheckACK()
 {
-	/*  
-	unsigned char status;
-	
-	status = nrfReadReg(R_REGISTER+STATUS); //读取状态寄存器
-	
-	if( status & 0x20 ) //检查TX_DS位，置位则发送成功
-	{
-		nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除TX_DS标志
-		
-		//发送成功后，FIFO自动清空，这里就不用再清了
-		
-		//返回自动重发次数
-		return( nrfReadReg(R_REGISTER+OBSERVE_TX) & 0x0f ); 
-	}
-	else if( status & 0x10) //检查MAX_RT位，置位则说明最大重发次数达到后仍然未收到ACK，发送失败
-	{
-		nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除MAX_RT标志
-		
-		//发送失败，FIFO不会自动清空，必须手动清空 ！！
-		//关键！！不然会出现意想不到的后果！！！
-		nrfFlushTx();
-
-		return 255;
-	}
-	else //还在发送中...
-	{
-		return 100;
-	}
-	* */
-	
 	unsigned char status;
 	
 	if( digitalRead( IRQ ))
@@ -442,16 +412,5 @@ unsigned char* nrfGetReceivedData()
 //返回值: 1-收到数据， 0-未收到数据
 unsigned char nrfIsDataReceived()
 {
-	/*
-	unsigned char status;
-	
-	//读取状态寄存器
-	status = nrfReadReg(R_REGISTER+STATUS);
-	if( status & 0x40 ) //检查RX_DR位，如果置位，则说明接收到数据
-		return 1;
-	else
-		return 0;
-	* */
-	
 	return (! digitalRead( IRQ ) );
 }
