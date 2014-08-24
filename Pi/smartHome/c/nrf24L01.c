@@ -4,7 +4,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年08月20日  黄长浩  初始版本
-
+2014年08月20日  黄长浩  修改nrfSendData()函数，增加rfPower, maxRetry参数
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 版权所有者：黄长浩 HuangChangHao@gmail.com
@@ -204,7 +204,12 @@ void nrf24L01Init()
 //          rfPower=2, 发射功率-12dBm (+15dBm with PA) 
 //          rfPower=3, 发射功率-6dBm (+20dBm with PA) 
 //          rfPower=4, 发射功率0dBm (+22dBm with PA) 
-// retry: 如果发送不成功，重试的最大次数
+// maxRetry: 如果发送不成功，重试的最大次数 取值范围0-9
+//           0:如果发送失败，（特指nrf24l01+芯片Re-transmit 15次后仍然不成功），那么不重试，直接返回
+//           1:如果发送失败，（特指nrf24l01+芯片Re-transmit 15次后仍然不成功），重试1次。以此类推。
+//           特别说明，retry和retransmit的区别是：
+//             芯片被设定为每次发送数据，如果一次transmission不成功，则自动再重传（retransmit）15次
+//             而retry是指，在芯片自动重传了15次后，还是不成功的情况下，再发送一轮，即transmit (1+15)=16次
 // addrWidth: 发送地址宽度
 // txAddr: 发送的地址（接收方地址）
 // dataWidth: 发送数据的宽度
@@ -213,23 +218,28 @@ void nrf24L01Init()
 // unsigned char rfChannel = 0x64; //选择无线电频道
 // unsigned char rec_addr[3]= { 0x54, 0x53, 0x95 };  //接收方地址
 // unsigned char data_to_send[5] = {0x01, 0x02, 0x03, 0x04, 0x05 };　//要发送的数据
-// nrfSendData( rfChannel, 3, rec_addr, 5, data_to_send );  //发送
+// nrfSendData( rfChannel, 1, 3, 3, rec_addr, 5, data_to_send );  //发送
 //
-// 返回值：
-// 255-表示大重发次数达到后仍然未收到ACK，发送失败
-// 100或200-都是系统异常情况。（其实这两个值都不应出现。目前200没有出现过，100在系统上电后第一次发送数据会出现）
-// 0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
-//    0：没有重发，直接发送成功
-//    1: 重发了1次后成功收到ack
-//    2: 重发了2次后成功收到ack
-//    以此类推
-//    最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
-unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsigned char retry, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
+// 返回值：本函数返回数据发送成功时，芯片重传（Re-transmit）的次数。
+//   返回0：没有re-transmit，直接发送成功
+//   返回1: 表示芯片re-transmit 1次成功
+//   返回2：表示芯片re-transmit 2次成功
+//   以此类推，最多re-transmit 159次成功。
+//
+//   返回251或252：都是系统异常情况。（其实这两个值都不应出现。）
+//   返回253：表示本函数的入口参数有超过取值范围的，需要检查入口参数。
+//   返回255：表示达到了重发次数达到后仍然未收到ACK，发送失败
+unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsigned char maxRetry, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
 {
 	unsigned char ret = 0;
-	//unsigned char retry = 3;
 	unsigned char retryCnt = 0;
 	unsigned long timeoutCnt;
+
+	//检测各个参数是否在允许的取值范围内
+	if( rfChannel>125 || rfPower==0 || rfPower>4 || maxRetry>9 || addrWidth<3 || addrWidth>5 || dataWidth==0 || dataWidth>32 )
+	{
+		return 253;
+	}
 	
 	digitalWrite( CE, LOW );
 
@@ -253,7 +263,7 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 	nrfWriteReg( W_REGISTER+CONFIG, 0x4e ); //屏蔽RX_DR中断, 使能TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	
-	for( retryCnt=0; retryCnt<=retry; retryCnt++ )
+	for( retryCnt=0; retryCnt<=maxRetry; retryCnt++ )
 	{
 		nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据
 		
@@ -265,13 +275,20 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 		do
 		{
 			ret=nrfCheckACK();
-		}while( ret==100 && ++timeoutCnt < 250000L );//检测是否发送完毕或者超时
+		}while( ret==251 && ++timeoutCnt < 250000L );//检测是否发送完毕或者超时
 		//实验发现：一般重发15次后，timeoutCnt的值在172000左右
 		//这里取250000作为超时的值，够了。
 		printf( "retry count:[%d]\r\n", retryCnt );
 		
+		//如果返回值小于等于15，说明本次数据传送成功
 		if( ret<=15 ) 
 		{
+			//计算函数返回值，即Retransmission的次数
+			//一次性发送成功，返回0，即没有重传(re-transmission)
+			//retry第1次时，一次性发送成功，则retransit 16次 （之前15次加本次）
+			//一次类推，
+			//retry第9次时，（加开始retry之前的一次，共发射了10次），retransmit 15次成功，则，总共retransmit了16*9+15=159次
+			//每次try是transmit 16次 （本身1次，加15次retransmit）
 			ret += (15*retryCnt + retryCnt);
 			break;
 		}
@@ -315,8 +332,8 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 
 
 // 用于检查发送结果(Ack)
-// 返回值：100-表示还在发送中
-//         200-不应该出现的返回值。（中断触发了，但既不是TX_DS也不是MAX_RT）
+// 返回值：251-表示还在发送中
+//         252-不应该出现的返回值。（中断触发了，但既不是TX_DS也不是MAX_RT）
 //         255-表示大重发次数达到后仍然未收到ACK，发送失败
 //         0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
 //           0：没有重发，直接发送成功
@@ -360,7 +377,7 @@ unsigned char nrfCheckACK()
 	
 	if( digitalRead( IRQ ))
 	{
-		return 100;
+		return 251;
 	}
 	else
 	{
@@ -385,7 +402,7 @@ unsigned char nrfCheckACK()
 
 			return 255;
 		}
-		else return 200;
+		else return 252;
 	}
 }
 
