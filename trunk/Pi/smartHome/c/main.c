@@ -22,6 +22,7 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 //#include <wiringPi.h>
 #include "nrf24L01.h"
 
+#define SEND_RETRY 3
 
 void testChannel( unsigned char rfChannel, unsigned char frameCount )
 {
@@ -36,7 +37,7 @@ void testChannel( unsigned char rfChannel, unsigned char frameCount )
 	sendData[3] = frameCount; //qty
 
 
-	tmp = nrfSendData( 125, 1, 3, toAddr, 10, sendData);
+	tmp = nrfSendData( 125, 1, SEND_RETRY, 3, toAddr, 10, sendData);
 	
 	//printf( "\n\rTesting Channel [%d]. Trigger sent. Result=%d\n\r", rfChannel, tmp);
 	
@@ -71,11 +72,11 @@ void sendDataToHeater()
 	for(i=1; i<=10; i++)
 	{
 		sendData[2] = 1;
-		tmp = nrfSendData( 92, 1, 3, toAddr, 5, sendData);
+		tmp = nrfSendData( 92, 1, SEND_RETRY, 3, toAddr, 5, sendData);
 		printf( "Sending [On], result=%d \n\r", tmp );
 		usleep( 1000000L);
 		sendData[2] = 0;
-		tmp = nrfSendData( 92, 1, 3, toAddr, 5, sendData);
+		tmp = nrfSendData( 92, 1, SEND_RETRY, 3, toAddr, 5, sendData);
 		printf( "Sending [Off], result=%d \n\r", tmp  );
 		usleep( 1000000L);
 	}
