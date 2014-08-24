@@ -21,5 +21,5 @@ void nrf24L01Init( void );
 unsigned char nrfIsDataReceived(void);
 unsigned char* nrfGetReceivedData( void );
 void nrfSetRxMode(  unsigned char rfChannel, unsigned char addrWidth, unsigned char *rxAddr);
-unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData );
+unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData );
 #endif

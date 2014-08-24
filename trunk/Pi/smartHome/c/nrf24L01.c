@@ -185,7 +185,7 @@ void nrf24L01Init()
 	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us+86us，自动重发15次
 	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
 	//nrfWriteReg( W_REGISTER+RF_SETUP,0x27 );   // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
-	nrfWriteReg( W_REGISTER+RF_SETUP,0x21 );   // 数据传输率250Kbps，发射功率-18dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+	//nrfWriteReg( W_REGISTER+RF_SETUP,0x21 );   // 数据传输率250Kbps，发射功率-18dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
 	
 	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
 	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
@@ -199,6 +199,12 @@ void nrf24L01Init()
 // 将24L01设置为发送模式PTX，并发送数据
 // 参数如下：
 // rfChannel: 无线电频道  取值范围是0-125（即，0x00到0x7d）
+// rfPower: 发射功率 取值1-4，
+//          rfPower=1, 发射功率-18dBm (+7dBm with PA) 
+//          rfPower=2, 发射功率-12dBm (+15dBm with PA) 
+//          rfPower=3, 发射功率-6dBm (+20dBm with PA) 
+//          rfPower=4, 发射功率0dBm (+22dBm with PA) 
+// retry: 如果发送不成功，重试的最大次数
 // addrWidth: 发送地址宽度
 // txAddr: 发送的地址（接收方地址）
 // dataWidth: 发送数据的宽度
@@ -218,32 +224,58 @@ void nrf24L01Init()
 //    2: 重发了2次后成功收到ack
 //    以此类推
 //    最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
-unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
+unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsigned char retry, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
 {
 	unsigned char ret = 0;
-	unsigned long timeoutCnt=0;
+	//unsigned char retry = 3;
+	unsigned char retryCnt = 0;
+	unsigned long timeoutCnt;
 	
 	digitalWrite( CE, LOW );
 
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth ); //写寄存器指令+接收地址使能指令+接收地址+地址宽度
 	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
-	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据 
+	//nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据
+	
+	if(rfPower==1)
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x20 );   // 数据传输率250Kbps，发射功率-18dBm (+7dBm with PA)
+	else if(rfPower==2)
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x22 );   // 数据传输率250Kbps，发射功率-12dBm (+15dBm with PA)
+	else if(rfPower==3)
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x24 );   // 数据传输率250Kbps，发射功率-6dBm (+20dBm with PA)
+	else if(rfPower==4)
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x26 );   // 数据传输率250Kbps，发射功率0dBm (+22dBm with PA)
+
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
 	nrfWriteReg( W_REGISTER+STATUS, 0x7f );  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
 	//nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 	nrfWriteReg( W_REGISTER+CONFIG, 0x4e ); //屏蔽RX_DR中断, 使能TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，PTX
 	
-	digitalWrite( CE, HIGH );
-	delayFor24L01();
-	digitalWrite( CE, LOW ); //待发送完毕后转为Standby-1模式
 	
-	do
+	for( retryCnt=0; retryCnt<=retry; retryCnt++ )
 	{
-		ret=nrfCheckACK();
-	}while( ret==100 && ++timeoutCnt < 250000L );//检测是否发送完毕或者超时
-	//实验发现：一般重发15次后，timeoutCnt的值在172000左右
-	//这里取250000作为超时的值，够了。
+		nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据
+		
+		digitalWrite( CE, HIGH );
+		delayFor24L01();
+		digitalWrite( CE, LOW ); //待发送完毕后转为Standby-1模式
+		
+		timeoutCnt=0;
+		do
+		{
+			ret=nrfCheckACK();
+		}while( ret==100 && ++timeoutCnt < 250000L );//检测是否发送完毕或者超时
+		//实验发现：一般重发15次后，timeoutCnt的值在172000左右
+		//这里取250000作为超时的值，够了。
+		printf( "retry count:[%d]\r\n", retryCnt );
+		
+		if( ret<=15 ) 
+		{
+			ret += (15*retryCnt + retryCnt);
+			break;
+		}
+	}
 
 
 	//printf( "cnt=%ld\n\r", timeoutCnt );
@@ -272,6 +304,8 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
+  	
+  	nrfWriteReg( W_REGISTER+RF_SETUP,0x26 );   // 数据传输率250Kbps，发射功率0dBm (+22dBm with PA)
 
 	nrfWriteReg( W_REGISTER+STATUS, 0x7f );  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式

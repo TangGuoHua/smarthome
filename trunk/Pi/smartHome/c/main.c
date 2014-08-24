@@ -36,7 +36,7 @@ void testChannel( unsigned char rfChannel, unsigned char frameCount )
 	sendData[3] = frameCount; //qty
 
 
-	tmp = nrfSendData( 125, 3, toAddr, 10, sendData);
+	tmp = nrfSendData( 125, 1, 3, toAddr, 10, sendData);
 	
 	//printf( "\n\rTesting Channel [%d]. Trigger sent. Result=%d\n\r", rfChannel, tmp);
 	
@@ -50,6 +50,35 @@ void startRecv( unsigned char rfChannel )
 	
 	//printf( "Starting listening on channel [%d]... \n\r" , rfChannel);
 	
+}
+
+
+void sendDataToHeater()
+{
+	unsigned char sendData[5];
+	unsigned char toAddr[3]= {97,83,91};
+	unsigned char tmp, i;
+
+		
+	sendData[0] = 0;
+	sendData[1] = 105;
+	sendData[2] = 2;
+	sendData[3] = 0;
+	sendData[4] = 0;
+	
+	usleep( 6000000L);
+	
+	for(i=1; i<=10; i++)
+	{
+		sendData[2] = 1;
+		tmp = nrfSendData( 92, 1, 3, toAddr, 5, sendData);
+		printf( "Sending [On], result=%d \n\r", tmp );
+		usleep( 1000000L);
+		sendData[2] = 0;
+		tmp = nrfSendData( 92, 1, 3, toAddr, 5, sendData);
+		printf( "Sending [Off], result=%d \n\r", tmp  );
+		usleep( 1000000L);
+	}
 }
 
 int main(int argc, char **argv)
@@ -76,6 +105,9 @@ int main(int argc, char **argv)
 	
 	// initialize
 	nrf24L01Init();
+	
+	sendDataToHeater();
+	return 0;
 	
 	//testing channel 0-124
 	for( ;rfChannel<=124; rfChannel++)
