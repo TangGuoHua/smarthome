@@ -20,11 +20,11 @@ sfr AUXR = 0x8E;
 sbit PIR=P1^7; //热释红外探头引脚定义
 
 //计时中断累计10ms和1s的变量
-unsigned char count10ms = 0;
-unsigned int count1s = 0;
+volatile unsigned char count10ms = 0;
+volatile unsigned int count1s = 0;
 
 //时间到发送数据的标志位
-volatile bit toSend = 1;
+volatile bit toSend = 0;
 
 void initTimer0(void)
 {
@@ -46,7 +46,7 @@ void initINT0(void)
 void main()
 { 
 	unsigned char sendData[15];
-	unsigned char addr[3];
+	//unsigned char addr[3];
 	bit thisPIR=0, lastPIR=0;
 	MY_LONG tmp;
 
@@ -112,6 +112,7 @@ void main()
 //			//nrfSendData( HOST_RF_CHANNEL, ADDRESS_WIDTH, HOST_ADDR, HOST_DATA_WIDTH, sendData);
 //				
 //			//nrfSetRxMode(); //设置nrf24L01为接收模式
+//
 //		}
 		
 		//定时发送气压温度亮度等数据 100-11
@@ -145,6 +146,8 @@ void main()
 			sendData[13]=tmp.byte[3];
 			// 数据复原 tmp.byte[2]*256 + tmp.byte[3]
 			
+			sendData[14] = thisPIR;
+			
 			nrfSendData( HOST_RF_CHANNEL, ADDRESS_WIDTH, HOST_ADDR, HOST_DATA_WIDTH, sendData);
 			
 			toSend = 0;
@@ -157,17 +160,19 @@ void main()
 // 中断每10ms一次
 void timer0Interrupt(void) interrupt 1
 {
-    TH0 = 0x0f;
-    TL0 = 0xe0; // f0偏快 
+    TH0 = 0x1d;
+    TL0 = 0x70;
     
 	if( ++count10ms == 100 ) // 每100个10ms就是1秒
 	{
+		TR0=0;
 		count10ms = 0;
-		if( ++count1s == 300 )
+		if( ++count1s == 600 )
 		{
 			count1s = 0;
 			toSend = 1;
 		}
+		TR0=1;
 	}
 }
 
