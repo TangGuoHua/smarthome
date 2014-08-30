@@ -43,20 +43,20 @@ switch($param)
 		$s2Unit="";
 		break;
 
-	case "31-1": //书房温度亮度
-		$query = "select (fldData4*256+fldData5)/10.0 as s1, fldData12*256+fldData13 as s2, fldCreatedOn from tabDataRecved where fldNodeID=31 and fldData1=11";
-		$chartTitle = "书房温度亮度";
+	case "31-1": //书房温度气压
+		$query = "select (fldData4*256+fldData5)/10.0 as s1, fldData7*65536+fldData8*256+fldData9 as s2, fldCreatedOn from tabDataRecved where fldNodeID=31 and fldData1=11";
+		$chartTitle = "书房温度气压";
 		$s1Title="温度";
 		$s1Unit="度";
-		$s2Title="亮度";
-		$s2Unit="Lux";
+		$s2Title="气压";
+		$s2Unit="帕";
 		break;
 
-	case "31-2": //书房气压
-		$query = "select fldData7*65536+fldData8*256+fldData9 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=31 and fldData1=11";
-		$chartTitle = "书房气压";
-		$s1Title="气压";
-		$s1Unit="帕";
+	case "31-2": //书房亮度
+		$query = "select fldData12*256+fldData13 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=31 and fldData1=11";
+		$chartTitle = "书房亮度";
+		$s1Title="亮度";
+		$s1Unit="Lux";
 		$s2Title="";
 		$s2Unit="";
 		break;
