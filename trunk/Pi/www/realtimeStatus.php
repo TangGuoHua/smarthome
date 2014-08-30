@@ -56,14 +56,7 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=31-1'>温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", ($row["fldData4"]*256+$row["fldData5"])/10, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=31-1'>亮度 %d Lux <span class='ui-li-count'>%s</span></a></li>", $row["fldData12"]*256+$row["fldData13"], $row["fldCreatedOn"]);	
 	printf( "<li><a href='chart.php?param=31-2'>气压 %.1f hPa <span class='ui-li-count'>%s</span></a></li>", ($row["fldData7"]*65536+$row["fldData8"]*256+$row["fldData9"])/100, $row["fldCreatedOn"]);
-	
-	//PIR红外探头
-	$query = "select * from tabDataRecved where fldNodeID=31 and fldData1=111 order by fldID desc limit 1";
-	$results = $db->query($query);
-	if ($row = $results->fetchArray()) 
-	{
-		printf( "<li>%s <span class='ui-li-count'>%s</span></li>", $row["fldData2"]==1?"有人":"无人", $row["fldCreatedOn"]);	
-	}
+	printf( "<li>%s <span class='ui-li-count'>%s</span></li>", $row["fldData14"]==1?"有人":"无人", $row["fldCreatedOn"]);	
 	
 }
 
