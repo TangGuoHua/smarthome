@@ -6,7 +6,7 @@
 2014-FEB-05 黄长浩  增加卫生间温度
                     增加南卧温湿度
                     画图的点数由30增加到33
-
+2014-AUG-30 黄长浩  增加书房温度气压亮度
 */
 
 $gPageTitle = "图";
@@ -42,6 +42,27 @@ switch($param)
 		$s2Title="亮度";
 		$s2Unit="";
 		break;
+
+	case "31-1": //书房温度亮度
+		$query = "select (fldData4*256+fldData5)/10.0 as s1, fldData12*256+fldData13 as s2, fldCreatedOn from tabDataRecved where fldNodeID=31 and fldData1=11";
+		$chartTitle = "书房温度亮度";
+		$s1Title="温度";
+		$s1Unit="度";
+		$s2Title="亮度";
+		$s2Unit="Lux";
+		break;
+
+	case "31-2": //书房气压
+		$query = "select fldData7*65536+fldData8*256+fldData9 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=31 and fldData1=11";
+		$chartTitle = "书房气压";
+		$s1Title="气压";
+		$s1Unit="帕";
+		$s2Title="";
+		$s2Unit="";
+		break;
+
+
+
 	case "54": //客厅温湿度
 		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=54";
 		$chartTitle = "客厅温湿度";
@@ -105,23 +126,7 @@ switch($param)
 		$s2Unit="";
 		break;
 
-	case "11-1": //书房温度亮度
-		$query = "select ((fldData3*256+fldData4)/10.0) as s1, fldData11*256+fldData12 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=11";
-		$chartTitle = "书房温度亮度";
-		$s1Title="温度";
-		$s1Unit="度";
-		$s2Title="亮度";
-		$s2Unit="Lx";
-		break;
-	
-	case "11-2": //书房气压温度
-		$query = "select ((fldData3*256+fldData4)/10.0) as s2, fldData6*65536+fldData7*256+fldData8 as s1, fldCreatedOn from tabDataHistory where fldNodeID2=11";
-		$chartTitle = "书房气压温度";
-		$s2Title="温度";
-		$s2Unit="度";
-		$s1Title="气压";
-		$s1Unit="帕";
-		break;
+
 		
 	case "15": //主卧亮度
 		$query = "select fldData3||'.'||fldData4 as s1, fldData1 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=15";
