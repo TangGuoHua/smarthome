@@ -163,7 +163,8 @@ void nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned cha
 	
 	
 	//NRFWriteReg(W_REGISTER+SETUP_RETR,0x0a);  // 自动重发延时等待250us+86us，自动重发10次
-	nrfWriteReg( W_REGISTER+SETUP_RETR,0x7a );  // 自动重发延时等待2000us+86us，自动重发10次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x7a );  // 自动重发延时等待2000us+86us，自动重发10次
+	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f );  // 自动重发延时等待1500us+86us，自动重发15次
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道0x64
 	
 	nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm

@@ -35,7 +35,8 @@ void BMP085Delay5us()
 {
 	unsigned char a;
 	//for(a=3;a>0;a--); // 晶振：3.6864MHz
-	for(a=6;a>0;a--); //内部RC振荡: 6.22MHz
+	//for(a=6;a>0;a--); //内部RC振荡: 6.22MHz
+	for(a=5;a>0;a--); //内部RC振荡: 5.8MHz
 }
 
 
