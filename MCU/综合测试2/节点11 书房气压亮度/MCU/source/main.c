@@ -167,7 +167,7 @@ void timer0Interrupt(void) interrupt 1
 	{
 		TR0=0;
 		count10ms = 0;
-		if( ++count1s == 600 )
+		if( ++count1s == 60 )
 		{
 			count1s = 0;
 			toSend = 1;
