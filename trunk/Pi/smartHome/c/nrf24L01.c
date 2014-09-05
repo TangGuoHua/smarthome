@@ -221,7 +221,7 @@ void nrf24L01Init()
 	//SCLK=0;
 	digitalWrite( SCLK, LOW );
 	
-	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
+	/***下面这些寄存器的配置，在这个程序运行期间不变化，故在初始化芯片时配置。***/
 	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );     // 使能接收通道0自动应答
 	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); // 使能接收通道0
 
