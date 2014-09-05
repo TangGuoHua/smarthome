@@ -24,27 +24,25 @@ Date         Author   Remarks
 #include <stdio.h>
 #include <sqlite3.h>
 #include <strings.h>
-#include "nrf24L01.h"
 #include <unistd.h>
+#include "nrf24L01.h"
 
-//#define BAUDRATE B57600
-//#define BAUDRATE B115200
-//#define SERIAL_DEVICE "/dev/ttyAMA0"
-//#define _POSIX_SOURCE 1 /* POSIX compliant source */
 #define FALSE 0
 #define TRUE 1
 #define DATABASE_FILE_NAME "/var/www/db/smarthome.sqlite3"
 
 
-// Create a handle for database connection, create a pointer to sqlite3
+//Create a handle for database connection, create a pointer to sqlite3
 sqlite3 *g_dbHandle = NULL;
 
-
+//Declare functions
+void startRecv();
 void initDatabase();
 void checkSendDataToNode();
-void startRecv();
+void checkScheduledTask();
 
 
+//NRF24L01接收到数据后执行本方法
 void onDataReceived()
 {
 	//unsigned char i;
@@ -52,12 +50,13 @@ void onDataReceived()
 	unsigned char *data;
 	int tmp;
 	
+	//读取nrf24L01收到的数据
 	data = nrfGetReceivedData();
 
 	//sqlite3_stmt * stmt;
 	//sqlite3_prepare ( g_dbHandle, "INSERT INTO tabDataHistory  ( fldNodeID1, fldNodeID2, fldData1, fldData2 ) VALUES( ?, ?, ?, ? )", -1, &stmt, 0 );
 	
-	//sprintf( sqlStr, "INSERT INTO tabDataHistory (fldNodeID1,fldNodeID2,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data);
+	//将数据存入数据库
 	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data);
 	tmp = sqlite3_exec(g_dbHandle,sqlStr,0,0,0);
 	//tmp = sqlite3_exec(g_dbHandle,sqlStr,NULL,NULL,NULL);
@@ -69,34 +68,29 @@ void onDataReceived()
     }
 }
 
-
+//NRF24L01进入接收模式
 void startRecv()
 {
 	unsigned char myAddr[3] = {53,70, 132};
-	nrfSetRxMode( 92, 3, myAddr );
-	
-	//printf( "Starting listening on channel [%d]... \n\r" , rfChannel);
-	
+	nrfSetRxMode( 92, 3, myAddr ); //监听92频道，3字节地址
 }
 
 //检查数据库，看是否有数据需要发送至节点
 void checkSendDataToNode()
 {
-
 	int ret;
 	char sqlStr[250];
 	sqlite3_stmt* stmt = NULL;
 	int fldID, fldNodeID;
-	//unsigned char fldAddr1, fldAddr2, fldAddr3, 
 	unsigned char fldRFChannel, fldDataLength;
-	unsigned char buf[10];
 	unsigned char toAddr[3];
+	unsigned char sendData[10];
 	unsigned char sendResult;
 	
 	unsigned char sendAnything = FALSE;
 
 	//选出需要往节点发送的数据	
-	ret = sqlite3_prepare(g_dbHandle, "select * from tabDataToNode where fldUpdatedBy is null OR fldUpdatedBy<>'robot'", -1, &stmt, 0);
+	ret = sqlite3_prepare(g_dbHandle, "SELECT * FROM tabDataToNode WHERE fldUpdatedBy IS NULL OR fldUpdatedBy<>'robot'", -1, &stmt, 0);
 	if (ret != SQLITE_OK){
 		fprintf(stderr, "Could not execute SELECT/n");
 		return;
@@ -119,23 +113,22 @@ void checkSendDataToNode()
 		fldRFChannel = sqlite3_column_int(stmt, 6);
 		fldDataLength = sqlite3_column_int(stmt, 7);
 		
-		buf[0] = sqlite3_column_int(stmt, 8);
-		buf[1] = sqlite3_column_int(stmt, 9);
-		buf[2] = sqlite3_column_int(stmt, 10);
-		buf[3] = sqlite3_column_int(stmt, 11);
-		buf[4] = sqlite3_column_int(stmt, 12);
-		buf[5] = sqlite3_column_int(stmt, 13);
-		buf[6] = sqlite3_column_int(stmt, 14);
-		buf[7] = sqlite3_column_int(stmt, 15);
-		buf[8] = sqlite3_column_int(stmt, 16);
-		buf[9] = sqlite3_column_int(stmt, 17);
-
-
-		sendResult = nrfSendData( fldRFChannel, 1, 3, 3, toAddr, fldDataLength, buf);
+		sendData[0] = sqlite3_column_int(stmt, 8);
+		sendData[1] = sqlite3_column_int(stmt, 9);
+		sendData[2] = sqlite3_column_int(stmt, 10);
+		sendData[3] = sqlite3_column_int(stmt, 11);
+		sendData[4] = sqlite3_column_int(stmt, 12);
+		sendData[5] = sqlite3_column_int(stmt, 13);
+		sendData[6] = sqlite3_column_int(stmt, 14);
+		sendData[7] = sqlite3_column_int(stmt, 15);
+		sendData[8] = sqlite3_column_int(stmt, 16);
+		sendData[9] = sqlite3_column_int(stmt, 17);
+		
+		//发送数据
+		sendResult = nrfSendData( fldRFChannel, 1, 3, 3, toAddr, fldDataLength, sendData);
 		sendAnything = TRUE;
 
 		printf( "send result=%d\n", sendResult );
-
 		
 		// update record
 		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime') WHERE fldID=%d", fldID);
@@ -148,6 +141,8 @@ void checkSendDataToNode()
 		}
 	}
 
+	//如果发送过数据，则说明NRF24L01已经退出了PRX模式
+	//重新让其进入接收模式
 	if(sendAnything)
 	{
 		startRecv();
@@ -205,8 +200,6 @@ void checkScheduledTask()
 }
 
 
-
-
 //打开数据库，并完成一些参数的初始化
 void initDatabase()
 {
@@ -249,16 +242,11 @@ void initDatabase()
 
 }
 
-
+//主程序入口
 int main ( int argc, char **argv )
 {
+	printf( "Start SmartHome v2 dameon ... \n\r" );
 	
-
-
-	printf( "Start testing NRF24L01+ ... \n\r" );
-	
-
-
 	// database initialization
 	initDatabase();
 
@@ -266,12 +254,6 @@ int main ( int argc, char **argv )
 	nrf24L01Init();	
 	startRecv( );
 
-
-	
-
-	// initialize serial port
-	//initSerialPort();
-	
 	while( TRUE ) 
 	{
 		if( nrfIsDataReceived() )
@@ -279,7 +261,11 @@ int main ( int argc, char **argv )
 			printf( "data received.\n");
 			// NRF24L01接收到数据
 			onDataReceived();
-
+		}
+		else
+		{		
+			//如果没有收到数据，则sleep 300ms
+			usleep( 300000 ); // sleep for x us
 		}
 
 		//检查是否有计划任务
@@ -287,14 +273,7 @@ int main ( int argc, char **argv )
 		
 		//检查是否有数据需要发送到节点
 		checkSendDataToNode();
-		
-		//如果串口没有收到数据，则sleep 300ms
-		//printf( "-" );
-		usleep( 300000 ); // sleep for x us
-
-
 	}
 
 	return 0;
-	
 }
