@@ -58,7 +58,6 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 //本节点的接收的数据宽度 (1-32字节)
 #define RECEIVE_DATA_WIDTH 16
 
-
 /**
  * Define Hardware wiring
  *
