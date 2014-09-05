@@ -10,6 +10,7 @@
 2014-JUL-30 黄长浩  增加阳台卷帘
 2014-JUL-31 黄长浩  增加书房调光台灯
 2014-AUG-02 黄长浩  阳台卷帘覆盖度支持20%、40%等值
+2014-SEP-05 黄长浩  增加客厅吊顶射灯控制器
 */
 
 $gPageTitle = "常用";
@@ -77,6 +78,37 @@ function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
 		$.post("/api/sendData.php", { nodeID: "53", data2: val } );
 	}
 }
+
+
+// 客厅吊顶射灯
+function chkLivingRoomCeilingLightclicked( val, obj )
+{
+	//alert( val + ' obj.selected=' + obj.checked );
+
+	//开，tmp=1；关，tmp=0
+	var tmp;
+	tmp = obj.checked?1:0;
+
+	if( val == 'E' ) //East
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data2: tmp } );
+	}
+	else if( val == 'S' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data4: tmp } );
+	}
+	else if( val == 'W' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data3: tmp } );
+	}
+	else if( val == 'N' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data5: tmp } );
+	}
+}
+
+
+
 
 // 餐厅
 function chkDinningRoomLightclicked( val, obj )
@@ -208,10 +240,24 @@ while ($row = $results->fetchArray())
 					<label for="rdoLivingRoomFan1">开</label>
 		    </fieldset>
 		</li>
-
-
-
-
+	<?php
+	}
+	elseif( $row["fldNodeID"]==52 )	// 客厅吊顶射灯
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>客厅顶射灯</legend>
+		    	<input type="checkbox" name="chkLivingRoomLightEast" id="chkLivingRoomLightEast" onclick="chkLivingRoomCeilingLightclicked('E', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightEast">东</label>
+				<input type="checkbox" name="chkLivingRoomLightSouth" id="chkLivingRoomLightSouth" onclick="chkLivingRoomCeilingLightclicked('S', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightSouth">南</label>
+				<input type="checkbox" name="chkLivingRoomLightWest" id="chkLivingRoomLightWest" onclick="chkLivingRoomCeilingLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightWest">西</label>
+				<input type="checkbox" name="chkLivingRoomLightNorth" id="chkLivingRoomLightNorth" onclick="chkLivingRoomCeilingLightclicked('N', this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightNorth">北</label>
+		    </fieldset>
+		</li>
 	<?php
 	}
 	elseif( $row["fldNodeID"]==53 )	// 客厅东墙南头（落地灯）
