@@ -360,13 +360,10 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
     digitalWrite( CE, LOW );
 
   	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, rxAddr, addrWidth ); //接收设备接收通道0使用和发送设备相同的发送地址
-
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
-  	
-  	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 );   // 数据传输率250Kbps，发射功率0dBm (+22dBm with PA), LNA?
-
-	nrfWriteReg( W_REGISTER+STATUS, 0x7f );  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
+  	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 ); // 数据传输率250Kbps，发射功率0dBm (+22dBm with PA), LNA?
+	nrfWriteReg( W_REGISTER+STATUS, 0x7f ); // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
 
   	digitalWrite( CE, HIGH ); //设为接收模式 PRX
