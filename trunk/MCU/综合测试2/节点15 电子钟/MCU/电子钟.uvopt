@@ -172,10 +172,10 @@
       <FileType>1</FileType>
       <tvExp>1</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>32</ColumnNumber>
+      <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>262</TopLine>
-      <CurrentLine>270</CurrentLine>
+      <TopLine>316</TopLine>
+      <CurrentLine>335</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -225,7 +225,33 @@
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点15 电子钟\MCU\SOURCE\ADC.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点15 电子钟\MCU\SOURCE\DS18B20.H</PathWithFilename>
+    <TopLine>1</TopLine>
+    <CurrentLine>16</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点15 电子钟\MCU\SOURCE\ADC.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>24</CurrentLine>
     <Constant>0</Constant>
@@ -251,61 +277,35 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点15 电子钟\MCU\SOURCE\NRF24L01.H</PathWithFilename>
-    <TopLine>1</TopLine>
-    <CurrentLine>1</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点15 电子钟\MCU\SOURCE\NRF24L01NODE.H</PathWithFilename>
-    <TopLine>1</TopLine>
-    <CurrentLine>11</CurrentLine>
-    <Constant>0</Constant>
-    <WindowPosition>
-      <length>0</length>
-      <flags>0</flags>
-      <showCmd>0</showCmd>
-      <MinPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MinPosition>
-      <MaxPosition>
-        <xPos>0</xPos>
-        <yPos>0</yPos>
-      </MaxPosition>
-      <NormalPosition>
-        <Top>0</Top>
-        <Left>0</Left>
-        <Right>0</Right>
-        <Bottom>0</Bottom>
-      </NormalPosition>
-    </WindowPosition>
-  </AlienFiles>
-
-  <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点15 电子钟\MCU\SOURCE\DS18B20.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点15 电子钟\MCU\SOURCE\NRF24L01NODE.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>16</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>D:\MyWorks\SourceForgeProj\MCU\综合测试2\节点15 电子钟\MCU\SOURCE\NRF24L01.H</PathWithFilename>
+    <TopLine>1</TopLine>
+    <CurrentLine>1</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1673,9 +1673,9 @@
       <Documents>
         <Doc>
           <Name>.\source\main.c</Name>
-          <ColumnNumber>32</ColumnNumber>
-          <TopLine>262</TopLine>
-          <CurrentLine>270</CurrentLine>
+          <ColumnNumber>5</ColumnNumber>
+          <TopLine>316</TopLine>
+          <CurrentLine>335</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\NRF24L01.H</Name>
@@ -1685,9 +1685,9 @@
         </Doc>
         <Doc>
           <Name>SOURCE\NRF24L01NODE.H</Name>
-          <ColumnNumber>20</ColumnNumber>
+          <ColumnNumber>0</ColumnNumber>
           <TopLine>1</TopLine>
-          <CurrentLine>11</CurrentLine>
+          <CurrentLine>16</CurrentLine>
         </Doc>
         <Doc>
           <Name>SOURCE\ADC.H</Name>

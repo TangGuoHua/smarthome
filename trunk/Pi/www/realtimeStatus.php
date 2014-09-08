@@ -7,6 +7,7 @@
                     增加南卧温湿度
 2014-JUL-03 黄长浩  增加厨房、卫生间下的更多参数，如有人？热水器状态等
 2014-AUG-30 黄长浩  增加书房温度气压亮度
+2014-SEP-08 黄长浩  增加客厅南卧露点
 */
 
 $gPageTitle = "全家实况";
@@ -27,9 +28,17 @@ $query = "select * from tabDataRecved where fldNodeID=54 order by fldID desc lim
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
+	//计算露点
+	$Tn = 243.12;
+	$m =17.62;
+	$T=floatval($row["fldData4"])+floatval($row["fldData5"])*0.1;
+	$RH= floatval($row["fldData2"])+floatval($row["fldData3"])*0.1;
+	$tDew=$Tn*(log($RH/100)+$m*$T/($Tn+$T))/($m-log($RH/100)-$m*$T/($Tn+$T));
+
 	echo "<li data-role='list-divider'>客厅</li>";
-	printf( "<li><a href='chart.php?param=54'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $row["fldData4"], $row["fldData5"], $row["fldCreatedOn"]);
-	printf( "<li><a href='chart.php?param=54'>湿度 %d.%d%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldData3"], $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=54'>温度 %s%.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $T, $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=54'>湿度 %.1f%% <span class='ui-li-count'>%s</span></a></li>", $RH, $row["fldCreatedOn"]);
+	printf( "<li>露点 %.1f度 <span class='ui-li-count'>%s</span></li>", $tDew, $row["fldCreatedOn"]);
 }
 
 $query = "select * from tabDataRecved where fldNodeID=22 order by fldID desc limit 1";
@@ -64,9 +73,17 @@ $query = "select * from tabDataRecved where fldNodeID=82 order by fldID desc lim
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
+	//计算露点
+	$Tn = 243.12;
+	$m =17.62;
+	$T=floatval($row["fldData4"])+floatval($row["fldData5"])*0.1;
+	$RH= floatval($row["fldData2"])+floatval($row["fldData3"])*0.1;
+	$tDew=$Tn*(log($RH/100)+$m*$T/($Tn+$T))/($m-log($RH/100)-$m*$T/($Tn+$T));
+
 	echo "<li data-role='list-divider'>南卧</li>";
-	printf( "<li><a href='chart.php?param=82'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $row["fldData4"], $row["fldData5"], $row["fldCreatedOn"]);
-	printf( "<li><a href='chart.php?param=82'>湿度 %d.%d%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldData3"], $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=82'>温度 %s%.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $T, $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=82'>湿度 %.1f%% <span class='ui-li-count'>%s</span></a></li>", $RH, $row["fldCreatedOn"]);
+	printf( "<li>露点 %.1f度 <span class='ui-li-count'>%s</span></li>", $tDew, $row["fldCreatedOn"]);
 }
 
 

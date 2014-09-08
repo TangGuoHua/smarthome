@@ -30,18 +30,18 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 
 
-//开机延时 
-//根据NodeID，进行约为500*NodeID毫秒的延时
-//作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
-void initDelay(void)
-{
-	//4MHz Crystal, 1T STC11F04E
-    unsigned char a,b,c,d;
-    for(d=NODE_ID;d>0;d--)
-	    for(c=167;c>0;c--)
-	        for(b=171;b>0;b--)
-	            for(a=16;a>0;a--);
-}
+////开机延时 
+////根据NodeID，进行约为500*NodeID毫秒的延时
+////作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
+//void initDelay(void)
+//{
+//	//4MHz Crystal, 1T STC11F04E
+//    unsigned char a,b,c,d;
+//    for(d=NODE_ID;d>0;d--)
+//	    for(c=167;c>0;c--)
+//	        for(b=171;b>0;b--)
+//	            for(a=16;a>0;a--);
+//}
 
 
 void initINT0(void)
@@ -73,7 +73,8 @@ void startRecv()
 void sendDataToHost( unsigned char readDHT11Result )
 {
 	unsigned char sendData[16];
-	unsigned char toAddr[3]= {53, 69, 149}; //Pi, 3字节地址
+	//unsigned char toAddr[3]= {53, 69, 149}; //Pi, 3字节地址
+	unsigned char toAddr[3]= {53, 70, 132}; //Pi2, 3字节地址
 	unsigned char tmp;
 	
 	sendData[0] = NODE_ID;//Node ID
@@ -83,7 +84,8 @@ void sendDataToHost( unsigned char readDHT11Result )
 	sendData[3] = getDHT11Temperature();
 	
 	
-	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//Pi, 96频道，3字节地址，接收16字节
+	//tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//Pi, 96频道，3字节地址，接收16字节
+	tmp = nrfSendData( 92, 3, toAddr, 16, sendData);//Pi2, 92频道，3字节地址，接收16字节
 	
 	//24L01开始接收数据
 	startRecv(); 
@@ -116,17 +118,14 @@ void main()
 			
 	while(1)
 	{
-		
-		//读取DHT11
-		readDht11Result = readDHT11(2);
-
 		//向主机发送数据
 		if( ++sendDataTimerCount >= 6 )  //如果设置为60，则每60*10＝600秒发送一次数据
 		{
+			//读取DHT11
+			readDht11Result = readDHT11(2);
 			sendDataToHost( readDht11Result );	
 			sendDataTimerCount=0;
 		}
-
 		delay10s(); //延时10秒
 	}
 }

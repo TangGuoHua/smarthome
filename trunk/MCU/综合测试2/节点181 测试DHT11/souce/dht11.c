@@ -139,6 +139,8 @@ unsigned char readDHT11( unsigned char mode)
 	
 	//主机设为输入 判断从机响应信号 
 	DHT11=1;
+	dht11Delay10Us();
+	
 	//判断从机是否有低电平响应信号 如不响应则跳出，响应则向下运行	  
 	if(!DHT11)
 	{

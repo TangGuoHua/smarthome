@@ -324,7 +324,7 @@ void timer0Interrupt(void) interrupt 1
 				second=0;
 				minute++;
 				
-				if( minute%5 == 0 )
+				if( minute%1 == 0 )
 				{
 				
 					// 发送亮度数据
