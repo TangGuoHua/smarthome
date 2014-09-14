@@ -11,6 +11,7 @@
 2014-JUL-31 黄长浩  增加书房调光台灯
 2014-AUG-02 黄长浩  阳台卷帘覆盖度支持20%、40%等值
 2014-SEP-05 黄长浩  增加客厅吊顶射灯控制器
+2014-SEP-14 黄长浩  客厅吊顶射灯实现“全开全关”
 */
 
 $gPageTitle = "常用";
@@ -104,6 +105,22 @@ function chkLivingRoomCeilingLightclicked( val, obj )
 	else if( val == 'N' )
 	{
 		$.post("/api/sendData.php", { nodeID: "52", data5: tmp } );
+	}
+	else if(val == 'ALLON' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data2:1, data3:1, data4:1, data5:1 } );
+		$("#chkLivingRoomLightEast").attr("checked",true).checkboxradio("refresh");
+		$("#chkLivingRoomLightWest").attr("checked",true).checkboxradio("refresh");
+		$("#chkLivingRoomLightNorth").attr("checked",true).checkboxradio("refresh");
+		$("#chkLivingRoomLightSouth").attr("checked",true).checkboxradio("refresh");
+	}
+	else if(val == 'ALLOFF' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data2:0, data3:0, data4:0, data5:0 } );
+		$("#chkLivingRoomLightEast").attr("checked",false).checkboxradio("refresh");
+		$("#chkLivingRoomLightWest").attr("checked",false).checkboxradio("refresh");
+		$("#chkLivingRoomLightNorth").attr("checked",false).checkboxradio("refresh");
+		$("#chkLivingRoomLightSouth").attr("checked",false).checkboxradio("refresh");
 	}
 }
 
@@ -256,7 +273,11 @@ while ($row = $results->fetchArray())
 				<label for="chkLivingRoomLightWest">西</label>
 				<input type="checkbox" name="chkLivingRoomLightNorth" id="chkLivingRoomLightNorth" onclick="chkLivingRoomCeilingLightclicked('N', this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
 				<label for="chkLivingRoomLightNorth">北</label>
-		    </fieldset>
+				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOn" onclick="chkLivingRoomCeilingLightclicked('ALLON', this);" />
+				<label for="chkLivingRoomLightAllOn">全开</label>
+				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOff" onclick="chkLivingRoomCeilingLightclicked('ALLOFF', this);" />
+				<label for="chkLivingRoomLightAllOff">全关</label>
+			</fieldset>
 		</li>
 	<?php
 	}
