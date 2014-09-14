@@ -36,11 +36,11 @@ void initTimer0(void)
     TR0 = 1;
 }
 
-void initINT0(void)
-{
-	EA=1;
-	EX0=1; // Enable int0 interrupt.
-}
+//void initINT0(void)
+//{
+//	EA=1;
+//	EX0=1; // Enable int0 interrupt.
+//}
 
 
 void main()
@@ -55,7 +55,7 @@ void main()
 	bmp085Init(); //初始化BMP085 
 	bh1750Init(); // 初始化 BH1750FVI
 	
-	initINT0(); //初始化中断0
+	//initINT0(); //初始化中断0
 	nrf24L01Init(); //初始化NRF24L01+
 	//nrfSetRxMode(); //设置nrf24L01为接收模式
 	
@@ -167,7 +167,7 @@ void timer0Interrupt(void) interrupt 1
 	{
 		TR0=0;
 		count10ms = 0;
-		if( ++count1s == 60 )
+		if( ++count1s == 600 )
 		{
 			count1s = 0;
 			toSend = 1;
