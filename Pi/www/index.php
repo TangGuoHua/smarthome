@@ -13,7 +13,7 @@ include "include/templateHeader.php";
 		<li><a href="realtimeStatus.php">实况</a></li>
 		<li><a href="control.php" data-ajax="false">控制</a></li>
 		<li><a href="presetMode.php" data-ajax="false">场景</a></li>
-		<li><a href="presetMode.php" data-ajax="false">定时任务</a></li>
+		<li><a href="" data-ajax="false">定时任务</a></li>
 	<!--li data-role="list-divider">区域菜单</li>
 		<li><a data-ajax="false" href="section/entrance.php">玄关</a></li>
 		<li><a data-ajax="false" href="section/dining.php">餐厅</a></li>
