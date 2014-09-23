@@ -3,17 +3,14 @@
 负责将各节点发来的数据存入数据库;
 同时负责将一些数据发往各个节点。
 
-编译命令行： gcc smartHome.c -o smartHome -l sqlite3
-编译命令行 gcc -Wall -lwiringPi -o "main" "main.c" "nrf24L01.c"
-
-gcc -Wall -lwiringPi -l sqlite3 -o "main" "main.c" "nrf24L01.c"
- gcc -Wall -lwiringPi -l sqlite3 -o "smartHome2" "smartHome2.c" "nrf24L01.c"
+编译命令行：gcc -Wall -lwiringPi -l sqlite3 -o "smartHome2" "smartHome2.c" "nrf24L01.c"
 
 
 修改记录：
 Date         Author   Remarks
 -------------------------------------------------------------------------------
 2013-FEB-25  黄长浩   初始版本
+2014-SEP-23  黄长浩   修改checkSendDataToNode（）方法，增加transaction，增加tabDataSent表
 */
 
 #include <sys/types.h>
@@ -57,7 +54,7 @@ void onDataReceived()
 	//sqlite3_prepare ( g_dbHandle, "INSERT INTO tabDataHistory  ( fldNodeID1, fldNodeID2, fldData1, fldData2 ) VALUES( ?, ?, ?, ? )", -1, &stmt, 0 );
 	
 	//将数据存入数据库
-	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data++, *data);
+	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
 	tmp = sqlite3_exec(g_dbHandle,sqlStr,0,0,0);
 	//tmp = sqlite3_exec(g_dbHandle,sqlStr,NULL,NULL,NULL);
 	
@@ -79,20 +76,21 @@ void startRecv()
 void checkSendDataToNode()
 {
 	int ret;
-	char sqlStr[250];
+	char sqlStr[400];
 	sqlite3_stmt* stmt = NULL;
 	int fldID, fldNodeID;
-	unsigned char fldRFChannel, fldDataLength;
+	unsigned char fldRFChannel, fldRFPower, fldMaxRetry, fldDataLength;
 	unsigned char toAddr[3];
 	unsigned char sendData[10];
 	unsigned char sendResult;
 	
-	unsigned char sendAnything = FALSE;
+	unsigned char sentAnything = FALSE;
+
 
 	//选出需要往节点发送的数据	
 	ret = sqlite3_prepare(g_dbHandle, "SELECT * FROM tabDataToNode WHERE fldUpdatedBy IS NULL OR fldUpdatedBy<>'robot'", -1, &stmt, 0);
 	if (ret != SQLITE_OK){
-		fprintf(stderr, "Could not execute SELECT/n");
+		fprintf(stderr, "Could not execute SELECT!\n");
 		return;
 	}
 
@@ -104,6 +102,16 @@ void checkSendDataToNode()
 		//			sqlite3_column_int(stmt, 3),
 		//			sqlite3_column_text(stmt, 8));
 
+		if( !sentAnything )
+		{
+			//还没有发送任何数据，说明这是第一条记录，则开始一个transaction	
+			ret = sqlite3_exec(g_dbHandle,"BEGIN",NULL,NULL,NULL);
+			if (ret != SQLITE_OK){
+				fprintf(stderr, "BEGIN transaction failed!!\n");
+				return;
+			}
+		}
+
 		fldID = sqlite3_column_int(stmt, 0);
 		fldNodeID = sqlite3_column_int(stmt, 1);
 
@@ -111,6 +119,8 @@ void checkSendDataToNode()
 		toAddr[1] = sqlite3_column_int(stmt, 4);
 		toAddr[2] = sqlite3_column_int(stmt, 5);
 		fldRFChannel = sqlite3_column_int(stmt, 6);
+		fldRFPower = 1;
+		fldMaxRetry = 3;
 		fldDataLength = sqlite3_column_int(stmt, 7);
 		
 		sendData[0] = sqlite3_column_int(stmt, 8);
@@ -125,14 +135,23 @@ void checkSendDataToNode()
 		sendData[9] = sqlite3_column_int(stmt, 17);
 		
 		//发送数据
-		sendResult = nrfSendData( fldRFChannel, 1, 3, 3, toAddr, fldDataLength, sendData);
-		sendAnything = TRUE;
+		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, 3, toAddr, fldDataLength, sendData);
+		sentAnything = TRUE;
 
-		printf( "send result=%d\n", sendResult );
+		printf( "send data to NodeID:[%d], result=%d\n", fldNodeID, sendResult );
 		
 		// update record
 		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime') WHERE fldID=%d", fldID);
 		ret = sqlite3_exec( g_dbHandle, sqlStr, 0, 0, 0);
+		if( ret != SQLITE_OK )
+		{
+			fprintf(stderr,"错误%s\n",sqlite3_errmsg(g_dbHandle));
+			//fprintf(stderr,"错误%s\n",errmsg);
+		}
+
+		//将数据存入数据库
+		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldRFChannel, fldRFPower,fldMaxRetry,fldAddr1,fldAddr2,fldAddr3,fldDataLength,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", fldNodeID, fldRFChannel, fldRFPower, fldMaxRetry, toAddr[0], toAddr[1], toAddr[2], fldDataLength, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], sendResult );
+		ret = sqlite3_exec(g_dbHandle,sqlStr,NULL,NULL,NULL);
 		
 		if( ret != SQLITE_OK )
 		{
@@ -141,11 +160,20 @@ void checkSendDataToNode()
 		}
 	}
 
+	//如果发送过数据，则说明有表要更新，结束transaction。
 	//如果发送过数据，则说明NRF24L01已经退出了PRX模式
 	//重新让其进入接收模式
-	if(sendAnything)
+	if(sentAnything)
 	{
+		//重新进入接收模式
 		startRecv();
+		
+		//结束transaction
+		ret = sqlite3_exec(g_dbHandle, "COMMIT", NULL, NULL, NULL);
+		if (ret != SQLITE_OK){
+			fprintf(stderr, "COMMIT transaction failed!!\n");
+			return;
+		}
 	}
 
 	sqlite3_finalize(stmt);

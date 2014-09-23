@@ -5,6 +5,8 @@
 ----------------------------------------------------------------------
 2014年08月20日  黄长浩  初始版本
 2014年08月20日  黄长浩  修改nrfSendData()函数，增加rfPower, maxRetry参数
+2014年09月23日  黄长浩  修改nrfSendData()函数，由于改用了带PA的模块（模块的LNA使能和CE相连），所以在发送数据后不能马上让CE=0，
+                        一定要等收到ACK或者等发送失败后，才能让CE＝0。
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -143,8 +145,7 @@ void nrfFlushRx()
 
 
 // 用于检查发送状态
-// 返回值：251-表示还在发送中
-//         252-不应该出现的返回值。（中断触发了，但既不是TX_DS也不是MAX_RT）
+// 返回值：252-不应该出现的返回值。（中断触发了，但既不是TX_DS也不是MAX_RT）
 //         255-表示大重发次数达到后仍然未收到ACK，发送失败
 //         0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
 //           0：没有重发，直接发送成功
@@ -155,36 +156,31 @@ void nrfFlushRx()
 unsigned char nrfCheckSendStatus()
 {
 	unsigned char status;
-	
-	if( digitalRead( IRQ ))
+
+	status = nrfReadReg(R_REGISTER+STATUS); //读取状态寄存器
+
+	if( status & 0x20 ) //检查TX_DS位，置位则发送成功
 	{
-		//仍然在发送中
-		return 251;
+		nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除TX_DS标志
+		
+		//发送成功后，FIFO自动清空，这里就不用再清了
+		
+		//返回自动重发次数
+		return( nrfReadReg(R_REGISTER+OBSERVE_TX) & 0x0f ); 
+	}
+	else if( status & 0x10 ) //检查MAX_RT位，置位则说明最大重发次数达到后仍然未收到ACK，发送失败
+	{
+		nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除MAX_RT标志
+		
+		//发送失败，FIFO不会自动清空，必须手动清空 ！！
+		//关键！！不然会出现意想不到的后果！！！
+		nrfFlushTx();
+
+		return 255;
 	}
 	else
 	{
-		status = nrfReadReg(R_REGISTER+STATUS); //读取状态寄存器
-	
-		if( status & 0x20 ) //检查TX_DS位，置位则发送成功
-		{
-			nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除TX_DS标志
-			
-			//发送成功后，FIFO自动清空，这里就不用再清了
-			
-			//返回自动重发次数
-			return( nrfReadReg(R_REGISTER+OBSERVE_TX) & 0x0f ); 
-		}
-		else if( status & 0x10 ) //检查MAX_RT位，置位则说明最大重发次数达到后仍然未收到ACK，发送失败
-		{
-			nrfWriteReg(W_REGISTER+STATUS,0x7f);  // 清除MAX_RT标志
-			
-			//发送失败，FIFO不会自动清空，必须手动清空 ！！
-			//关键！！不然会出现意想不到的后果！！！
-			nrfFlushTx();
-
-			return 255;
-		}
-		else return 252; //不应该出现的一个值
+		return 252; //不应该出现的一个值
 	}
 }
 
@@ -277,7 +273,6 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 {
 	unsigned char ret = 0;
 	unsigned char retryCnt = 0;
-	unsigned long timeoutCnt;
 
 	//检测各个参数是否在允许的取值范围内
 	if( rfChannel>125 || rfPower==0 || rfPower>4 || maxRetry>9 || addrWidth<3 || addrWidth>5 || dataWidth==0 || dataWidth>32 )
@@ -288,21 +283,20 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 	digitalWrite( CE, LOW );
 
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth ); //写寄存器指令+接收地址使能指令+接收地址+地址宽度
-	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
-	//nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据
+	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr, addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
 	
 	if(rfPower==1)
-		nrfWriteReg( W_REGISTER+RF_SETUP,0x21 );   // 数据传输率250Kbps，发射功率-18dBm (+7dBm with PA), LNA?
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x21 ); //数据传输率250Kbps，发射功率-18dBm (+7dBm with PA), LNA?
 	else if(rfPower==2)
-		nrfWriteReg( W_REGISTER+RF_SETUP,0x23 );   // 数据传输率250Kbps，发射功率-12dBm (+15dBm with PA), LNA?
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x23 ); //数据传输率250Kbps，发射功率-12dBm (+15dBm with PA), LNA?
 	else if(rfPower==3)
-		nrfWriteReg( W_REGISTER+RF_SETUP,0x25 );   // 数据传输率250Kbps，发射功率-6dBm (+20dBm with PA), LNA?
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x25 ); //数据传输率250Kbps，发射功率-6dBm (+20dBm with PA), LNA?
 	else if(rfPower==4)
-		nrfWriteReg( W_REGISTER+RF_SETUP,0x27 );   // 数据传输率250Kbps，发射功率0dBm (+22dBm with PA), LNA?
+		nrfWriteReg( W_REGISTER+RF_SETUP,0x27 ); //数据传输率250Kbps，发射功率0dBm (+22dBm with PA), LNA?
 
 
-	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
-	nrfWriteReg( W_REGISTER+STATUS, 0x7f );  // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
+	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //选择射频通道
+	nrfWriteReg( W_REGISTER+STATUS, 0x7f ); //清除RX_DR,TX_DS,MAX_RT标志
 	nrfWriteReg( W_REGISTER+CONFIG, 0x4e ); //屏蔽RX_DR中断, 使能TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，PTX
 	
 	for( retryCnt=0; retryCnt<=maxRetry; retryCnt++ )
@@ -310,17 +304,12 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 		nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据
 		
 		digitalWrite( CE, HIGH );
-		delayFor24L01();
-		digitalWrite( CE, LOW ); //待发送完毕后转为Standby-1模式
+		while( digitalRead( IRQ ) ); //等待发送完毕（成功或达到最大重传次数）
+		digitalWrite( CE, LOW ); //因为要使用AA，所以等中断产生后才能使CE=0，否则LNA无法工作
 		
-		timeoutCnt=0;
-		do
-		{
-			ret=nrfCheckSendStatus();
-		}while( ret==251 && ++timeoutCnt < 250000L );//检测是否发送完毕或者超时
-		//实验发现：一般重发15次后，timeoutCnt的值在172000左右
-		//这里取250000作为超时的值，够了。
-		printf( "retry count:[%d]\r\n", retryCnt );
+		ret=nrfCheckSendStatus();
+
+		//printf( "retry count:[%d]\r\n", retryCnt );
 		
 		//如果返回值小于等于15，说明本次数据传送成功
 		if( ret<=15 ) 
@@ -363,7 +352,7 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
   	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 ); // 数据传输率250Kbps，发射功率0dBm (+22dBm with PA), LNA?
-	nrfWriteReg( W_REGISTER+STATUS, 0x7f ); // 清除RX_DR,TX_DS,MAX_RT标志 Newly added
+	nrfWriteReg( W_REGISTER+STATUS, 0x7f ); // 清除RX_DR,TX_DS,MAX_RT标志
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
 
   	digitalWrite( CE, HIGH ); //设为接收模式 PRX
