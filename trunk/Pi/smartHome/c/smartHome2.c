@@ -55,8 +55,7 @@ void onDataReceived()
 	
 	//将数据存入数据库
 	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
-	tmp = sqlite3_exec(g_dbHandle,sqlStr,0,0,0);
-	//tmp = sqlite3_exec(g_dbHandle,sqlStr,NULL,NULL,NULL);
+	tmp = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, NULL);
 	
 	if( tmp != SQLITE_OK )
     {
@@ -142,16 +141,16 @@ void checkSendDataToNode()
 		
 		// update record
 		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime') WHERE fldID=%d", fldID);
-		ret = sqlite3_exec( g_dbHandle, sqlStr, 0, 0, 0);
+		ret = sqlite3_exec( g_dbHandle, sqlStr, NULL, NULL, NULL);
 		if( ret != SQLITE_OK )
 		{
 			fprintf(stderr,"错误%s\n",sqlite3_errmsg(g_dbHandle));
 			//fprintf(stderr,"错误%s\n",errmsg);
 		}
 
-		//将数据存入数据库
+		//将数据存入tabDataSent
 		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldRFChannel, fldRFPower,fldMaxRetry,fldAddr1,fldAddr2,fldAddr3,fldDataLength,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", fldNodeID, fldRFChannel, fldRFPower, fldMaxRetry, toAddr[0], toAddr[1], toAddr[2], fldDataLength, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], sendResult );
-		ret = sqlite3_exec(g_dbHandle,sqlStr,NULL,NULL,NULL);
+		ret = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, NULL);
 		
 		if( ret != SQLITE_OK )
 		{
