@@ -320,7 +320,7 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 			//一次类推，
 			//retry第9次时，（加开始retry之前的一次，共发射了10次），retransmit 15次成功，则，总共retransmit了16*9+15=159次
 			//每次try是transmit 16次 （本身1次，加15次retransmit）
-			ret += (15*retryCnt + retryCnt);
+			ret += (16*retryCnt);
 			break;
 		}
 	}
@@ -389,6 +389,7 @@ unsigned char* nrfGetReceivedData()
 
 
 //获取是否收到数据
+//注意：本方法只能在PRX模式下使用！
 //返回值: 1-收到数据， 0-未收到数据
 unsigned char nrfIsDataReceived()
 {

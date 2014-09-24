@@ -9,7 +9,7 @@
 修改记录：
 Date         Author   Remarks
 -------------------------------------------------------------------------------
-2013-FEB-25  黄长浩   初始版本
+2013-SEP-02  黄长浩   初始版本，智能家Deamon v2
 2014-SEP-23  黄长浩   修改checkSendDataToNode（）方法，增加transaction，增加tabDataSent表
 */
 
