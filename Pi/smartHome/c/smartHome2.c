@@ -3,14 +3,16 @@
 负责将各节点发来的数据存入数据库;
 同时负责将一些数据发往各个节点。
 
-编译命令行：gcc -Wall -lwiringPi -l sqlite3 -o "smartHome2" "smartHome2.c" "nrf24L01.c"
+编译命令行：gcc -Wall -lwiringPi -lsqlite3 -o "smartHome2" "smartHome2.c" "nrf24L01.c"
 
 
 修改记录：
 Date         Author   Remarks
 -------------------------------------------------------------------------------
 2013-SEP-02  黄长浩   初始版本，智能家Deamon v2
-2014-SEP-23  黄长浩   修改checkSendDataToNode（）方法，增加transaction，增加tabDataSent表
+2014-SEP-23  黄长浩   修改checkSendDataToNode()方法，增加transaction，增加tabDataSent表
+2014-SEP-23  黄长浩   修改onDataReceived()方法，Pi的接收地址变为5字节
+                      修改checkSendDataToNode()方法，以适应新的tabDataToNode和tabDataSent表结构
 */
 
 #include <sys/types.h>
@@ -67,8 +69,8 @@ void onDataReceived()
 //NRF24L01进入接收模式
 void startRecv()
 {
-	unsigned char myAddr[3] = {53,70, 132};
-	nrfSetRxMode( 92, 3, myAddr ); //监听92频道，3字节地址
+	unsigned char myAddr[5] = {53, 70, 132, 231, 231};
+	nrfSetRxMode( 92, 5, myAddr ); //监听92频道，5字节地址
 }
 
 //检查数据库，看是否有数据需要发送至节点
@@ -77,9 +79,9 @@ void checkSendDataToNode()
 	int ret;
 	char sqlStr[400];
 	sqlite3_stmt* stmt = NULL;
-	int fldID, fldNodeID;
-	unsigned char fldRFChannel, fldRFPower, fldMaxRetry, fldDataLength;
-	unsigned char toAddr[3];
+	unsigned char fldNodeID;
+	unsigned char fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, fldDataLength;
+	unsigned char toAddr[5];
 	unsigned char sendData[10];
 	unsigned char sendResult;
 	
@@ -111,36 +113,37 @@ void checkSendDataToNode()
 			}
 		}
 
-		fldID = sqlite3_column_int(stmt, 0);
-		fldNodeID = sqlite3_column_int(stmt, 1);
-
-		toAddr[0] = sqlite3_column_int(stmt, 3);
-		toAddr[1] = sqlite3_column_int(stmt, 4);
-		toAddr[2] = sqlite3_column_int(stmt, 5);
-		fldRFChannel = sqlite3_column_int(stmt, 6);
-		fldRFPower = 1;
-		fldMaxRetry = 3;
-		fldDataLength = sqlite3_column_int(stmt, 7);
+		fldNodeID = sqlite3_column_int(stmt, 0);
+		fldAddrLength = sqlite3_column_int(stmt, 3);
+		toAddr[0] = sqlite3_column_int(stmt, 4);
+		toAddr[1] = sqlite3_column_int(stmt, 5);
+		toAddr[2] = sqlite3_column_int(stmt, 6);
+		toAddr[3] = sqlite3_column_int(stmt, 7);
+		toAddr[4] = sqlite3_column_int(stmt, 8);
+		fldRFChannel = sqlite3_column_int(stmt, 9);
+		fldRFPower = sqlite3_column_int(stmt, 10);
+		fldMaxRetry = sqlite3_column_int(stmt, 11);
+		fldDataLength = sqlite3_column_int(stmt, 12);
 		
-		sendData[0] = sqlite3_column_int(stmt, 8);
-		sendData[1] = sqlite3_column_int(stmt, 9);
-		sendData[2] = sqlite3_column_int(stmt, 10);
-		sendData[3] = sqlite3_column_int(stmt, 11);
-		sendData[4] = sqlite3_column_int(stmt, 12);
-		sendData[5] = sqlite3_column_int(stmt, 13);
-		sendData[6] = sqlite3_column_int(stmt, 14);
-		sendData[7] = sqlite3_column_int(stmt, 15);
-		sendData[8] = sqlite3_column_int(stmt, 16);
-		sendData[9] = sqlite3_column_int(stmt, 17);
+		sendData[0] = sqlite3_column_int(stmt, 13);
+		sendData[1] = sqlite3_column_int(stmt, 14);
+		sendData[2] = sqlite3_column_int(stmt, 15);
+		sendData[3] = sqlite3_column_int(stmt, 16);
+		sendData[4] = sqlite3_column_int(stmt, 17);
+		sendData[5] = sqlite3_column_int(stmt, 18);
+		sendData[6] = sqlite3_column_int(stmt, 19);
+		sendData[7] = sqlite3_column_int(stmt, 20);
+		sendData[8] = sqlite3_column_int(stmt, 21);
+		sendData[9] = sqlite3_column_int(stmt, 22);
 		
 		//发送数据
-		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, 3, toAddr, fldDataLength, sendData);
+		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, toAddr, fldDataLength, sendData);
 		sentAnything = TRUE;
 
 		printf( "send data to NodeID:[%d], result=%d\n", fldNodeID, sendResult );
 		
 		// update record
-		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime') WHERE fldID=%d", fldID);
+		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime'), fldLastSentResult=%d WHERE fldNodeID=%d", sendResult, fldNodeID );
 		ret = sqlite3_exec( g_dbHandle, sqlStr, NULL, NULL, NULL);
 		if( ret != SQLITE_OK )
 		{
@@ -149,7 +152,7 @@ void checkSendDataToNode()
 		}
 
 		//将数据存入tabDataSent
-		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldRFChannel, fldRFPower,fldMaxRetry,fldAddr1,fldAddr2,fldAddr3,fldDataLength,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", fldNodeID, fldRFChannel, fldRFPower, fldMaxRetry, toAddr[0], toAddr[1], toAddr[2], fldDataLength, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], sendResult );
+		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", fldNodeID, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], sendResult );
 		ret = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, NULL);
 		
 		if( ret != SQLITE_OK )

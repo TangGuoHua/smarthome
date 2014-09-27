@@ -3,7 +3,7 @@
 <title>智能家</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8"></meta>
 <style type="text/css">
-body { width:1200px; margin:auto; font-family:Arial; font-size: 9px; }
+body { width:1600px; margin:auto; font-family:Arial; font-size: 9px; }
 table{ border-collapse:collapse;  border-spacing:0;  }
 td {font-family:Arial; font-size: 9px; padding: 3; }
 </style>
@@ -16,6 +16,7 @@ td {font-family:Arial; font-size: 9px; padding: 3; }
 日期        作者    备注
 ------------------------------------------
 2014-SEP-23 黄长浩  增加tabDataSent，并修改一些页面样式
+2014-SEP-23 黄长浩  修改页面以适应新的tabDataToNode和tabDataSent表结构
 */
 
 //phpinfo( );
@@ -47,12 +48,12 @@ $results = $db->query($query);
 
 echo("tabDataToNode<br>");
 echo("<table border='1'>");
-echo( "<tr><td>ID</td><td>NodeID</td><td>Channel</td><td>Addr1</td><td>Addr2</td><td>Addr3</td><td>Len</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>Updated By</td><td>Updated On</td><td>Remarks</td></tr>");
+echo( "<tr><td>NodeID</td><td>DispOrder</td><td>Channel</td><td>RFPower</td><td>MaxRetry</td><td>A.Len</td><td>A1</td><td>A2</td><td>A3</td><td>A4</td><td>A5</td><td>D.Len</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>LastResult</td><td>Updated By</td><td>Updated On</td><td>Remarks</td></tr>");
 while ($row = $results->fetchArray()) {  
     //var_dump($row);
 	//echo( $row[0] );
 	//echo( "<br>");
-	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>", $row["fldID"], $row["fldNodeID"], $row["fldRFChannel"], $row["fldAddr1"], $row["fldAddr2"], $row["fldAddr3"], $row["fldDataLength"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldUpdatedBy"], $row["fldUpdatedOn"], $row["fldNodeRemarks"]);
+	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>", $row["fldNodeID"], $row["fldDisplayOrder"], $row["fldRFChannel"], $row["fldRFPower"], $row["fldMaxRetry"], $row["fldAddrLength"], $row["fldAddr1"], $row["fldAddr2"], $row["fldAddr3"], $row["fldAddr4"], $row["fldAddr5"],$row["fldDataLength"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData8"], $row["fldData9"], $row["fldData10"], $row["fldLastSentResult"], $row["fldUpdatedBy"], $row["fldUpdatedOn"], $row["fldNodeRemarks"]);
 } 
 echo ("</table><br><br>");
 
@@ -78,12 +79,12 @@ $results = $db->query($query);
 
 echo("tabDataSent<br>" );
 echo("<table border='1'>");
-echo( "<tr><td>ID</td><td>ToNodeID</td><td>Channel</td><td>RFPower</td><td>MaxRetry</td><td>Addr1</td><td>Addr2</td><td>Addr3</td><td>Len</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>Sent On</td><td>SentResult</td></tr>");
+echo( "<tr><td>ID</td><td>ToNodeID</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>Sent On</td><td>SentResult</td></tr>");
 while ($row = $results->fetchArray()) {  
     //var_dump($row);
 	//echo( $row[0] );
 	//echo( "<br>");
-	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%d</td></tr>", $row["fldID"], $row["fldToNodeID"], $row["fldRFChannel"], $row["fldRFPower"], $row["fldMaxRetry"], $row["fldAddr1"], $row["fldAddr2"], $row["fldAddr3"], $row["fldDataLength"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"],  $row["fldSentOn"], $row["fldSentResult"]);
+	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%d</td></tr>", $row["fldID"], $row["fldToNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData7"], $row["fldData8"], $row["fldData10"],  $row["fldSentOn"], $row["fldSentResult"]);
 } 
 echo ("</table>");
 
