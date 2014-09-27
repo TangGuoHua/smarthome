@@ -22,6 +22,7 @@ function rdoPresetModeClicked( modeIndex )
 	if( modeIndex == 'Dinner' ) //晚餐
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1: 1, data3:1 } ); //开餐厅射灯
+		$.post("/api/sendData.php", { nodeID: "51", data4:1 } ); //开台灯
 		$.post("/api/sendData.php", { nodeID: "53", data1:1 } ); //开客厅落地灯
 	}
 	else if( modeIndex == 'WatchTV' ) // 看电视
@@ -34,7 +35,7 @@ function rdoPresetModeClicked( modeIndex )
 	else if( modeIndex == 'Sleep' ) // 睡觉
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1:0, data2:0, data3:0, data4:0 } ); //关餐厅射灯
-		$.post("/api/sendData.php", { nodeID: "51", data4:0, data5:0 } ); //关台灯 天猫盒子
+		$.post("/api/sendData.php", { nodeID: "51", data4:0, data5:0, data6:0, data7:0, data8:0 } ); //关电视墙上的电器
 		$.post("/api/sendData.php", { nodeID: "53", data1:0 } ); //关客厅落地灯
 		$.post("/api/sendData.php", { nodeID: "200", data2: 0 } ); //关书房LED灯带
 		$.post("/api/sendData.php", { nodeID: "31", data1: 0 } ); //关书房台灯
