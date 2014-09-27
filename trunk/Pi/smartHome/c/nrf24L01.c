@@ -7,6 +7,8 @@
 2014年08月20日  黄长浩  修改nrfSendData()函数，增加rfPower, maxRetry参数
 2014年09月23日  黄长浩  修改nrfSendData()函数，由于改用了带PA的模块（模块的LNA使能和CE相连），所以在发送数据后不能马上让CE=0，
                         一定要等收到ACK或者等发送失败后，才能让CE＝0。
+2014年09月27日  黄长浩  修改nrfSendData()函数，使重发等待时间由1500us降到500us
+                        修改nrfSetRxMode()和nrfSendData()函数，纠正以前地址宽度未设置的问题
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -221,9 +223,10 @@ void nrf24L01Init()
 	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );     // 使能接收通道0自动应答
 	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); // 使能接收通道0
 
-	nrfWriteReg( W_REGISTER+SETUP_AW, 0x03 ); // Set up address width to 5 bytes
-	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us+86us，自动重发15次
-	
+	//nrfWriteReg( W_REGISTER+SETUP_AW, 0x03 ); // Set up address width to 5 bytes
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us+86us，自动重发15次
+	nrfWriteReg( W_REGISTER+SETUP_RETR,0x1f ); // 自动重发延时等待500us，自动重发15次
+
 	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
 	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 
@@ -282,6 +285,7 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 	
 	digitalWrite( CE, LOW );
 
+	nrfWriteReg( W_REGISTER+SETUP_AW, addrWidth-2 ); //设置地址宽度
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth ); //写寄存器指令+接收地址使能指令+接收地址+地址宽度
 	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr, addrWidth ); //为了应答接收设备，接收通道0地址和发送地址相同
 	
@@ -301,7 +305,7 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsig
 	
 	for( retryCnt=0; retryCnt<=maxRetry; retryCnt++ )
 	{
-		nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入数据
+		nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth ); //写入要发送的数据
 		
 		digitalWrite( CE, HIGH );
 		while( digitalRead( IRQ ) ); //等待发送完毕（成功或达到最大重传次数）
@@ -348,6 +352,7 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 {
     digitalWrite( CE, LOW );
 
+	nrfWriteReg( W_REGISTER+SETUP_AW, addrWidth-2 ); //设置地址宽度
   	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, rxAddr, addrWidth ); //接收设备接收通道0使用和发送设备相同的发送地址
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
