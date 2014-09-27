@@ -69,8 +69,8 @@ void onDataReceived()
 //NRF24L01进入接收模式
 void startRecv()
 {
-	unsigned char myAddr[5] = {53, 70, 132, 231, 231};
-	nrfSetRxMode( 92, 5, myAddr ); //监听92频道，5字节地址
+	unsigned char myAddr[5] = {53, 69, 149, 231, 231};
+	nrfSetRxMode( 96, 5, myAddr ); //监听96频道，5字节地址
 }
 
 //检查数据库，看是否有数据需要发送至节点
@@ -140,7 +140,7 @@ void checkSendDataToNode()
 		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, toAddr, fldDataLength, sendData);
 		sentAnything = TRUE;
 
-		printf( "send data to NodeID:[%d], result=%d\n", fldNodeID, sendResult );
+		//printf( "send data to NodeID:[%d], result=%d\n", fldNodeID, sendResult );
 		
 		// update record
 		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime'), fldLastSentResult=%d WHERE fldNodeID=%d", sendResult, fldNodeID );
@@ -288,7 +288,7 @@ int main ( int argc, char **argv )
 	{
 		if( nrfIsDataReceived() )
 		{
-			printf( "data received.\n");
+			//printf( "data received.\n");
 			// NRF24L01接收到数据
 			onDataReceived();
 		}
