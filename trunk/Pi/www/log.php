@@ -46,7 +46,7 @@ $db = new MyDB();
 $query = "select * from tabDataToNode order by fldNodeID";
 $results = $db->query($query);
 
-echo("tabDataToNode<br>");
+echo("<b>DataToNode</b><br>");
 echo("<table border='1'>");
 echo( "<tr><td>NodeID</td><td>DispOrder</td><td>Channel</td><td>RFPower</td><td>MaxRetry</td><td>A.Len</td><td>A1</td><td>A2</td><td>A3</td><td>A4</td><td>A5</td><td>D.Len</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>LastResult</td><td>Updated By</td><td>Updated On</td><td>Remarks</td></tr>");
 while ($row = $results->fetchArray()) {  
@@ -55,39 +55,41 @@ while ($row = $results->fetchArray()) {
 	//echo( "<br>");
 	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>", $row["fldNodeID"], $row["fldDisplayOrder"], $row["fldRFChannel"], $row["fldRFPower"], $row["fldMaxRetry"], $row["fldAddrLength"], $row["fldAddr1"], $row["fldAddr2"], $row["fldAddr3"], $row["fldAddr4"], $row["fldAddr5"],$row["fldDataLength"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData8"], $row["fldData9"], $row["fldData10"], $row["fldLastSentResult"], $row["fldUpdatedBy"], $row["fldUpdatedOn"], $row["fldNodeRemarks"]);
 } 
-echo ("</table><br><br>");
+echo ("</table><br>");
 
+echo ("<table><tr><td>");
 
-$query = "select * from tabDataRecved order by fldID desc limit 50";
-$results = $db->query($query);
+	$query = "select * from tabDataRecved order by fldID desc limit 40";
+	$results = $db->query($query);
 
-echo("tabDataRecved<br>" );
-echo("<table border='1'>");
-echo( "<tr><td>ID</td><td>NodeID</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>D11</td><td>D12</td><td>D13</td><td>D14</td><td>D15</td><td>Created On</td></tr>");
-while ($row = $results->fetchArray()) {  
-    //var_dump($row);
-	//echo( $row[0] );
-	//echo( "<br>");
-	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>", $row["fldID"], $row["fldNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData8"], $row["fldData9"], $row["fldData10"], $row["fldData11"], $row["fldData12"], $row["fldData13"], $row["fldData14"], $row["fldData15"], $row["fldCreatedOn"]);
-} 
+	echo("<b>DataRecved</b><br>" );
+	echo("<table border='1'>");
+	echo( "<tr><td>ID</td><td>NodeID</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>D11</td><td>D12</td><td>D13</td><td>D14</td><td>D15</td><td>Created On</td></tr>");
+	while ($row = $results->fetchArray()) {  
+		//var_dump($row);
+		//echo( $row[0] );
+		//echo( "<br>");
+		printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>", $row["fldID"], $row["fldNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData8"], $row["fldData9"], $row["fldData10"], $row["fldData11"], $row["fldData12"], $row["fldData13"], $row["fldData14"], $row["fldData15"], $row["fldCreatedOn"]);
+	} 
+	echo ("</table>");
 
-echo ("</table><br><br>");
+echo ("</td><td width=40>&nbsp;</td><td>");
 
+	$query = "select * from tabDataSent order by fldID desc limit 40";
+	$results = $db->query($query);
 
-$query = "select * from tabDataSent order by fldID desc limit 20";
-$results = $db->query($query);
+	echo("<b>DataSent</b><br>" );
+	echo("<table border='1'>");
+	echo( "<tr><td>ID</td><td>ToNodeID</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>Sent On</td><td>SentResult</td></tr>");
+	while ($row = $results->fetchArray()) {  
+		//var_dump($row);
+		//echo( $row[0] );
+		//echo( "<br>");
+		printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%d</td></tr>", $row["fldID"], $row["fldToNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData7"], $row["fldData8"], $row["fldData10"],  $row["fldSentOn"], $row["fldSentResult"]);
+	} 
+	echo ("</table>");
 
-echo("tabDataSent<br>" );
-echo("<table border='1'>");
-echo( "<tr><td>ID</td><td>ToNodeID</td><td>D1</td><td>D2</td><td>D3</td><td>D4</td><td>D5</td><td>D6</td><td>D7</td><td>D8</td><td>D9</td><td>D10</td><td>Sent On</td><td>SentResult</td></tr>");
-while ($row = $results->fetchArray()) {  
-    //var_dump($row);
-	//echo( $row[0] );
-	//echo( "<br>");
-	printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%d</td></tr>", $row["fldID"], $row["fldToNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData7"], $row["fldData8"], $row["fldData10"],  $row["fldSentOn"], $row["fldSentResult"]);
-} 
-echo ("</table>");
-
+echo ("</td></tr></table>");
 
 $db->close();
 ?>
