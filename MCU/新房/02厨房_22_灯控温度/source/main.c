@@ -43,8 +43,8 @@ sbit RELAY_LIGHT2 = P1^4; //灯控继电器2 （顶灯）
 
 unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
 unsigned char light2Mode = 2; //0：常关，1：常开，2：自动
-unsigned char light1OnThreshold = 60; // 开1号灯的阈值
-unsigned char light2OnThreshold = 60; // 开2号灯的阈值
+unsigned char light1OnThreshold = 100; // 开1号灯的阈值
+unsigned char light2OnThreshold = 80; // 开2号灯的阈值
 
 unsigned char timerCounter10ms = 0;
 unsigned int timerSendData = 0;
