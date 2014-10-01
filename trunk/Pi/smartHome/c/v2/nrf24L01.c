@@ -20,7 +20,7 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 #include <wiringPi.h>
 #include <stdio.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include "nrf24L01Def.h"
 
 void nrfFlushTx();
@@ -36,11 +36,11 @@ unsigned char nrfWriteTxData(unsigned char regAddr, unsigned char *txData, unsig
 /******************
 函数功能:延时 15us
 *******************/
-void delayFor24L01( )
-{
-	usleep(15); // needs #include <unistd.h>
-	//delayMicroseconds(15); // needs #include <wiringPi.h>
-}
+//void delayFor24L01( )
+//{
+//	usleep(15); // needs #include <unistd.h>
+//	//delayMicroseconds(15); // needs #include <wiringPi.h>
+//}
 
 
 //********* 以下函数仅供本模块内部调用 **************
@@ -224,14 +224,18 @@ void nrf24L01Init()
 	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); // 使能接收通道0
 
 	//nrfWriteReg( W_REGISTER+SETUP_AW, 0x03 ); // Set up address width to 5 bytes
-	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us+86us，自动重发15次
-	nrfWriteReg( W_REGISTER+SETUP_RETR,0x1f ); // 自动重发延时等待500us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x1f ); // 自动重发延时等待500us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x3f ); // 自动重发延时等待1000us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us，自动重发15次
+	nrfWriteReg( W_REGISTER+SETUP_RETR,0x7f ); // 自动重发延时等待2000us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0xbf ); // 自动重发延时等待3000us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0xff ); // 自动重发延时等待4000us，自动重发15次
 
 	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
 	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 
-	delayFor24L01();
-	delayFor24L01();
+	//delayFor24L01();
+	//delayFor24L01();
 	
 	//flush buffers
 	nrfFlushTx();

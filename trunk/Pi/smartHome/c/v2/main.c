@@ -22,11 +22,12 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 //#include <wiringPi.h>
 #include "nrf24L01.h"
 
-#define SEND_RETRY 3
+#define SEND_RETRY 5
 
-void testChannel( unsigned char rfChannel, unsigned char frameCount )
+int testChannel( unsigned char rfChannel, unsigned char frameCount )
 {
 	unsigned char sendData[10];
+	//unsigned char toAddr[5]= {97,83,175, 231, 231};
 	unsigned char toAddr[3]= {97,83,175};
 	unsigned char tmp;
 
@@ -40,54 +41,29 @@ void testChannel( unsigned char rfChannel, unsigned char frameCount )
 	tmp = nrfSendData( 125, 1, SEND_RETRY, 3, toAddr, 10, sendData);
 	
 	//printf( "\n\rTesting Channel [%d]. Trigger sent. Result=%d\n\r", rfChannel, tmp);
-	
+	printf( "\n\r%d,\t%d,", rfChannel, tmp);
+
+	return tmp;
 
 }
 
 void startRecv( unsigned char rfChannel )
 {
-	unsigned char myAddr[3] = {53,70, 132};
-	nrfSetRxMode( rfChannel, 3, myAddr );
+	unsigned char myAddr[5] = {53,70, 132, 231, 231};
+	nrfSetRxMode( rfChannel, 5, myAddr );
 	
 	//printf( "Starting listening on channel [%d]... \n\r" , rfChannel);
 	
 }
 
 
-void sendDataToHeater()
-{
-	unsigned char sendData[5];
-	unsigned char toAddr[3]= {97,83,91};
-	unsigned char tmp, i;
-
-		
-	sendData[0] = 0;
-	sendData[1] = 105;
-	sendData[2] = 2;
-	sendData[3] = 0;
-	sendData[4] = 0;
-	
-	usleep( 6000000L);
-	
-	for(i=1; i<=10; i++)
-	{
-		sendData[2] = 1;
-		tmp = nrfSendData( 92, 1, SEND_RETRY, 3, toAddr, 5, sendData);
-		printf( "Sending [On], result=%d \n\r", tmp );
-		usleep( 1000000L);
-		sendData[2] = 0;
-		tmp = nrfSendData( 92, 1, SEND_RETRY, 3, toAddr, 5, sendData);
-		printf( "Sending [Off], result=%d \n\r", tmp  );
-		usleep( 1000000L);
-	}
-}
 
 int main(int argc, char **argv)
 {
 	unsigned char *receivedData;
 	unsigned char cnt = 0;
 	
-	unsigned int timeout=60000;
+	unsigned long timeout=60000;
 	
 	unsigned char rfChannel=0;
 	
@@ -103,24 +79,23 @@ int main(int argc, char **argv)
 	unsigned int score;
 
 	printf( "Start testing NRF24L01+ ... \n\r" );
+	printf( "CH,\tTrg,\tMySN,\tScore\n\r");
+	//printf( "--------------------------------------------------------------\n\r");
 	
 	// initialize
 	nrf24L01Init();
 	
-	sendDataToHeater();
-	return 0;
-	
-	//testing channel 0-124
-	for( ;rfChannel<=124; rfChannel++)
+	//testing channels
+	for( rfChannel=80;rfChannel<=120; rfChannel++)
 	{
-		//trigger slave to send back data
-		testChannel( rfChannel, testFrameCount);
-		//start receiving
-		startRecv(rfChannel);
+		if( rfChannel==100 ) continue;
 
-		timeout=60000;
+
+		timeout=120000;
 
 		//reset statistics
+		cnt=0;
+
 		mySN=0;
 		myLastRT=0;
 		myR0=0;
@@ -136,13 +111,19 @@ int main(int argc, char **argv)
 		rR10=0;
 		rR15=0;
 		rFail=0;
-		
+
+		//trigger slave to send back data
+		testChannel( rfChannel, testFrameCount) ;
+
+		//start receiving
+		startRecv(rfChannel);
+			
 		//printf( "Testing channel [%d]... \r\n", rfChannel );
 		while(--timeout>10)
 		{
 			if( nrfIsDataReceived() )
 			{
-				//printf( "Channel [%03d] received data #[%3d] - ", rfChannel, ++cnt );
+				
 				
 				mySN++;
 				
@@ -158,7 +139,9 @@ int main(int argc, char **argv)
 				rFail = *(receivedData++);
 
 				if( rLastRT==100 )
+				{
 					continue;
+				}
 				else if( rLastRT==0 )
 					myR0++;
 				else if( 1<= rLastRT && rLastRT <=5 )
@@ -170,29 +153,34 @@ int main(int argc, char **argv)
 				else if( rLastRT==255 )
 					myFail++;
 
+				//printf( "Channel [%03d] received data #[%3d] - ", rfChannel, ++cnt );
 				//printf( "SN:%3d, Last ReTxn:%2d, ReTxn0:%2d, ReTxn5:%2d, ReTxn10:%2d, ReTxn15:%2d, TxFailed:%2d\n\r", rSN, rLastRT, rR0, rR5, rR10, rR15, rFail);
-				timeout=60000;
+				timeout=120000;
 				if( cnt== (testFrameCount+1) || rSN== (testFrameCount+1) || (mySN + rFail) == (testFrameCount+1) )
 				{
+					usleep(200);
 					break;
 				}
 			}
 			
-
 			usleep(10);
 		}
-		if( mySN == (testFrameCount+1) )
-		{
-			score= myR5*5+myR10*10+myR15*15;
-			printf( "Channel [%d], Score=[%d]\r\n" , rfChannel, score );
+		
+
+//		if( mySN == (testFrameCount+1) )
+//		{
+			score= myR5*5+myR10*10+myR15*15+myFail*15 + (testFrameCount+1-mySN)*15;
+
+			if( score>100 ) score=100;
+			//printf( "Channel [%d], Score=[%d]\r\n" , rfChannel, score );
 			//printf( "   SN:%3d, Last ReTxn:%2d, ReTxn0:%2d, ReTxn5:%2d, ReTxn10:%2d, ReTxn15:%2d, TxFailed:%2d\r\n", rSN, rLastRT, rR0, rR5, rR10, rR15, rFail);
 			//printf( "MY SN:%3d, Last ReTxn:%2d, ReTxn0:%2d, ReTxn5:%2d, ReTxn10:%2d, ReTxn15:%2d, TxFailed:%2d\r\n", mySN, myLastRT, myR0, myR5, myR10, myR15, myFail);
+			printf( "\t%3d,\t%d", mySN, score);
 			
-			
-			
-			
-		}
+//		}
 	}
+
+	printf( "\n\r\n\r" );
 
 
 	return 0;
