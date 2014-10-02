@@ -1,0 +1,31 @@
+# m h dom mon dow   command
+#分　时　日　月　周　命令 
+#第1列表示分钟1～59 每分钟用*或者 */1表示 
+#第2列表示小时1～23（0表示0点） 
+#第3列表示日期1～31 
+#第4列表示月份1～12 
+#第5列标识号星期0～6（0表示星期天） 
+#第6列要运行的命令 
+
+# Report external IP address to web portal
+0,30 * * * * /home/pi/smartHome/script/updateExtIP.sh
+
+
+# Kitchen ceiling light AUTO at 4:30 every day
+30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22"
+
+# Balcony curtain 0%-coverage at 4:35 every day
+35 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62"
+
+# Living room floor lamp ON at 16:50 every day
+50 16 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData1=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53"
+
+# Living room desk lamp ON at 16:51 every day
+51 16 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51"
+
+# Balcony curtain 100%-coverage at 18:00 every day
+0 18 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62"
+
+# Kitchen ceiling light OFF at 19:30 every day
+30 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22"
+
