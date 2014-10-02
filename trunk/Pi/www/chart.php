@@ -35,7 +35,7 @@ switch($param)
 
 	
 	case "22": //厨房温度亮度
-		$query = "select fldData7||'.'||fldData8 as s1, fldData2 as s2, fldCreatedOn from tabDataRecved where fldNodeID=22";
+		$query = "select fldData11||'.'||fldData12 as s1, fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=22";
 		$chartTitle = "厨房温度亮度";
 		$s1Title="温度";
 		$s1Unit="度";

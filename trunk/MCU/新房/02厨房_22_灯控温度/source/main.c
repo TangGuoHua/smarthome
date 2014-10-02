@@ -14,6 +14,9 @@ DS18B20温度探头
 2013年09月26日  黄长浩  初始版本
 2014年01月27日  黄长浩  增加initDelay()
 2014年02月09日  黄长浩  1号、2号灯分别设置开灯阈值
+2014年10月02日  黄长浩  更新nrf24l01+驱动
+                        传回Pi的数据增加灯工作模式值
+
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -41,13 +44,13 @@ sbit RELAY_LIGHT1 = P1^5; //灯控继电器1 （柜灯）
 sbit RELAY_LIGHT2 = P1^4; //灯控继电器2 （顶灯）
 
 
-unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
-unsigned char light2Mode = 2; //0：常关，1：常开，2：自动
-unsigned char light1OnThreshold = 100; // 开1号灯的阈值
-unsigned char light2OnThreshold = 80; // 开2号灯的阈值
+volatile unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
+volatile unsigned char light2Mode = 2; //0：常关，1：常开，2：自动
+volatile unsigned char light1OnThreshold = 100; // 开1号灯的阈值
+volatile unsigned char light2OnThreshold = 80; // 开2号灯的阈值
 
-unsigned char timerCounter10ms = 0;
-unsigned int timerSendData = 0;
+volatile unsigned char timerCounter10ms = 0;
+volatile unsigned int timerSendData = 0;
 
 // Flag for sending data to Pi
 bit sendDataNow = 0;
@@ -78,8 +81,8 @@ void initINT0(void)
 //NRF24L01开始进入接收模式
 void startRecv()
 {
-	unsigned char myAddr[3]= {97, 83, 22}; //本节点的接收地址
-	nrfSetRxMode( 92, 3, myAddr); //接收92频道，3字节地址
+	unsigned char myAddr[5]= {97, 83, 22, 231, 231}; //本节点的接收地址
+	nrfSetRxMode( 92, 5, myAddr); //接收92频道，5字节地址
 }
 
 
@@ -109,20 +112,21 @@ void saveLightOnThreshold( unsigned char threshold1, unsigned char threshold2 )
 void sendDataToHost( )
 {
 	unsigned char sendData[16];
-	unsigned char toAddr[3]= {53, 69, 149}; //Pi, 96频道，3字节地址，接收16字节
+	unsigned char toAddr[5]= {53, 69, 149, 231, 231}; //Pi, 96频道，5字节地址，接收16字节
 	unsigned char tmp;
 	float temperature;
 	int intTemperature;
 		
 	sendData[0] = NODE_ID;//Node ID
-
-	sendData[1] = PIR;
-	sendData[2] = getBrightness(); //亮度
-	sendData[3] = light1OnThreshold; 
-	sendData[4] = light2OnThreshold; 
-		
-	sendData[5] = ~RELAY_LIGHT1;
-	sendData[6] = ~RELAY_LIGHT2;
+	sendData[1] = 1; //Regular Status Update
+	sendData[2] = PIR;
+	sendData[3] = getBrightness(); //亮度
+	sendData[4] = light1OnThreshold;
+	sendData[5] = light2OnThreshold;
+	sendData[6] = light1Mode;
+	sendData[7] = light2Mode;
+	sendData[8] = ~RELAY_LIGHT1;
+	sendData[9] = ~RELAY_LIGHT2;
 
 	// DS18B20取得温度值
 	temperature = readTemperature(1);
@@ -130,11 +134,11 @@ void sendDataToHost( )
 	//四舍五入到十分位
 	intTemperature = temperature<0? (temperature*(-10)+0.5) : temperature*10+0.5; 
 	
-	sendData[7]= temperature<0 ? 1 : 0; //如果是零下则此位置1
-	sendData[8]= intTemperature/10; //温度的整数部分
-	sendData[9]= intTemperature%10; //温度的小数部分
+	sendData[10]= temperature<0 ? 1 : 0; //如果是零下则此位置1
+	sendData[11]= intTemperature/10; //温度的整数部分
+	sendData[12]= intTemperature%10; //温度的小数部分
 
-	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//向Pi发送, 96频道，3字节地址，16字节数据
+	tmp = nrfSendData( 96, 5, toAddr, 16, sendData);//向Pi发送, 96频道，3字节地址，16字节数据
 	
 	//24L01开始接收数据
 	startRecv(); 
@@ -282,7 +286,7 @@ void interrupt24L01(void) interrupt 0
 	//开灯阈值
 	tmp1 = *(receivedData+0);
 	tmp2 = *(receivedData+1);
-	if( tmp1 != light1OnThreshold || tmp2 != light2OnThreshold)
+	if( tmp1 != light1OnThreshold || tmp2 != light2OnThreshold )
 	{
 		//threshold changed, let's save it.
 		light1OnThreshold = tmp1;
