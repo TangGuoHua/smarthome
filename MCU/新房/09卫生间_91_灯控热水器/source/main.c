@@ -12,7 +12,9 @@
 ----------------------------------------------------------------------
 2013年10月01日  黄长浩  初始版本
 2014年01月27日  黄长浩  增加initDelay()
-
+2014年10月03日  黄长浩  增加向92号节点发送数据的逻辑
+                        升级NRF24L01+驱动
+						
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 版权所有者：黄长浩 HuangChangHao@gmail.com
@@ -38,16 +40,16 @@ sbit RELAY_LIGHT1 = P1^7; //灯控继电器1
 sbit RELAY_LIGHT2 = P1^6; //灯控继电器2
 
 
-unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
-unsigned char lightOnThreshold = 60; // 开灯的阈值
+volatile unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
+volatile unsigned char lightOnThreshold = 90; // 开灯的阈值
 
-unsigned char heaterMode = 0; //0：常关，非0：常开
+volatile unsigned char heaterMode = 0; //0：常关，非0：常开
 
-unsigned char timerCounter10ms = 0;
-unsigned int timerSendData = 0;
+volatile unsigned char timerCounter10ms = 0;
+volatile unsigned int timerSendData = 0;
 
 // Flag for sending data to Pi
-bit sendDataNow = 0;
+volatile bit sendDataNow = 0;
 
 
 //开机延时 
@@ -71,13 +73,11 @@ void initINT0(void)
 }
 
 
-
-
 //NRF24L01开始进入接收模式
 void startRecv()
 {
-	unsigned char myAddr[3]= {97, 83, 91}; //本节点的接收地址
-	nrfSetRxMode( 92, 3, myAddr);
+	unsigned char myAddr[5]= {97, 83, 91, 231, 91}; //本节点的接收地址
+	nrfSetRxMode( 92, 5, myAddr);
 }
 
 
@@ -88,13 +88,13 @@ unsigned char getBrightness()
 }
 
 
-
 //将开灯阈值存入片内eeprom
 void saveLightOnThreshold( unsigned char x )
 {
 	eepromEraseSector( 0x0000 );
 	eepromWrite( 0x0000, x );
 }
+
 
 //从片内eeprom取得开灯阈值
 unsigned char getLightOnThreshold()
@@ -103,24 +103,43 @@ unsigned char getLightOnThreshold()
 }
 
 
+//发送数据给Pi
 void sendDataToHost( )
 {
 	unsigned char sendData[16];
-	unsigned char toAddr[3]= {53, 69, 149}; //Pi, 96频道，3字节地址，接收16字节
-	//unsigned char toAddr[3]= {97, 83, 175}; //
+	unsigned char toAddr[5]= {53, 69, 149, 231, 231}; //Pi
 	unsigned char tmp;
 	
 	sendData[0]= NODE_ID;//Node ID
+	sendData[1] = 1; //Regular Status Update
 
-	sendData[1] = PIR;
-	sendData[2] = getBrightness(); //亮度
-	sendData[3] = lightOnThreshold; 
+	sendData[2] = PIR;
+	sendData[3] = getBrightness(); //亮度
+	sendData[4] = lightOnThreshold; 
 		
-	sendData[4] = ~RELAY_LIGHT1;
-	sendData[5] = ~RELAY_LIGHT2;
-	sendData[6] = ~RELAY_HEATER;
+	sendData[5] = ~RELAY_LIGHT1;
+	sendData[6] = ~RELAY_LIGHT2;
+	sendData[7] = ~RELAY_HEATER;
 
-	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//Pi, 96频道，3字节地址，接收16字节
+	tmp = nrfSendData( 96, 5, toAddr, 16, sendData);//Pi, 96频道，5字节地址，接收16字节
+	
+	//24L01开始接收数据
+	startRecv(); 
+}
+
+
+//发送数据给92号节点
+//供控制小厨宝用
+void sendDataToNode92( unsigned char val )
+{
+	unsigned char sendData[3];
+	unsigned char toAddr[5]= {97,83,92,231,92}; //Node 92地址
+	unsigned char tmp;
+	
+	sendData[0]= NODE_ID;//Node ID
+	sendData[1]= val;
+
+	tmp = nrfSendData( 92, 5, toAddr, 3, sendData);//Pi, 92频道，5字节地址，接收3字节
 	
 	//24L01开始接收数据
 	startRecv(); 
@@ -130,6 +149,7 @@ void sendDataToHost( )
 // 初始化Timer0
 void initTimer0(void)
 {
+	AUXR = AUXR|0x80;  // T0, 1T Mode
     TMOD = 0x01;
     TH0 = 0x63;
     TL0 = 0xC0;
@@ -138,6 +158,7 @@ void initTimer0(void)
     TR0 = 1;
 }
 
+
 void initRelays()
 {
 	RELAY_LIGHT1=1;
@@ -145,13 +166,12 @@ void initRelays()
 	RELAY_HEATER=1;
 }
 
+
 void main()
 {
 
 	bit lastPIR=0;
 	bit thisPIR=0;
-	
-	AUXR = AUXR|0x80;  // T0, 1T Mode
 	
 	//初始化中断0
 	initINT0();
@@ -171,14 +191,12 @@ void main()
 	//24L01开始接收数据
 	startRecv(); 
 	
-	//初始化timer0
-	initTimer0();
-	
 	//初始化延时
 	initDelay();
 	
-	
-	
+	//初始化timer0
+	initTimer0();
+
 	while(1)
 	{
 		//取得传感器的当前值
@@ -216,6 +234,13 @@ void main()
 			}
 		}
 		
+		//控制小厨宝（NodeID:92）
+		//当有人无人状态发生转变时，将数据传给92号节点
+		if( thisPIR != lastPIR ) 
+		{
+			sendDataToNode92( thisPIR );
+		}
+		
 		//记录当前值
 		lastPIR = thisPIR;
 
@@ -233,7 +258,7 @@ void interrupt24L01(void) interrupt 0
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
-	// *(receivedData+0): 固定为1
+	// *(receivedData+0): From Node ID, 固定为1
 	// *(receivedData+1): 开灯的亮度阈值
 	// *(receivedData+2): 灯控继电器1的工作模式
 	// *(receivedData+3): 灯控继电器2的工作模式
@@ -264,7 +289,7 @@ void timer0Interrupt(void) interrupt 1
 	{
 		timerCounter10ms=0;
 		
-		if( ++timerSendData == 300 ) //每300秒向Pi发送一次数据
+		if( ++timerSendData == 600 ) //每600秒向Pi发送一次数据
 		{
 			timerSendData = 0;
 			sendDataNow = 1;
