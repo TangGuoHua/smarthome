@@ -15,6 +15,7 @@
 2014-JUL-01 黄长浩  去掉餐厅射灯（北）
 2014-JUL-15 黄长浩  增加餐厅灯带
 2014-JUL-15 黄长浩  修改书房台灯控制器ID
+2014-OCT-03 黄长浩  卫生间小厨宝增加自动模式
 */
 
 $gPageTitle = "控制";
@@ -50,6 +51,7 @@ $(document).ready(function() {
 	showButton( "btnSetKitchenLight2OnThreshold", false );
 	showButton( "btnSetStudyroomLamp", false );
 	showButton( "btnSetSouthBedroomTemp", false );
+	showButton( "btnSetBathroomXiaoChuBaoDelay", false );
 });
 
 
@@ -201,7 +203,19 @@ function rdoBathroomHeaterClicked( val )
 //卫生间小厨宝
 function rdoBathroomXiaoChuBaoClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "92", data1: val } );
+	$.post("/api/sendData.php", { nodeID: "92", data2: val } );
+}
+
+function btnSetBathroomXiaoChuBaoDelayClicked()
+{
+	var setVal = document.getElementById('sliderBathroomXiaoChuBao').value;
+
+	if( setVal>=1 && setVal <=20 )
+	{
+		$.post("/api/sendData.php", { nodeID: "92", data3:setVal } );
+	}
+
+	showButton( 'btnSetBathroomXiaoChuBaoDelay', false );
 }
 
 //书房LED灯带
@@ -439,12 +453,20 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>卫生间小厨宝</legend>
-					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao0" value="0" onclick="rdoBathroomXiaoChuBaoClicked('0');" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao0" onclick="rdoBathroomXiaoChuBaoClicked('0');" <?php echo $row["fldData2"]==0?"checked":"";?> />
 					<label for="rdoBathroomXiaoChuBao0">关</label>
-					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao1" value="1" onclick="rdoBathroomXiaoChuBaoClicked('1');" <?php echo $row["fldData1"]==1?"checked":"";?> />
+
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao1" onclick="rdoBathroomXiaoChuBaoClicked('1');" <?php echo $row["fldData2"]==1?"checked":"";?> />
 					<label for="rdoBathroomXiaoChuBao1">开</label>
 
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao2" onclick="rdoBathroomXiaoChuBaoClicked('2');" <?php echo $row["fldData2"]==2?"checked":"";?> />
+					<label for="rdoBathroomXiaoChuBao2">自动</label>
 			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderBathroomXiaoChuBao">小厨宝延时</label>
+			<input type="range" name="sliderBathroomXiaoChuBao" id="sliderBathroomXiaoChuBao" onchange="showButton( 'btnSetBathroomXiaoChuBaoDelay', true );" value="<?php echo $row["fldData3"];?>" min="1" max="20" step="1" data-highlight="true" />
+			<button id="btnSetBathroomXiaoChuBaoDelay" data-icon="check" onclick="btnSetBathroomXiaoChuBaoDelayClicked();">设定</button>
 		</li>
 	<?php
 	}
