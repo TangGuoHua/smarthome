@@ -8,6 +8,7 @@
 2014-JUL-03 黄长浩  增加厨房、卫生间下的更多参数，如有人？热水器状态等
 2014-AUG-30 黄长浩  增加书房温度气压亮度
 2014-SEP-08 黄长浩  增加客厅南卧露点
+2014-OCT-03 黄长浩  卫生间小厨宝增加模式、延时分钟数等信息
 */
 
 $gPageTitle = "全家实况";
@@ -94,17 +95,20 @@ $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
 	echo "<li data-role='list-divider'>卫生间</li>";
-	printf( "<li><a href='chart.php?param=91'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);
-	printf( "<li>开灯阈值 %d <span class='ui-li-count'>%s</span></li>", $row["fldData3"], $row["fldCreatedOn"]);
-	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData1"]==1?"是":"否", $row["fldCreatedOn"]);
-	printf( "<li>热水器 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"开":"关", $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=91'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
+	printf( "<li>开灯阈值 %d <span class='ui-li-count'>%s</span></li>", $row["fldData4"], $row["fldCreatedOn"]);
+	printf( "<li>灯 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData5"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"是":"否", $row["fldCreatedOn"]);
+	printf( "<li>热水器 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
 }
 
 $query = "select * from tabDataRecved where fldNodeID=92 order by fldID desc limit 1";
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
-	printf( "<li>小厨宝 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData1"]==1?"开":"关", $row["fldCreatedOn"]);
+	printf( "<li>小厨宝模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData5"], $row["fldCreatedOn"]);
+	printf( "<li>小厨宝延时 [%d分钟] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"], $row["fldCreatedOn"]);
+	printf( "<li>小厨宝 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=92'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"-":"", $row["fldData3"], $row["fldData4"], $row["fldCreatedOn"]);
 }
 
