@@ -17,6 +17,9 @@ DS18B20温度探头
 2014年10月02日  黄长浩  更新nrf24l01+驱动
                         传回Pi的数据增加灯工作模式值
 
+TODO:
+[1] bit sendDataNow = 0; 应该使用volatile (2014-10-3)
+
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -146,6 +149,8 @@ void sendDataToHost( )
 
 
 // 初始化Timer0
+// 每10ms触发中断1一次
+// （STC 1T @4MHz 外部晶振）
 void initTimer0(void)
 {
     TMOD = 0x01;
