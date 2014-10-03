@@ -139,6 +139,7 @@ void nrf24L01Init()
 	//nrfWriteReg( W_REGISTER+SETUP_RETR,0xbf ); // 自动重发延时等待3000us，自动重发15次
 	//nrfWriteReg( W_REGISTER+SETUP_RETR,0xff ); // 自动重发延时等待4000us，自动重发15次
 
+	nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
 	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
 	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 }
@@ -178,6 +179,7 @@ unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, uns
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
 	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
+	//nrfWriteReg( W_REGISTER+STATUS, 0x7f ); // 清除RX_DR,TX_DS,MAX_RT标志
 	
 	for( retryCnt=0; retryCnt<= SEND_MAX_RETRY; retryCnt++ )
 	{
@@ -228,14 +230,15 @@ void nrfSetRxMode(  unsigned char rfChannel, unsigned char addrWidth, unsigned c
 	nrfWriteReg( W_REGISTER+SETUP_AW, addrWidth-2 ); //设置地址宽度
   	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, rxAddr, addrWidth ); //接收设备接收通道0使用和发送设备相同的发送地址
 
-
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
 
 	//nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
-	nrfWriteReg( W_REGISTER+RF_SETUP, 0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+	//nrfWriteReg( W_REGISTER+RF_SETUP, 0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
 	//nrfWriteReg( W_REGISTER+RF_SETUP,0x21 ); // 数据传输率250Kbps，发射功率-18dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
+
 
   	CE = 1;	//设为接收模式 PRX
 }
