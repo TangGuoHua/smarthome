@@ -242,12 +242,16 @@ void interrupt24L01(void) interrupt 0
 			tmp = *(receivedData+1);
 			if( tmp == 1)
 			{
-				//有人，烧水
-				RELAY_WATERHEATER = 0;
+				//人来了，烧水
+								
+				waterHeaterDelayOn = 0; //烧水延时计时停止
+				waterHeaterDelayCounter1s = 0;
+				
+				RELAY_WATERHEATER = 0; //开始烧水
 			}
 			else if( tmp == 0 )
 			{
-				//无人
+				//人走了，继续烧水(waterHeaterDelayMinute)分钟，然后再关小厨宝
 				waterHeaterDelayCounter1s = 0;
 				waterHeaterDelayOn = 1; //烧水延时开始计时
 			}
