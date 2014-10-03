@@ -19,7 +19,7 @@ DS18B20温度探头
 
 TODO:
 [1] bit sendDataNow = 0; 应该使用volatile (2014-10-3)
-
+[2] AUXR = AUXR|0x80;  //将T0设置为1T模式  此行需要移入initTimer0()
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
