@@ -35,6 +35,6 @@
 # Bath room big water heater ON at 21:10 every day
 10 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91"
 
-# Bath room big water heater OFF at 21:40 every day
-40 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91"
+# Bath room big water heater OFF at 21:30 every day
+30 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91"
 
