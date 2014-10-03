@@ -58,7 +58,7 @@ void initDelay(void)
     unsigned char a,b,c,d;
     for(d=NODE_ID;d>0;d--)
 	    for(c=167;c>0;c--)
-	        for(b=171;b>0;b--)
+	        for(b=172;b>0;b--)
 	            for(a=16;a>0;a--);
 }
 
