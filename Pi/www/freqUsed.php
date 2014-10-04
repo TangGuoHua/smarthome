@@ -51,21 +51,43 @@ $(document).ready(function() {
 
 /***********各个区域控制***********/
 
-function rdoLivingRoomTVWallControllerClicked(ind, val) //客厅电视墙控制器
+//客厅西墙（电视墙）插座
+function chkLivingTVWallSocketClicked( socketNum, obj )
 {
-	if( ind == 4 ) //台灯
+	//开，tmp=1；关，tmp=0
+	var tmp;
+	tmp = obj.checked?1:0;
+
+	if( socketNum == 1 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data4: val } );
+		$.post("/api/sendData.php", { nodeID: "51", data2: tmp } );
 	}
-	else if( ind == 5 ) //天猫盒子
+	else if( socketNum == 3 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data5: val } );
+		$.post("/api/sendData.php", { nodeID: "51", data4: tmp } );
 	}
-	else if( ind == 8 ) //风扇
+	else if( socketNum == 4 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data8: val } );
+		$.post("/api/sendData.php", { nodeID: "51", data5: tmp } );
+	}
+	else if( socketNum == 5 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data6: tmp } );
+	}
+	else if( socketNum == 6 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data7: tmp } );
+	}
+	else if( socketNum == 7 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data8: tmp } );
+	}
+	else if( socketNum == 8 )
+	{
+		$.post("/api/sendData.php", { nodeID: "51", data9: tmp } );
 	}
 }
+
 
 //客厅东墙南头控制器  （落地灯、插座）
 function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
@@ -203,7 +225,7 @@ function rdoBalconyCurtainClicked( val )
 <ul data-role="listview" data-inset="true">
 <?php
 $db = new DBHelper();
-$sql = "select * from tabDataToNode order by fldNodeID";
+$sql = "select * from tabDataToNode order by fldDisplayOrder";
 $results = $db->query($sql);
 
 while ($row = $results->fetchArray()) 
@@ -232,29 +254,25 @@ while ($row = $results->fetchArray())
 	?>
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>客厅台灯</legend>
-					<input type="radio" name="rdoLivingRoomDeskLamp" id="rdoLivingRoomDeskLamp0" value="0" onclick="rdoLivingRoomTVWallControllerClicked(4, '0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
-					<label for="rdoLivingRoomDeskLamp0">关</label>
-					<input type="radio" name="rdoLivingRoomDeskLamp" id="rdoLivingRoomDeskLamp1" value="1" onclick="rdoLivingRoomTVWallControllerClicked(4, '1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomDeskLamp1">开</label>
-		    </fieldset>
-		</li>
-		<li data-role="fieldcontain">
-		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>客厅天猫盒子</legend>
-					<input type="radio" name="rdoLivingRoomTMallBox" id="rdoLivingRoomTMallBox0" value="0" onclick="rdoLivingRoomTVWallControllerClicked(5, '0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
-					<label for="rdoLivingRoomTMallBox0">关</label>
-					<input type="radio" name="rdoLivingRoomTMallBox" id="rdoLivingRoomTMallBox1" value="1" onclick="rdoLivingRoomTVWallControllerClicked(5, '1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomTMallBox1">开</label>
-		    </fieldset>
-		</li>
-		<li data-role="fieldcontain">
-		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>客厅风扇</legend>
-					<input type="radio" name="rdoLivingRoomFan" id="rdoLivingRoomFan0" value="0" onclick="rdoLivingRoomTVWallControllerClicked(8, '0');" <?php echo $row["fldData8"]==0?"checked":"";?> />
-					<label for="rdoLivingRoomFan0">关</label>
-					<input type="radio" name="rdoLivingRoomFan" id="rdoLivingRoomFan1" value="1" onclick="rdoLivingRoomTVWallControllerClicked(8, '1');" <?php echo $row["fldData8"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomFan1">开</label>
+		    	<legend>电视背景墙</legend>
+
+				<input type="checkbox" name="chkLivingTVWallSocket1" id="chkLivingTVWallSocket1" onclick="chkLivingTVWallSocketClicked( 1, this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket1">电信机顶盒</label>
+
+				<input type="checkbox" name="chkLivingTVWallSocket3" id="chkLivingTVWallSocket3" onclick="chkLivingTVWallSocketClicked( 3, this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket3">电视机</label>
+
+				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket4">台灯</label>
+		    	<input type="checkbox" name="chkLivingTVWallSocket5" id="chkLivingTVWallSocket5" onclick="chkLivingTVWallSocketClicked( 5, this);" <?php echo $row["fldData6"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket5">天猫盒子</label>
+		    	<input type="checkbox" name="chkLivingTVWallSocket6" id="chkLivingTVWallSocket6" onclick="chkLivingTVWallSocketClicked( 6, this);" <?php echo $row["fldData7"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket6">功放</label>		    	
+				<input type="checkbox" name="chkLivingTVWallSocket" id="chkLivingTVWallSocket7" onclick="chkLivingTVWallSocketClicked( 7, this);" <?php echo $row["fldData8"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket7">熔岩灯</label>
+
+				<input type="checkbox" name="chkLivingTVWallSocket8" id="chkLivingTVWallSocket8" onclick="chkLivingTVWallSocketClicked( 8, this);" <?php echo $row["fldData9"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket8">风扇</label>
 		    </fieldset>
 		</li>
 	<?php
