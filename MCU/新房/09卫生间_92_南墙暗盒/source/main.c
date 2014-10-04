@@ -281,7 +281,7 @@ void timer0Interrupt(void) interrupt 1
 		//小厨宝延时
 		if( waterHeaterDelayOn )
 		{
-			if( ++waterHeaterDelayCounter1s == waterHeaterDelayMinute*60 )
+			if( ++waterHeaterDelayCounter1s >= waterHeaterDelayMinute*60 )
 			{
 				//延时已到
 				waterHeaterDelayOn = 0; //停止延时计时
