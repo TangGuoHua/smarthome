@@ -17,6 +17,7 @@
 2014-JUL-15 黄长浩  修改书房台灯控制器ID
 2014-OCT-03 黄长浩  卫生间小厨宝增加自动模式
 2014-OCT-04 黄长浩  电视背景墙控制器增加电视、电信机顶盒的控制
+                    调整显示顺序按DisplayOrder排
 */
 
 $gPageTitle = "控制";
@@ -374,18 +375,22 @@ while ($row = $results->fetchArray())
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>电视背景墙</legend>
 
-				<input type="checkbox" name="chkLivingTVWallSocket1" id="chkLivingTVWallSocket1" onclick="chkLivingTVWallSocketClicked( 1, this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
-				<label for="chkLivingTVWallSocket1">电信机顶盒</label>
+				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket4">台灯</label>
 
 				<input type="checkbox" name="chkLivingTVWallSocket3" id="chkLivingTVWallSocket3" onclick="chkLivingTVWallSocketClicked( 3, this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket3">电视机</label>
 
-				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
-				<label for="chkLivingTVWallSocket4">台灯</label>
+				<input type="checkbox" name="chkLivingTVWallSocket1" id="chkLivingTVWallSocket1" onclick="chkLivingTVWallSocketClicked( 1, this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket1">白机顶盒</label>
+
+
 		    	<input type="checkbox" name="chkLivingTVWallSocket5" id="chkLivingTVWallSocket5" onclick="chkLivingTVWallSocketClicked( 5, this);" <?php echo $row["fldData6"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket5">天猫盒子</label>
+
 		    	<input type="checkbox" name="chkLivingTVWallSocket6" id="chkLivingTVWallSocket6" onclick="chkLivingTVWallSocketClicked( 6, this);" <?php echo $row["fldData7"]==1?"checked":"";?> />
-				<label for="chkLivingTVWallSocket6">功放</label>		    	
+				<label for="chkLivingTVWallSocket6">功放</label>
+				
 				<input type="checkbox" name="chkLivingTVWallSocket" id="chkLivingTVWallSocket7" onclick="chkLivingTVWallSocketClicked( 7, this);" <?php echo $row["fldData8"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket7">熔岩灯</label>
 
