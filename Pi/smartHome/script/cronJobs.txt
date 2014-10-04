@@ -10,7 +10,6 @@
 # Report external IP address to web portal
 0,30 * * * * /home/pi/smartHome/script/updateExtIP.sh
 
-
 # Kitchen ceiling light AUTO at 4:30 every day
 30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22"
 
@@ -26,8 +25,8 @@
 # Living room desk lamp ON at 17:21 every day
 21 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51"
 
-# Dinning room lights ON at 17:50 every day
-50 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData1=1, fldData3=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41"
+# Dinning room lights ON at 17:40 every day
+40 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData1=1, fldData3=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41"
 
 # Balcony curtain 100%-coverage at 18:30 every day
 30 18 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62"
@@ -40,4 +39,3 @@
 
 # Bath room big water heater OFF at 21:30 every day
 30 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91"
-
