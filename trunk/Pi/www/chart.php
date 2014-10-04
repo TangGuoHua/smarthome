@@ -80,7 +80,7 @@ switch($param)
 		$s2Unit="%";
 		break;
 	case "91": //卫生间亮度
-		$query = "select fldData2 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=91";
+		$query = "select fldData3 as s1, 0 as s2, fldCreatedOn from tabDataRecved where fldNodeID=91";
 		$chartTitle = "卫生间亮度";
 		$s1Title="亮度";
 		$s1Unit="";

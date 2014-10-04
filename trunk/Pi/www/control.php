@@ -16,6 +16,7 @@
 2014-JUL-15 黄长浩  增加餐厅灯带
 2014-JUL-15 黄长浩  修改书房台灯控制器ID
 2014-OCT-03 黄长浩  卫生间小厨宝增加自动模式
+2014-OCT-04 黄长浩  电视背景墙控制器增加电视、电信机顶盒的控制
 */
 
 $gPageTitle = "控制";
@@ -52,6 +53,7 @@ $(document).ready(function() {
 	showButton( "btnSetStudyroomLamp", false );
 	showButton( "btnSetSouthBedroomTemp", false );
 	showButton( "btnSetBathroomXiaoChuBaoDelay", false );
+	showButton( "btnSetBalconyCurtainCoverage", false );
 });
 
 
@@ -113,37 +115,37 @@ function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
 //客厅西墙（电视墙）插座
 function chkLivingTVWallSocketClicked( socketNum, obj )
 {
-		//开，tmp=1；关，tmp=0
+	//开，tmp=1；关，tmp=0
 	var tmp;
 	tmp = obj.checked?1:0;
 
-	if( socketNum == 2 )
+	if( socketNum == 1 )
 	{
 		$.post("/api/sendData.php", { nodeID: "51", data2: tmp } );
 	}
 	else if( socketNum == 3 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data3: tmp } );
+		$.post("/api/sendData.php", { nodeID: "51", data4: tmp } );
 	}
 	else if( socketNum == 4 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data4: tmp } );
+		$.post("/api/sendData.php", { nodeID: "51", data5: tmp } );
 	}
 	else if( socketNum == 5 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data5: tmp } );
+		$.post("/api/sendData.php", { nodeID: "51", data6: tmp } );
 	}
 	else if( socketNum == 6 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data6: tmp } );
+		$.post("/api/sendData.php", { nodeID: "51", data7: tmp } );
 	}
 	else if( socketNum == 7 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data7: tmp } );
+		$.post("/api/sendData.php", { nodeID: "51", data8: tmp } );
 	}
 	else if( socketNum == 8 )
 	{
-		$.post("/api/sendData.php", { nodeID: "51", data8: tmp } );
+		$.post("/api/sendData.php", { nodeID: "51", data9: tmp } );
 	}
 }
 
@@ -269,6 +271,24 @@ function btnSetSouthBedroomTempClicked()
 }
 
 
+//阳台卷帘
+function rdoBalconyCurtainClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "62", data4: val } );
+}
+
+
+function btnSetBalconyCurtainCoverageClicked()
+{
+	var setVal = document.getElementById('sliderBalconyCurtain').value;
+	
+	if( setVal>=0 && setVal <=100 ) 
+	{
+		$.post("/api/sendData.php", { nodeID: "62", data4:setVal } );
+	}
+
+	showButton( 'btnSetBalconyCurtainCoverage', false );
+}
 
 
 // 测试移动节点
@@ -285,7 +305,7 @@ function rdoTestMobileLightClicked( val )
 <ul data-role="listview" data-inset="true">
 <?php
 $db = new DBHelper();
-$sql = "select * from tabDataToNode order by fldNodeID";
+$sql = "select * from tabDataToNode order by fldDisplayOrder";
 $results = $db->query($sql);
 
 while ($row = $results->fetchArray()) 
@@ -353,17 +373,23 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>电视背景墙</legend>
-	    	
-				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+
+				<input type="checkbox" name="chkLivingTVWallSocket1" id="chkLivingTVWallSocket1" onclick="chkLivingTVWallSocketClicked( 1, this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket1">电信机顶盒</label>
+
+				<input type="checkbox" name="chkLivingTVWallSocket3" id="chkLivingTVWallSocket3" onclick="chkLivingTVWallSocketClicked( 3, this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkLivingTVWallSocket3">电视机</label>
+
+				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket4">台灯</label>
-		    	<input type="checkbox" name="chkLivingTVWallSocket5" id="chkLivingTVWallSocket5" onclick="chkLivingTVWallSocketClicked( 5, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
+		    	<input type="checkbox" name="chkLivingTVWallSocket5" id="chkLivingTVWallSocket5" onclick="chkLivingTVWallSocketClicked( 5, this);" <?php echo $row["fldData6"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket5">天猫盒子</label>
-		    	<input type="checkbox" name="chkLivingTVWallSocket6" id="chkLivingTVWallSocket6" onclick="chkLivingTVWallSocketClicked( 6, this);" <?php echo $row["fldData6"]==1?"checked":"";?> />
+		    	<input type="checkbox" name="chkLivingTVWallSocket6" id="chkLivingTVWallSocket6" onclick="chkLivingTVWallSocketClicked( 6, this);" <?php echo $row["fldData7"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket6">功放</label>		    	
-				<input type="checkbox" name="chkLivingTVWallSocket" id="chkLivingTVWallSocket7" onclick="chkLivingTVWallSocketClicked( 7, this);" <?php echo $row["fldData7"]==1?"checked":"";?> />
+				<input type="checkbox" name="chkLivingTVWallSocket" id="chkLivingTVWallSocket7" onclick="chkLivingTVWallSocketClicked( 7, this);" <?php echo $row["fldData8"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket7">熔岩灯</label>
 
-				<input type="checkbox" name="chkLivingTVWallSocket8" id="chkLivingTVWallSocket8" onclick="chkLivingTVWallSocketClicked( 8, this);" <?php echo $row["fldData8"]==1?"checked":"";?> />
+				<input type="checkbox" name="chkLivingTVWallSocket8" id="chkLivingTVWallSocket8" onclick="chkLivingTVWallSocketClicked( 8, this);" <?php echo $row["fldData9"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket8">风扇</label>
 		    </fieldset>
 		</li>
@@ -394,7 +420,40 @@ while ($row = $results->fetchArray())
 		</li>
 	<?php
 	}
-	else if( $row["fldNodeID"]==82 ) //南卧
+	elseif( $row["fldNodeID"]==62 )	// 阳台卷帘
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>阳台卷帘覆盖度</legend>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData4"]==0?"checked":"";?> />
+					<label for="rdoBalconyCurtain0">全开</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain20" onclick="rdoBalconyCurtainClicked(20);" <?php echo $row["fldData4"]==20?"checked":"";?> />
+					<label for="rdoBalconyCurtain20">20%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain40" onclick="rdoBalconyCurtainClicked(40);" <?php echo $row["fldData4"]==40?"checked":"";?> />
+					<label for="rdoBalconyCurtain40">40%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain60" onclick="rdoBalconyCurtainClicked(60);" <?php echo $row["fldData4"]==60?"checked":"";?> />
+					<label for="rdoBalconyCurtain60">60%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain85" onclick="rdoBalconyCurtainClicked(85);" <?php echo $row["fldData4"]==85?"checked":"";?> />
+					<label for="rdoBalconyCurtain85">85%</label>
+
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain100" onclick="rdoBalconyCurtainClicked(100);" <?php echo $row["fldData4"]==100?"checked":"";?> />
+					<label for="rdoBalconyCurtain100">全关</label>
+
+		    </fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderBalconyCurtain">阳台卷帘覆盖%</label>
+			<input type="range" name="sliderBalconyCurtain" id="sliderBalconyCurtain" onchange="showButton( 'btnSetBalconyCurtainCoverage', true );" value="<?php echo $row["fldData4"];?>" min="0" max="100" step="5" data-highlight="true" />
+			<button id="btnSetBalconyCurtainCoverage" data-icon="check" onclick="btnSetBalconyCurtainCoverageClicked();">设定</button>
+		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==82 ) //南卧
 	{
 	?>
 		<li data-role="fieldcontain">
