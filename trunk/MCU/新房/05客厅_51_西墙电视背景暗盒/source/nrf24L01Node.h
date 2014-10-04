@@ -16,7 +16,7 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #ifndef __NRF24L01NODE_H__
 #define __NRF24L01NODE_H__
 
-#define RECEIVE_DATA_WIDTH 8 //本节点的接收的数据宽度 (1-32字节)
+#define RECEIVE_DATA_WIDTH 9 //本节点的接收的数据宽度 (1-32字节)
 
 // ***** 相关函数声明 **********
 void nrf24L01Init( void );
