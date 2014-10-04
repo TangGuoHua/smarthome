@@ -20,11 +20,11 @@
 # Balcony curtain 0%-coverage at 16:00 every day
 0 16 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62"
 
-# Living room floor lamp ON at 17:30 every day
-30 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData1=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53"
+# Living room floor lamp ON at 17:20 every day
+20 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData1=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53"
 
-# Living room desk lamp ON at 17:35 every day
-35 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51"
+# Living room desk lamp ON at 17:21 every day
+21 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51"
 
 # Balcony curtain 100%-coverage at 18:30 every day
 30 18 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62"
