@@ -24,7 +24,7 @@
 30 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData1=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53"
 
 # Living room desk lamp ON at 17:35 every day
-35 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51"
+35 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51"
 
 # Balcony curtain 100%-coverage at 18:30 every day
 30 18 * * * sqlite3 /var/www/db/smarthome.sqlite3 "update tabDataToNode set fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62"
