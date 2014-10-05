@@ -238,7 +238,7 @@ while ($row = $results->fetchArray())
 	?>
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>餐厅顶射灯</legend>
+		    	<legend>餐厅顶灯</legend>
 		    	<input type="checkbox" name="chkDinningLightEast" id="chkDinningLightEast" onclick="chkDinningRoomLightclicked('E', this);" <?php echo $row["fldData1"]==1?"checked":"";?> />
 				<label for="chkDinningLightEast">东</label>
 				<input type="checkbox" name="chkDinningLightSouth" id="chkDinningLightSouth" onclick="chkDinningRoomLightclicked('S', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
@@ -287,7 +287,7 @@ while ($row = $results->fetchArray())
 	?>
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>客厅顶射灯</legend>
+		    	<legend>客厅顶灯</legend>
 		    	<input type="checkbox" name="chkLivingRoomLightEast" id="chkLivingRoomLightEast" onclick="chkLivingRoomCeilingLightclicked('E', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
 				<label for="chkLivingRoomLightEast">东</label>
 				<input type="checkbox" name="chkLivingRoomLightSouth" id="chkLivingRoomLightSouth" onclick="chkLivingRoomCeilingLightclicked('S', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
