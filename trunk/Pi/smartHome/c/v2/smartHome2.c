@@ -13,6 +13,7 @@ Date         Author   Remarks
 2014-SEP-23  黄长浩   修改checkSendDataToNode()方法，增加transaction，增加tabDataSent表
 2014-SEP-23  黄长浩   修改onDataReceived()方法，Pi的接收地址变为5字节
                       修改checkSendDataToNode()方法，以适应新的tabDataToNode和tabDataSent表结构
+2014-OCT-05  黄长浩   tabDataSent表增加fldRequestor字段
 */
 
 #include <sys/types.h>
@@ -82,6 +83,7 @@ void checkSendDataToNode()
 	unsigned char fldNodeID;
 	unsigned char fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, fldDataLength;
 	unsigned char toAddr[5];
+	const unsigned char * fldRequestor = NULL;
 	unsigned char sendData[10];
 	unsigned char sendResult;
 	
@@ -135,6 +137,10 @@ void checkSendDataToNode()
 		sendData[7] = sqlite3_column_int(stmt, 20);
 		sendData[8] = sqlite3_column_int(stmt, 21);
 		sendData[9] = sqlite3_column_int(stmt, 22);
+
+		fldRequestor = sqlite3_column_text(stmt, 30);
+
+		//printf( "requestor:[%s]\n\r", fldRequestor );
 		
 		//发送数据
 		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, toAddr, fldDataLength, sendData);
@@ -147,17 +153,17 @@ void checkSendDataToNode()
 		ret = sqlite3_exec( g_dbHandle, sqlStr, NULL, NULL, NULL);
 		if( ret != SQLITE_OK )
 		{
-			fprintf(stderr,"错误%s\n",sqlite3_errmsg(g_dbHandle));
+			fprintf(stderr,"UPDATE tabDataToNode 错误%s\n",sqlite3_errmsg(g_dbHandle));
 			//fprintf(stderr,"错误%s\n",errmsg);
 		}
 
 		//将数据存入tabDataSent
-		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", fldNodeID, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], sendResult );
+		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldRequestor,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,'%s',%d)", fldNodeID, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], fldRequestor, sendResult );
 		ret = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, NULL);
 		
 		if( ret != SQLITE_OK )
 		{
-			fprintf(stderr,"错误%s\n",sqlite3_errmsg(g_dbHandle));
+			fprintf(stderr,"INSERT INTO tabDataSent 错误%s\n",sqlite3_errmsg(g_dbHandle));
 			//fprintf(stderr,"错误%s\n",errmsg);
 		}
 	}
