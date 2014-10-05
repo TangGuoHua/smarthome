@@ -325,7 +325,7 @@ while ($row = $results->fetchArray())
 	?>
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>阳台卷帘覆盖度</legend>
+		    	<legend>阳台窗帘</legend>
 					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoBalconyCurtain0">全开</label>
 
