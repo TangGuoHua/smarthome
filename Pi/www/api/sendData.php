@@ -39,7 +39,7 @@ if( isset($_POST["nodeID"]))
 		}
 		else
 		{
-			$sql = $sql . ", fldUpdatedBy='WEB_UI', fldUpdatedOn=datetime('now', 'localtime') WHERE fldNodeID=".$nodeID;
+			$sql = $sql . ", fldUpdatedBy='webAPI', fldUpdatedOn=datetime('now', 'localtime') WHERE fldNodeID=".$nodeID;
 			//$sql = $sql . ", fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime') WHERE fldNodeID1=".$nodeID1." AND fldNodeID2=".$nodeID2;
 			echo $sql;
 			
