@@ -99,11 +99,6 @@ void checkSendDataToNode()
 
 	while (sqlite3_step(stmt) == SQLITE_ROW)
 	{
-		//printf("ID=%d, Node1=%d, Node2=%d, data0=%d, LastUpdatedBy=%s\n", sqlite3_column_int(stmt, 0),
-		//			sqlite3_column_int(stmt, 1),
-		//			sqlite3_column_int(stmt, 2),
-		//			sqlite3_column_int(stmt, 3),
-		//			sqlite3_column_text(stmt, 8));
 
 		if( !sentAnything )
 		{
