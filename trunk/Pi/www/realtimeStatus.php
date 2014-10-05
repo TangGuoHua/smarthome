@@ -49,7 +49,7 @@ $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
 	echo( "<li>用电器 [收音机" );
-	if( $row["fldData3"] == 1 ) echo( "|电信机顶盒" );
+	if( $row["fldData2"] == 1 ) echo( "|白机顶盒" );
 	if( $row["fldData4"] == 1 ) echo( "|电视" );
 	if( $row["fldData5"] == 1 ) echo( "|台灯" );
 	if( $row["fldData6"] == 1 ) echo( "|天猫盒子" );
