@@ -14,7 +14,8 @@
 2014年01月27日  黄长浩  增加initDelay()
 2014年10月03日  黄长浩  增加向92号节点发送数据的逻辑
                         升级NRF24L01+驱动
-						
+2014年10月06日  黄长浩  修改initDelay()延时为(NodeID*2)秒
+					
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 版权所有者：黄长浩 HuangChangHao@gmail.com
@@ -52,17 +53,18 @@ volatile unsigned int timerSendData = 0;
 volatile bit sendDataNow = 0;
 
 
+
 //开机延时 
-//根据NodeID，进行约为500*NodeID毫秒的延时
+//根据NodeID，进行约为(NodeID*2)秒的延时
 //作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
 void initDelay(void)
 {
-	//4MHz Crystal, 1T STC11F04E
+	//4MHz Crystal, 1T
     unsigned char a,b,c,d;
     for(d=NODE_ID;d>0;d--)
-	    for(c=167;c>0;c--)
-	        for(b=171;b>0;b--)
-	            for(a=16;a>0;a--);
+	    for(c=252;c>0;c--)
+	        for(b=230;b>0;b--)
+	            for(a=33;a>0;a--);
 }
 
 
