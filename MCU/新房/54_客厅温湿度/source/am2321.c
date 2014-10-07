@@ -4,6 +4,7 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年01月26日  黄长浩  初始版本
+2014年10月07日  黄长浩  调整一些延时函数
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -13,35 +14,34 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 用于学习与参考目的，请在引用处注明版权和作者信息。
 ****************************************************************************/
 //
-// STC11F04E 1T单片机调试成功
+// STC11F04E 1T单片机 4MHz晶振 调试成功
 //
 
 #include <reg52.h>
-#include <intrins.h>
 #include "am2321.h"
 
 static unsigned char AM2321_Data[5]={0x00,0x00,0x00,0x00,0x00};
 
-
-/******************************\
-|* 功能：延时大约 t毫秒（ms）
-\*******************************/ 
-void am2321DelayMS(unsigned int t)
+void am2321Delay2S(void)
 {
-//	unsigned int i;
-//	unsigned int j;
-//	for(j=t;j>0;j--)
-//		//for(i=848;i>0;i--);  //1T STC12C5608AD 晶振为11.0592M
-//		//for( i=530; i>0; i-- ); // 1T STC11F04E 内部RC 6.97MHz
-//		for( i=490; i>0; i-- ); // 1T STC11F04E 内部RC 6.38MHz
-	
 	//晶振为4MHz时 1T STC11F04E
-	unsigned char a,b;
-	for(; t>0; t-- )
-		for(b=4;b>0;b--)
-	        for(a=248;a>0;a--);
+	//延时2.5s
+    unsigned char a,b,c,n;
+    for(c=165;c>0;c--)
+        for(b=100;b>0;b--)
+            for(a=150;a>0;a--);
+    for(n=1;n>0;n--);
 }
 
+void am2321DelayMS()
+{
+	//晶振为4MHz时 1T STC11F04E
+	//延时2ms
+    unsigned char a,b,c;
+    for(c=7;c>0;c--)
+        for(b=8;b>0;b--)
+            for(a=34;a>0;a--);
+}
 
 
 /******************
@@ -49,14 +49,15 @@ void am2321DelayMS(unsigned int t)
 *******************/
 void am2321DelayUS()
 {  
-	// 1T STC11F04E 4MHz晶振
+	//晶振为4MHz时 1T STC11F04E
+	//延时40us
     unsigned char a,b;
     for(b=11;b>0;b--)
         for(a=2;a>0;a--);
 } 
 
 //数据清零
-void ClearData(void)
+void clearData(void)
 {
 	int i;
 	for(i=0;i<5;i++)
@@ -66,26 +67,10 @@ void ClearData(void)
 }
 
 
-//初始化AM2321，并触发一次测量
-void initAM2321()
-{
-	AM2321_SDA = 1;
-	am2321DelayMS(2);  //延时2Ms
-	
-	//触发一次测量
-	
-	//主机拉低(Min=800US Max=20Ms) 
-	AM2321_SDA = 0;
-	am2321DelayMS(2);  //延时2Ms
-	//释放总线 延时(Min=30us Max=50us)
-	AM2321_SDA = 1;
-	
-	// 等待测量完成
-	am2321DelayMS(2500);  //延时2.5s
-}
+
 
 // 从AM2321读取一个字节的数据
-unsigned char Read_SensorData(void)
+unsigned char am2321ReadOneByte(void)
 {
 	unsigned char i, temp, returnData;
 	unsigned int loopCount;
@@ -114,6 +99,15 @@ unsigned char Read_SensorData(void)
 
 
 
+//初始化AM2321
+//需要2.5秒后才能返回
+void initAM2321()
+{
+	AM2321_SDA = 1;
+	am2321Delay2S();  //延时2.5s
+}
+
+
 /********************************************
 功能： 读传感器
 
@@ -125,9 +119,10 @@ unsigned char Read_SensorData(void)
   0 - 读取AM2321成功
   1 - AM2321未响应（传感器没有接）
   2 - 读出的数据校验和出错       
-  3 - 读取出错 （General error）
+  3,4 - 读取出错 （General error）
+  5 - 读取出错（所有读数为零）
 ********************************************/
-unsigned char readAM2321() // readAM2321(unsigned char mode ) 
+unsigned char readAM2321(unsigned char mode ) 
 {
 	unsigned char result = 0;
 	unsigned char i;
@@ -136,22 +131,22 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 	unsigned int tmp;
 	
 	//清除数据
-	ClearData();
+	clearData();
 	
 	//主机拉低(Min=800US Max=20Ms) 
 	AM2321_SDA = 0;
-	am2321DelayMS(2);  //延时2Ms
+	am2321DelayMS();  //延时2Ms
 	//释放总线 延时(Min=30us Max=50us)
 	AM2321_SDA = 1;
 	
-//	if( mode==2)
-//	{
-//		am2321DelayMS(2900);
-//		AM2321_SDA = 0;
-//		am2321DelayMS(2);  //延时2Ms
-//		//释放总线 延时(Min=30us Max=50us)
-//		AM2321_SDA = 1;
-//	}
+	if( mode==2)
+	{
+		am2321Delay2S();
+		AM2321_SDA = 0;
+		am2321DelayMS();  //延时2Ms
+		//释放总线 延时(Min=30us Max=50us)
+		AM2321_SDA = 1;
+	}
 
 	am2321DelayUS(); //延时40us
 	
@@ -159,12 +154,11 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 	//判断从机是否有低电平响应信号 如不响应则跳出，响应则向下运行 
 	if(AM2321_SDA ==0)
 	{
-	
 		//收到起始信号
 		
 		//判断从机是否发出 80us 的低电平响应信号是否结束
 		cnt=0;
-		while((!AM2321_SDA))
+		while(!AM2321_SDA)
 		{
 			if(++cnt>9000) //防止进入死循环
 			{
@@ -183,12 +177,13 @@ unsigned char readAM2321() // readAM2321(unsigned char mode )
 				return 4;
 			}
 		}
+		
 		// 数据接收	传感器共发送40位数据
 		// 即5个字节 高位先送  5个字节分别为湿度高位 湿度低位 温度高位 温度低位 校验和
 		// 校验和为：湿度高位+湿度低位+温度高位+温度低位
 		for(i=0;i<5;i++)
 		{
-			AM2321_Data[i] = Read_SensorData();
+			AM2321_Data[i] = am2321ReadOneByte();
 		}
 		
 		checkSum = AM2321_Data[0]+AM2321_Data[1]+AM2321_Data[2]+AM2321_Data[3];
