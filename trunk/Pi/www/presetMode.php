@@ -17,7 +17,7 @@ function setMode( modeName )
 	if( modeName == 'Dinner' ) //晚餐
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1: 1, data3:1 } ); //开餐厅射灯
-		$.post("/api/sendData.php", { nodeID: "51", data4:1 } ); //开台灯
+		$.post("/api/sendData.php", { nodeID: "51", data5:1 } ); //开台灯
 		$.post("/api/sendData.php", { nodeID: "53", data1:1 } ); //开客厅落地灯
 	}
 	else if( modeName == 'WatchTV' ) // 看电视
