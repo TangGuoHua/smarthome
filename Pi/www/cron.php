@@ -9,9 +9,9 @@ $output = $output . "# Kitchen ceiling light AUTO at 4:30 every day" . PHP_EOL;
 $output = $output . "30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"" . PHP_EOL;
 $output = $output . PHP_EOL;
 
-$output = $output . "# Balcony curtain 0%-coverage at 4:35 every day" . PHP_EOL;
-$output = $output . "35 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"" . PHP_EOL;
-$output = $output . PHP_EOL;
+//$output = $output . "# Balcony curtain 0%-coverage at 4:35 every day" . PHP_EOL;
+//$output = $output . "35 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"" . PHP_EOL;
+//$output = $output . PHP_EOL;
 
 $output = $output . "# Balcony curtain 0%-coverage at 16:00 every day" . PHP_EOL;
 $output = $output . "0 16 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"" . PHP_EOL;
@@ -54,7 +54,7 @@ echo exec('crontab /tmp/phpcrontab.txt');
 $output = shell_exec('crontab -l');
 
 
-echo $output;
+echo str_replace(PHP_EOL, '<br>', $output);
 echo "<br>";
 
 echo "done<br>";
