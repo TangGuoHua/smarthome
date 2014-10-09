@@ -1,13 +1,5 @@
 <?php
 
-
-$output = shell_exec('crontab -l');
-//file_put_contents('/tmp/phpcrontab.txt', $output.'* * * * * NEW_CRON'.PHP_EOL);
-//echo exec('crontab /tmp/crontab.txt');
-
-echo $output;
-echo "<br>";
-
 $output = "";
 $output = $output . "# Report external IP address to web portal" . PHP_EOL;
 $output = $output . "0 * * * * /home/pi/smartHome/script/updateExtIP.sh" . PHP_EOL;
@@ -37,9 +29,9 @@ $output = $output . "# Dinning room lights ON at 17:40 every day" . PHP_EOL;
 $output = $output . "40 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData3=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41\"" . PHP_EOL;
 $output = $output . PHP_EOL;
 
-$output = $output . "# Balcony curtain 100%-coverage at 18:30 every day" . PHP_EOL;
-$output = $output . "30 18 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"" . PHP_EOL;
-$output = $output . PHP_EOL;
+//$output = $output . "# Balcony curtain 100%-coverage at 18:30 every day" . PHP_EOL;
+//$output = $output . "30 18 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"" . PHP_EOL;
+//$output = $output . PHP_EOL;
 
 $output = $output . "# Kitchen ceiling light OFF at 19:30 every day" . PHP_EOL;
 $output = $output . "30 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"" . PHP_EOL;
@@ -53,9 +45,17 @@ $output = $output . "# Bath room big water heater OFF at 21:30 every day" . PHP_
 $output = $output . "30 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"" . PHP_EOL;
 
 
-//file_put_contents('/tmp/phpcrontab.txt', $output);
+file_put_contents('/tmp/phpcrontab.txt', $output);
 
-//echo exec('crontab -r');
-//echo exec('crontab /tmp/phpcrontab.txt');
+echo exec('crontab -r');
+echo exec('crontab /tmp/phpcrontab.txt');
+
+
+$output = shell_exec('crontab -l');
+
+
+echo $output;
+echo "<br>";
+
 echo "done<br>";
 ?>
