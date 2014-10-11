@@ -39,7 +39,7 @@ function setMode( modeName )
 </script>
 
 <a href="index.php" data-role="button" data-icon="arrow-l">返回</a>
-<a href="presetMode.php" data-role="button" data-icon="refresh" data-ajax="false">更新</a>
+<!--a href="presetMode.php" data-role="button" data-icon="refresh" data-ajax="false">更新</a-->
 
 <ul data-role="listview" data-inset="true">
 	<li data-role="fieldcontain">
