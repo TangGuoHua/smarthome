@@ -11,25 +11,24 @@ include "include/utils.php";
 
 
 $cronList = array(
-	"Report IP address to web portal every hour" => "0 * * * * /home/pi/smartHome/script/updateExtIP.sh",
 
-	"Kitchen ceiling light AUTO at 4:30 every day" => "30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"",
+	"每小时更新IP地址" => "0 * * * * /home/pi/smartHome/script/updateExtIP.sh",
 
-	"Balcony curtain 0%-coverage at 16:00 every day" => "0 16 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"",
+	"每天4:30厨房顶灯设为自动模式" => "30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"",
 
-	"Living room floor lamp ON at 17:20 every day" => "20 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53\"",
+	"每天16:00阳台窗帘全开" => "0 16 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"",
 
-	"Living room desk lamp ON at 17:21 every day" => "21 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51\"",
+	"每天17:20打开客厅落地灯、台灯" => "20 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData3=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53; update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51\"",
 
-	"Dinning room lights ON at 17:40 every day" => "40 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData3=1, fldData4=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41\"",
+	"每天17:40打开餐厅灯" => "40 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData3=1, fldData4=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41\"",
 
-	"Dinning room lights OFF at 19:00 every day" => "00 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=0, fldData3=0, fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41\"",
+	"每天19:00关闭餐厅灯" => "00 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=0, fldData3=0, fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41\"",
 
-	"Kitchen ceiling light OFF at 19:30 every day" => "30 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"",
+	"每天19:30关闭厨房顶灯" => "30 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"",
 
-	"Bath room big water heater ON at 21:10 every day" => "10 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
+	"每天21:10打开热水器" => "10 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
 
-	"Bath room big water heater OFF at 21:30 every day" => "30 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\""
+	"每天21:30关闭热水器" => "30 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\""
 
 	);
 
