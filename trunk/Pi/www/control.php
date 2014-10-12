@@ -378,9 +378,6 @@ while ($row = $results->fetchArray())
 				<input type="checkbox" name="chkLivingTVWallSocket4" id="chkLivingTVWallSocket4" onclick="chkLivingTVWallSocketClicked( 4, this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket4">台灯</label>
 
-				<input type="checkbox" name="chkLivingTVWallSocket3" id="chkLivingTVWallSocket3" onclick="chkLivingTVWallSocketClicked( 3, this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
-				<label for="chkLivingTVWallSocket3">电视机</label>
-
 				<input type="checkbox" name="chkLivingTVWallSocket1" id="chkLivingTVWallSocket1" onclick="chkLivingTVWallSocketClicked( 1, this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket1">白机顶盒</label>
 
