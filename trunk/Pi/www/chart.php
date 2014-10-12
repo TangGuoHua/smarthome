@@ -63,8 +63,8 @@ switch($param)
 
 
 
-	case "54": //客厅温湿度
-		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=54";
+	case "53": //客厅温湿度
+		$query = "select fldData5||'.'||fldData6 as s1, fldData3||'.'||fldData4 as s2, fldCreatedOn from tabDataRecved where fldNodeID=53";
 		$chartTitle = "客厅温湿度";
 		$s1Title="温度";
 		$s1Unit="度";

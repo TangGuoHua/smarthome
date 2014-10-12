@@ -62,7 +62,6 @@ $(document).ready(function() {
 /***********各个区域控制***********/
 
 //厨房
-
 function rdoKitchenLightClicked( ind, val )
 {
 	if( ind == 1 ) //Light 1
@@ -106,11 +105,11 @@ function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
 {
 	if( ind == 1 ) //落地灯
 	{
-		$.post("/api/sendData.php", { nodeID: "53", data1: val } );
+		$.post("/api/sendData.php", { nodeID: "53", data3: val } );
 	}
 	if( ind == 2 ) //插座
 	{
-		$.post("/api/sendData.php", { nodeID: "53", data2: val } );
+		$.post("/api/sendData.php", { nodeID: "53", data4: val } );
 	}
 }
 
@@ -404,9 +403,9 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>客厅落地灯</legend>
-					<input type="radio" name="rdoLivingRoomFloorLamp" id="rdoLivingRoomFloorLamp0" value="0" onclick="rdoLivingRoomEastWallSouthControllerClicked(1, '0');" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<input type="radio" name="rdoLivingRoomFloorLamp" id="rdoLivingRoomFloorLamp0" value="0" onclick="rdoLivingRoomEastWallSouthControllerClicked(1, '0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
 					<label for="rdoLivingRoomFloorLamp0">关</label>
-					<input type="radio" name="rdoLivingRoomFloorLamp" id="rdoLivingRoomFloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(1, '1');" <?php echo $row["fldData1"]==1?"checked":"";?> />
+					<input type="radio" name="rdoLivingRoomFloorLamp" id="rdoLivingRoomFloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(1, '1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
 					<label for="rdoLivingRoomFloorLamp1">开</label>
 
 		    </fieldset>
@@ -414,9 +413,9 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>客厅落地灯旁插座</legend>
-					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp0" value="0" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '0');" <?php echo $row["fldData2"]==0?"checked":"";?> />
+					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp0" value="0" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoLivingRoomSocketNext2FloorLamp0">关</label>
-					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '1');" <?php echo $row["fldData2"]==1?"checked":"";?> />
+					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
 					<label for="rdoLivingRoomSocketNext2FloorLamp1">开</label>
 
 		    </fieldset>
