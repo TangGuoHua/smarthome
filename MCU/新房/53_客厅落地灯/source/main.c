@@ -3,13 +3,16 @@
 单片机型号: STC11F04E
 工作频率: 4MHz 外部晶振
 其它：
-10A*2继电器模块
+继电器模块10A*2路
+AM2321
 
 【修改历史】
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年03月29日  黄长浩  初始版本
-
+2014年10月12日  黄长浩  升级nrf驱动
+                        增加AM2321
+						调整初始延时
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -23,27 +26,58 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 #include <reg52.h>
 #include "nrf24L01Node.h"
-
+#include "am2321.h"
 
 // Node ID
 #define NODE_ID 53
 
+sfr AUXR   = 0x8E;
 
 sbit RELAY1 = P1^7;
 sbit RELAY2 = P1^6; 
 
+// Flag for sending data to Pi
+volatile bit sendDataNow = 0;
+volatile unsigned char functionNum = 0;
+volatile unsigned char timerCounter10ms = 0;
+volatile unsigned int timerCounter1s = 0;
+
+//延时5秒 STC11F04E 4MHz
+void delay5s(void)
+{
+    unsigned char a,b,c;
+    for(c=191;c>0;c--)
+        for(b=189;b>0;b--)
+            for(a=137;a>0;a--);
+}
+
 
 //开机延时 
-//根据NodeID，进行约为(500*NodeID)毫秒的延时
-//作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
+//作用是避免所有节点同时上电，若都按相同的时间间隔发送数据造成的通讯碰撞
 void initDelay(void)
 {
-	//4MHz Crystal, 1T STC11F04E
-    unsigned char a,b,c,d;
-    for(d=NODE_ID;d>0;d--)
-	    for(c=167;c>0;c--)
-	        for(b=171;b>0;b--)
-	            for(a=16;a>0;a--);
+	//30秒
+    unsigned n;
+    for(n=0;n<6;n++)
+	{
+		delay5s();
+	}
+
+}
+
+
+// 初始化Timer0
+// 每10ms触发中断1一次
+// （STC 1T @4MHz 外部晶振）
+void initTimer0(void)
+{
+	AUXR = AUXR|0x80;  //设置T0为1T模式
+	TMOD = 0x01;
+	TH0 = 0x63;
+	TL0 = 0xC0;
+	EA = 1;
+	ET0 = 1;
+	TR0 = 1;
 }
 
 
@@ -54,26 +88,60 @@ void initINT0(void)
 }
 
 
-
+void initRelays()
+{
+	//初始化继电器
+	RELAY1 = 1;
+	RELAY2 = 1;
+}
 
 
 //NRF24L01开始进入接收模式
 void startRecv()
 {
-	unsigned char myAddr[3]= {97, 83, 53}; //本节点的接收地址
-	nrfSetRxMode( 92, 3, myAddr);
+	unsigned char myAddr[5]= {97, 83, 53, 231, 53}; //本节点的接收地址
+	nrfSetRxMode( 92, 5, myAddr);
 }
 
 
-
+//向主机发送当前的温度和继电器状态
+void sendDataToHost( unsigned char readAm2321Result )
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[5]= {53, 69, 149, 231, 231}; //Pi, 3字节地址
+	unsigned char tmp;
+	
+	sendData[0] = NODE_ID;//Node ID
+	sendData[1] = functionNum;// Function Number, 1-regular status update, 51-respond to 50
+	sendData[2] = readAm2321Result;
+	sendData[3] = getAM2321Data(0);
+	sendData[4] = getAM2321Data(1);
+	sendData[5] = getAM2321Data(2);
+	sendData[6] = getAM2321Data(3);
+	sendData[7] = getAM2321Data(4);
+	sendData[8] = ~RELAY1;
+	sendData[9] = ~RELAY2;
+	
+	TR0 = 0;//Pause timer0
+	tmp = nrfSendData( 96, 5, toAddr, 16, sendData);
+	
+	//24L01开始接收数据
+	startRecv();
+	TR0 = 1;//Resume timer0
+	
+}
 
 
 void main()
 {
+	unsigned char readAm2321Result = 0;
+	
 	//初始化继电器
-	RELAY1 = 1;
-	RELAY2 = 1;
-
+	initRelays();
+	
+	//init AM2321
+	initAM2321();	
+	
 	//初始化中断0
 	initINT0();
 	
@@ -85,10 +153,23 @@ void main()
 	
 	//初始化延时
 	initDelay();
+	
+	// 初始化Timer0
+	initTimer0();	
 			
 	while(1)
 	{
+		if(sendDataNow)
+		{
+			sendDataNow=0;
+			
+			//触发AM3231测量，并读取上一次测量的温湿度值
+			readAm2321Result = readAM2321( 2 );
 
+			//向主机发送数据
+			sendDataToHost( readAm2321Result );	
+
+		}
 	}
 }
 
@@ -100,12 +181,59 @@ void interrupt24L01(void) interrupt 0
 {
 	unsigned char * receivedData;
 	
+	TR0 = 0;//Pause timer0
+
+	
+	
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
-	//字节1，控制1号继电器工作模式（0：常关，1：常开）
-	RELAY1 = (*(receivedData++)==0)?1:0;
+	//*(receivedData+0) From Node ID
+	//*(receivedData+1) Function
 	
-	//字节2，控制2号继电器工作模式（0：常关，1：常开）
-	RELAY2 = (*(receivedData++)==0)?1:0;
+	switch( *(receivedData+1) )
+	{
+		case 20: //执行命令，无需返回
+			
+			//字节1，控制1号继电器工作模式（0：常关，1：常开）
+			RELAY1 = (*(receivedData+2)==0)?1:0;
+			
+			//字节2，控制2号继电器工作模式（0：常关，1：常开）
+			RELAY2 = (*(receivedData+3)==0)?1:0;		
+			break;
+		
+
+		
+		case 50: //请求立即报告状态
+			functionNum = 51;//回报50
+			timerCounter1s = 0;//计时重新开始
+			sendDataNow = 1;		
+			break;
+	
+	}//end of switch
+	
+	
+	TR0 = 1;//Resume timer0
+
+}
+
+
+//定时器0中断处理程序
+void timer0Interrupt(void) interrupt 1
+{
+    TH0 = 0x63;
+    TL0 = 0xC0;
+    
+	if( ++timerCounter10ms == 100 ) //100个10ms，即1秒
+	{
+		timerCounter10ms=0;
+		
+		//向Pi发送数据
+		if( ++timerCounter1s == 600 ) //每600秒一次
+		{
+			timerCounter1s = 0;
+			functionNum = 1;//定时状态报告
+			sendDataNow = 1;
+		}
+	}
 }
