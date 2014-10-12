@@ -356,6 +356,11 @@
               <FileType>1</FileType>
               <FilePath>.\source\main.c</FilePath>
             </File>
+            <File>
+              <FileName>am2321.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\am2321.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
