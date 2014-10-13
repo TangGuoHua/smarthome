@@ -380,18 +380,41 @@ unsigned char* nrfGetReceivedData()
 	if( status & 0x40 ) //检查RX_DR位，如果置位，则说明接收到数据
 	{
 		//CE=0;//进入Standby-I模式
+
+		//printf( "Data received. Status=%d, ", status );
+
+		//status = nrfReadReg(R_REGISTER+FIFO_STATUS);
+		//printf( "FIFO status=%d\n", status );
 		
 		// 从RX FIFO读取数据
 		nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);
+
+		//status = nrfReadReg(R_REGISTER+STATUS);
+		//printf( "After reading, Status=%d, ", status );
+
+		//status = nrfReadReg(R_REGISTER+FIFO_STATUS);
+		//printf( "FIFO status=%d\n", status );
 		
 		//接收到数据后RX_DR,TX_DS,MAX_PT都置高为1，通过写1来清除中断标
 		//nrfWriteReg(W_REGISTER+STATUS,0xff);
 		//网上找到的例子是用0xff来清中断标志，我通过试验发现用0x40也可以清掉RX_DR
 		nrfWriteReg(W_REGISTER+STATUS,0x40);
+
+		//status = nrfReadReg(R_REGISTER+STATUS);
+		//printf( "After cleaning RX_DR, Status=%d, ", status );
+
+		//status = nrfReadReg(R_REGISTER+FIFO_STATUS);
+		//printf( "FIFO status=%d\n", status );
 		
 		//用于清空FIFO ！！关键！！不然会出现意想不到的后果！！！大家记住！！
 		//我经过试验发现，不清FIFO的话，发送方有时候会出现收不到ACK的现象
 		nrfFlushRx();
+
+		//status = nrfReadReg(R_REGISTER+STATUS);
+		//printf( "After flush, Status=%d, ", status );
+
+		//status = nrfReadReg(R_REGISTER+FIFO_STATUS);
+		//printf( "FIFO status=%d\n", status );
 	}
 	return dataBuffer;
 } 
