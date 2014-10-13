@@ -67,21 +67,18 @@ void startRecv()
 }
 
 
-//处理NRF接收到的数据，如果收到了数据的话
+//处理NRF接收到的数据
 void processReceivedData()
 {
 	char sqlStr[450];
 	unsigned char *data;
 
-	if( nrfIsDataReceived() ) //如果收到数据
-	{
-		//读取nrf24L01收到的数据
-		data = nrfGetReceivedData();
+	//读取nrf24L01收到的数据
+	data = nrfGetReceivedData();
 
-		//将数据存入数据库
-		sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
-		execSql( sqlStr );
-	}
+	//将数据存入数据库
+	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
+	execSql( sqlStr );
 }
 
 
@@ -222,8 +219,11 @@ int main ( int argc, char **argv )
 
 	while( TRUE ) 
 	{
-		//处理接收到的数据，如果有的话
-		processReceivedData();
+		if( nrfIsDataReceived() ) //如果收到数据
+		{
+			//处理接收到的数据，如果有的话
+			processReceivedData();
+		}
 
 		//检查是否有数据需要发送到节点
 		processDataToNode();
