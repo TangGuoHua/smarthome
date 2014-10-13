@@ -33,6 +33,15 @@ unsigned char nrfWriteReg( unsigned char regAddr, unsigned char writeData);
 unsigned char nrfReadRxData( unsigned char regAddr, unsigned char *rxData, unsigned char dataLen);
 unsigned char nrfWriteTxData(unsigned char regAddr, unsigned char *txData, unsigned char dataLen);
 
+/******************
+函数功能:延时 15us
+*******************/
+//void delayFor24L01( )
+//{
+//	usleep(15); // needs #include <unistd.h>
+//	//delayMicroseconds(15); // needs #include <wiringPi.h>
+//}
+
 
 //********* 以下函数仅供本模块内部调用 **************
 //SPI时序函数
@@ -198,6 +207,9 @@ void nrf24L01Init()
 	pullUpDnControl( MISO, PUD_UP );
 	pullUpDnControl( IRQ, PUD_UP );
 	
+	//delayFor24L01();//让系统什么都不干
+	//delayFor24L01();//让系统什么都不干
+	
 	//CE=0; //待机模式1 (Standy-I)
 	digitalWrite( CE, LOW );
 	
@@ -222,6 +234,9 @@ void nrf24L01Init()
 	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
 	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 
+	//delayFor24L01();
+	//delayFor24L01();
+	
 	//flush buffers
 	nrfFlushTx();
 	nrfFlushRx();
@@ -353,6 +368,52 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 }
 
 
+//获取24L01接收到的数据。
+//调用本函数前，请调用nrfIsDataReceived()函数，确认有数据收到后，再调用本方法来取得24L01收到的数据
+unsigned char* nrfGetReceivedData()				 
+{
+	static unsigned char dataBuffer[RECEIVE_DATA_WIDTH];
+	unsigned char status;
+	
+	//读取状态寄存器
+	status = nrfReadReg(R_REGISTER+STATUS);
+	if( status & 0x40 ) //检查RX_DR位，如果置位，则说明接收到数据
+	{
+		//CE=0;//进入Standby-I模式
+		
+		// 从RX FIFO读取数据
+		nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);
+		
+		//接收到数据后RX_DR,TX_DS,MAX_PT都置高为1，通过写1来清除中断标
+		//nrfWriteReg(W_REGISTER+STATUS,0xff);
+		//网上找到的例子是用0xff来清中断标志，我通过试验发现用0x40也可以清掉RX_DR
+		nrfWriteReg(W_REGISTER+STATUS,0x40);
+		
+		//用于清空FIFO ！！关键！！不然会出现意想不到的后果！！！大家记住！！
+		//我经过试验发现，不清FIFO的话，发送方有时候会出现收不到ACK的现象
+		nrfFlushRx();
+	}
+	return dataBuffer;
+} 
+
+
+//获取是否收到数据
+//注意：本方法只能在PRX模式下使用！
+//返回值: 1-收到数据， 0-未收到数据
+unsigned char nrfIsDataReceived()
+{
+	return (! digitalRead( IRQ ) );
+}
+
+
+
+
+/***********************************
+  以下部分是实验RX FIFO的代码
+  但是实验没有成功。收不到数据。
+
+////////////////////////////////////
+
 
 //获取24L01接收到的一帧数据。
 //由于nrf带有3个FIFO，所以应该用调用nrfDataAvailable()，循环读取一帧帧数据，直到nrfDataAvailable()返回0为止。
@@ -360,7 +421,7 @@ void nrfSetRxMode( unsigned char rfChannel, unsigned char addrWidth, unsigned ch
 unsigned char* nrfGetOneDataPacket()				 
 {
 	static unsigned char dataBuffer[RECEIVE_DATA_WIDTH];
-	unsigned char status;
+	//unsigned char status;
 		
 	// 从RX FIFO读取数据
 	nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);
@@ -394,6 +455,10 @@ unsigned char nrfDataAvailable()
 				//既然能进到这里来，说明RX_DR已经被置1
 				//清掉RX_DR
 				nrfWriteReg(W_REGISTER+STATUS,0x40);
+
+				//用于清空FIFO ！！关键！！不然会出现意想不到的后果！！！大家记住！！
+				//我经过试验发现，不清FIFO的话，发送方有时候会出现收不到ACK的现象
+				nrfFlushRx();
 				
 				//到外面去 return 0;
 			}
@@ -408,36 +473,4 @@ unsigned char nrfDataAvailable()
 	return 0;
 }
 
-
-//****************************
-//***** Depricated ***********
-//****************************
-
-//获取24L01接收到的数据。
-//调用本函数前，请调用nrfIsDataReceived()函数，确认有数据收到后，再调用本方法来取得24L01收到的数据
-unsigned char* nrfGetReceivedData()				 
-{
-	static unsigned char dataBuffer[RECEIVE_DATA_WIDTH];
-	unsigned char status;
-	
-	//读取状态寄存器
-	status = nrfReadReg(R_REGISTER+STATUS);
-	if( status & 0x40 ) //检查RX_DR位，如果置位，则说明接收到数据
-	{
-		//CE=0;//进入Standby-I模式
-		
-		// 从RX FIFO读取数据
-		nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);
-		
-		//接收到数据后RX_DR,TX_DS,MAX_PT都置高为1，通过写1来清除中断标
-		//nrfWriteReg(W_REGISTER+STATUS,0xff);
-		//网上找到的例子是用0xff来清中断标志，我通过试验发现用0x40也可以清掉RX_DR
-		nrfWriteReg(W_REGISTER+STATUS,0x40);
-		
-		//用于清空FIFO ！！关键！！不然会出现意想不到的后果！！！大家记住！！
-		//我经过试验发现，不清FIFO的话，发送方有时候会出现收不到ACK的现象
-		nrfFlushRx();
-	}
-	return dataBuffer;
-} 
-
+******************************************************************/

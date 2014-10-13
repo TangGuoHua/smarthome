@@ -38,34 +38,24 @@ sqlite3 *g_dbHandle = NULL;
 //Declare functions
 void startRecv();
 void initDatabase();
-void checkSendDataToNode();
-void checkScheduledTask();
+void execSql( char *sqlStr );
+void processDataToNode();
+void processReceivedData();
 
 
-//NRF24L01接收到数据后执行本方法
-void onDataReceived()
+// Execute SQL
+void execSql( char *sqlStr )
 {
-	//unsigned char i;
-	char sqlStr[400];
-	unsigned char *data;
-	int tmp;
-	
-	//读取nrf24L01收到的数据
-	data = nrfGetReceivedData();
+	int execResult;
+	char *errMsg;
 
-	//sqlite3_stmt * stmt;
-	//sqlite3_prepare ( g_dbHandle, "INSERT INTO tabDataHistory  ( fldNodeID1, fldNodeID2, fldData1, fldData2 ) VALUES( ?, ?, ?, ? )", -1, &stmt, 0 );
-	
-	//将数据存入数据库
-	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
-	tmp = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, NULL);
-	
-	if( tmp != SQLITE_OK )
-    {
-        fprintf(stderr,"错误%s\n",sqlite3_errmsg(g_dbHandle));
-        //fprintf(stderr,"错误%s\n",errmsg);
-    }
+	execResult = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, &errMsg);
+	if ( execResult != SQLITE_OK ) {
+		printf ( "Execute SQL failed!! SQL:'%s', Error Code:%d, Error msg:%s\r\n", sqlStr, execResult, errMsg );
+		sqlite3_free(errMsg);
+	}
 }
+
 
 //NRF24L01进入接收模式
 void startRecv()
@@ -74,11 +64,30 @@ void startRecv()
 	nrfSetRxMode( 96, 5, myAddr ); //监听96频道，5字节地址
 }
 
+
+//处理NRF接收到的数据，如果收到了数据的话
+void processReceivedData()
+{
+	char sqlStr[450];
+	unsigned char *data;
+
+	if( nrfIsDataReceived() ) //如果收到数据
+	{
+		//读取nrf24L01收到的数据
+		data = nrfGetReceivedData();
+
+		//将数据存入数据库
+		sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
+		execSql( sqlStr );
+	}
+}
+
+
 //检查数据库，看是否有数据需要发送至节点
-void checkSendDataToNode()
+void processDataToNode()
 {
 	int ret;
-	char sqlStr[400];
+	char sqlStr[450];
 	sqlite3_stmt* stmt = NULL;
 	unsigned char fldNodeID;
 	unsigned char fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, fldDataLength;
@@ -103,11 +112,7 @@ void checkSendDataToNode()
 		if( !sentAnything )
 		{
 			//还没有发送任何数据，说明这是第一条记录，则开始一个transaction	
-			ret = sqlite3_exec(g_dbHandle,"BEGIN",NULL,NULL,NULL);
-			if (ret != SQLITE_OK){
-				fprintf(stderr, "BEGIN transaction failed!!\n");
-				return;
-			}
+			execSql("BEGIN");
 		}
 
 		fldNodeID = sqlite3_column_int(stmt, 0);
@@ -139,28 +144,17 @@ void checkSendDataToNode()
 		
 		//发送数据
 		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, toAddr, fldDataLength, sendData);
-		sentAnything = TRUE;
-
 		//printf( "send data to NodeID:[%d], result=%d\n", fldNodeID, sendResult );
+
+		sentAnything = TRUE;
 		
 		// update record
 		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime'), fldLastSentResult=%d WHERE fldNodeID=%d", sendResult, fldNodeID );
-		ret = sqlite3_exec( g_dbHandle, sqlStr, NULL, NULL, NULL);
-		if( ret != SQLITE_OK )
-		{
-			fprintf(stderr,"UPDATE tabDataToNode 错误%s\n",sqlite3_errmsg(g_dbHandle));
-			//fprintf(stderr,"错误%s\n",errmsg);
-		}
+		execSql( sqlStr );
 
 		//将数据存入tabDataSent
 		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldRequestor,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,'%s',%d)", fldNodeID, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], fldRequestor, sendResult );
-		ret = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, NULL);
-		
-		if( ret != SQLITE_OK )
-		{
-			fprintf(stderr,"INSERT INTO tabDataSent 错误%s\n",sqlite3_errmsg(g_dbHandle));
-			//fprintf(stderr,"错误%s\n",errmsg);
-		}
+		execSql( sqlStr );
 	}
 
 	//如果发送过数据，则说明有表要更新，结束transaction。
@@ -172,62 +166,11 @@ void checkSendDataToNode()
 		startRecv();
 		
 		//结束transaction
-		ret = sqlite3_exec(g_dbHandle, "COMMIT", NULL, NULL, NULL);
-		if (ret != SQLITE_OK){
-			fprintf(stderr, "COMMIT transaction failed!!\n");
-			return;
-		}
+		execSql("COMMIT");
 	}
 
 	sqlite3_finalize(stmt);
 
-}
-
-// 检查看是否有ScheduledTask该执行了
-void checkScheduledTask()
-{
-	/*
-	int tmp, taskStatus;
-	unsigned char sqlStr[250];
-	sqlite3_stmt* stmt = NULL;
-	int fldID;
-	
-	//选出应该被执行的计划任务	
-	tmp = sqlite3_prepare(g_dbHandle, "SELECT * FROM tabScheduledTask WHERE fldScheduledDateTime <= datetime('now', 'localtime') AND fldTaskStatus=0", -1, &stmt, 0);
-	if (tmp != SQLITE_OK){
-		fprintf(stderr, "Could not execute SELECT/n");
-		return;
-	}
-
-	while (sqlite3_step(stmt) == SQLITE_ROW)
-	{
-
-		fldID = sqlite3_column_int(stmt, 0);
-		//fldSQL = sqlite3_column_text(stmt, 2);
-		
-		//执行计划任务的sql语句
-		tmp = sqlite3_exec( g_dbHandle, sqlite3_column_text(stmt, 2), 0, 0, 0);
-		
-		if( tmp != SQLITE_OK )
-		{
-			fprintf(stderr,"error happens while executing scheduled Task SQL. %s\n",sqlite3_errmsg(g_dbHandle));
-			taskStatus=2; //计划任务执行出错
-		}
-		else
-		{
-			taskStatus=1; //计划任务执行成功
-		}
-		
-		//更新计划任务表tabScheduledTask里面的记录状态		
-		sprintf( sqlStr, "UPDATE tabScheduledTask SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime'), fldTaskStatus=%d WHERE fldID=%d", taskStatus, fldID );
-		tmp = sqlite3_exec( g_dbHandle, sqlStr, 0, 0, 0);
-		if( tmp != SQLITE_OK )
-		{
-			fprintf(stderr,"error happens trying to update tabScheduledTask %s\n",sqlite3_errmsg(g_dbHandle));
-		}
-	}
-	sqlite3_finalize(stmt);
-	*/
 }
 
 
@@ -235,7 +178,6 @@ void checkScheduledTask()
 void initDatabase()
 {
 	int ret;
-	char *errMsg;
 
 	// try to create the database. If it doesnt exist, it would be created
     // pass a pointer to the pointer to sqlite3, in short sqlite3**
@@ -253,20 +195,10 @@ void initDatabase()
 		// set timeout to 3000ms
 		sqlite3_busy_timeout(g_dbHandle, 3000);
 
-		ret = sqlite3_exec(g_dbHandle, "PRAGMA synchronous = OFF; ", NULL, NULL, &errMsg);
-		if ( ret != SQLITE_OK ) {
-            printf ( "PRAGMA synchronous = OFF Failed! Error Code:%d, Error msg:%s\r\n", ret, errMsg );
-        }
-
-		ret = sqlite3_exec(g_dbHandle, "PRAGMA journal_mode = OFF; ", NULL, NULL, &errMsg);	
-		if ( ret != SQLITE_OK ) {
-            printf ( "PRAGMA journal_mode = OFF Failed! Error Code:%d, Error msg:%s\r\n", ret, errMsg );
-        }
-
-		ret = sqlite3_exec(g_dbHandle, "PRAGMA temp_store = MEMORY; ", NULL, NULL, &errMsg);
-		if ( ret != SQLITE_OK ) {
-            printf ( "PRAGMA temp_store = MEMORY Failed! Error Code:%d, Error msg:%s\r\n", ret, errMsg );
-        }
+		// set some parameters
+		execSql( "PRAGMA synchronous = OFF;" );
+		execSql( "PRAGMA journal_mode = OFF;" );	
+		execSql( "PRAGMA temp_store = MEMORY;" );
 
 		printf("Database initialization done successfully.\n");
 	}
@@ -287,23 +219,14 @@ int main ( int argc, char **argv )
 
 	while( TRUE ) 
 	{
-		if( nrfIsDataReceived() )
-		{
-			//printf( "data received.\n");
-			// NRF24L01接收到数据
-			onDataReceived();
-		}
-		else
-		{		
-			//如果没有收到数据，则sleep 300ms
-			usleep( 300000 ); // sleep for x us
-		}
+		//处理接收到的数据，如果有的话
+		processReceivedData();
 
-		//检查是否有计划任务
-		//checkScheduledTask();
-		
 		//检查是否有数据需要发送到节点
-		checkSendDataToNode();
+		processDataToNode();
+
+		//线程休眠300ms
+		usleep( 300000 ); // sleep for x us
 	}
 
 	return 0;
