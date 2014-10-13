@@ -14,6 +14,7 @@ Date         Author   Remarks
 2014-SEP-23  黄长浩   修改onDataReceived()方法，Pi的接收地址变为5字节
                       修改checkSendDataToNode()方法，以适应新的tabDataToNode和tabDataSent表结构
 2014-OCT-05  黄长浩   tabDataSent表增加fldRequestor字段
+2014-OCT-05  黄长浩   增加execSql()方法，整理main()函数的主While循环结构
 */
 
 #include <sys/types.h>
@@ -43,14 +44,15 @@ void processDataToNode();
 void processReceivedData();
 
 
-// Execute SQL
+//执行指定的SQL
 void execSql( char *sqlStr )
 {
 	int execResult;
 	char *errMsg;
 
 	execResult = sqlite3_exec(g_dbHandle, sqlStr, NULL, NULL, &errMsg);
-	if ( execResult != SQLITE_OK ) {
+	if ( execResult != SQLITE_OK )
+	{
 		printf ( "Execute SQL failed!! SQL:'%s', Error Code:%d, Error msg:%s\r\n", sqlStr, execResult, errMsg );
 		sqlite3_free(errMsg);
 	}
@@ -205,6 +207,7 @@ void initDatabase()
 
 }
 
+
 //主程序入口
 int main ( int argc, char **argv )
 {
@@ -215,7 +218,7 @@ int main ( int argc, char **argv )
 
 	//初始化NRF24L01+，并进入接收模式
 	nrf24L01Init();	
-	startRecv( );
+	startRecv();
 
 	while( TRUE ) 
 	{
