@@ -150,6 +150,52 @@ function chkLivingTVWallSocketClicked( socketNum, obj )
 	}
 }
 
+
+// 客厅吊顶射灯
+function chkLivingRoomCeilingLightclicked( val, obj )
+{
+	//alert( val + ' obj.selected=' + obj.checked );
+
+	//开，tmp=1；关，tmp=0
+	var tmp;
+	tmp = obj.checked?1:0;
+
+	if( val == 'E' ) //East
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data2: tmp } );
+	}
+	else if( val == 'S' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data4: tmp } );
+	}
+	else if( val == 'W' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data3: tmp } );
+	}
+	else if( val == 'N' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data5: tmp } );
+	}
+	else if(val == 'ALLON' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data2:1, data3:1, data4:1, data5:1 } );
+		$("#chkLivingRoomLightEast").attr("checked",true).checkboxradio("refresh");
+		$("#chkLivingRoomLightWest").attr("checked",true).checkboxradio("refresh");
+		$("#chkLivingRoomLightNorth").attr("checked",true).checkboxradio("refresh");
+		$("#chkLivingRoomLightSouth").attr("checked",true).checkboxradio("refresh");
+	}
+	else if(val == 'ALLOFF' )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data2:0, data3:0, data4:0, data5:0 } );
+		$("#chkLivingRoomLightEast").attr("checked",false).checkboxradio("refresh");
+		$("#chkLivingRoomLightWest").attr("checked",false).checkboxradio("refresh");
+		$("#chkLivingRoomLightNorth").attr("checked",false).checkboxradio("refresh");
+		$("#chkLivingRoomLightSouth").attr("checked",false).checkboxradio("refresh");
+	}
+}
+
+
+
 // 餐厅
 function chkDinningRoomLightclicked( val, obj )
 {
@@ -394,6 +440,28 @@ while ($row = $results->fetchArray())
 				<input type="checkbox" name="chkLivingTVWallSocket8" id="chkLivingTVWallSocket8" onclick="chkLivingTVWallSocketClicked( 8, this);" <?php echo $row["fldData9"]==1?"checked":"";?> />
 				<label for="chkLivingTVWallSocket8">风扇</label>
 		    </fieldset>
+		</li>
+	<?php
+	}
+	elseif( $row["fldNodeID"]==52 )	// 客厅吊顶射灯
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>客厅顶灯</legend>
+		    	<input type="checkbox" name="chkLivingRoomLightEast" id="chkLivingRoomLightEast" onclick="chkLivingRoomCeilingLightclicked('E', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightEast">东</label>
+				<input type="checkbox" name="chkLivingRoomLightSouth" id="chkLivingRoomLightSouth" onclick="chkLivingRoomCeilingLightclicked('S', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightSouth">南</label>
+				<input type="checkbox" name="chkLivingRoomLightWest" id="chkLivingRoomLightWest" onclick="chkLivingRoomCeilingLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightWest">西</label>
+				<input type="checkbox" name="chkLivingRoomLightNorth" id="chkLivingRoomLightNorth" onclick="chkLivingRoomCeilingLightclicked('N', this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
+				<label for="chkLivingRoomLightNorth">北</label>
+				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOn" onclick="chkLivingRoomCeilingLightclicked('ALLON', this);" />
+				<label for="chkLivingRoomLightAllOn">全开</label>
+				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOff" onclick="chkLivingRoomCeilingLightclicked('ALLOFF', this);" />
+				<label for="chkLivingRoomLightAllOff">全关</label>
+			</fieldset>
 		</li>
 	<?php
 	}

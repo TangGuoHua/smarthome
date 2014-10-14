@@ -178,7 +178,7 @@ function chkDinningRoomLightclicked( val, obj )
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data4: tmp } );
 	}
-	else if( val == 'ALLON' )
+	else if( val == 'DINNERON' )
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1:1, data3:1, data4:1 } );
 		$("#chkDinningLightEast").attr("checked",true).checkboxradio("refresh");
@@ -187,7 +187,7 @@ function chkDinningRoomLightclicked( val, obj )
 	}
 	else if( val == 'ALLOFF' )
 	{
-		$.post("/api/sendData.php", { nodeID: "41", data1:0, data3:0, data4:0  } );
+		$.post("/api/sendData.php", { nodeID: "41", data1:0, data2:0, data3:0, data4:0  } );
 		$("#chkDinningLightEast").attr("checked",false).checkboxradio("refresh");
 		$("#chkDinningLightWest").attr("checked",false).checkboxradio("refresh");
 		$("#chkDinningLightNorth").attr("checked",false).checkboxradio("refresh");
@@ -263,8 +263,8 @@ while ($row = $results->fetchArray())
 				<label for="chkDinningLightWest">西</label>
 				<input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
 				<label for="chkDinningLightNorth">灯带</label>
-				<input type="radio" name="rdoDinningLight" id="rdoDinningLightAllOn" onclick="chkDinningRoomLightclicked('ALLON', this);" />
-				<label for="rdoDinningLightAllOn">全开</label>
+				<input type="radio" name="rdoDinningLight" id="rdoDinningLightAllOn" onclick="chkDinningRoomLightclicked('DINNERON', this);" />
+				<label for="rdoDinningLightAllOn">晚餐开</label>
 				<input type="radio" name="rdoDinningLight" id="rdoDinningLightAllOff" onclick="chkDinningRoomLightclicked('ALLOFF', this);" />
 				<label for="rdoDinningLightAllOff">全关</label>
 		    </fieldset>
