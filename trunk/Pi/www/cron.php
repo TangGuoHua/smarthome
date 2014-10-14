@@ -39,7 +39,7 @@ $cronList = array(
 ?>
 
 <a href="index.php" data-role="button" data-icon="arrow-l">返回</a>
-<a href="cron.php?installItems=Y" data-role="button" data-icon="refresh" data-ajax="false">Install</a>
+
 
 <ul data-role="listview" data-inset="true">
 	<?php
@@ -68,7 +68,10 @@ if(isset($installItems) and $installItems=='Y')
 	echo exec('crontab /tmp/phpcrontab.txt');
 	//$output = shell_exec('crontab -l');
 }
+?>
 
+<a href="cron.php?installItems=Y" data-role="button" data-icon="refresh" data-ajax="false">Install</a>
 
+<?php
 include "include/templateFooter.php";
 ?>
