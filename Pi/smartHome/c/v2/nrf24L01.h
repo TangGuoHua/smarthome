@@ -4,6 +4,8 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2014年08月20日  黄长浩  初始版本
+2014年10月15日  黄长浩  nrfDataAvailable()取代nrfIsDataReceived()
+                        nrfGetOneDataPacket()取代nrfGetReceivedData()
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -22,4 +24,6 @@ unsigned char nrfIsDataReceived(void);
 unsigned char* nrfGetReceivedData( void );
 void nrfSetRxMode(  unsigned char rfChannel, unsigned char addrWidth, unsigned char *rxAddr);
 unsigned char nrfSendData( unsigned char rfChannel, unsigned char rfPower, unsigned char maxRetry, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData );
+unsigned char nrfDataAvailable();
+unsigned char* nrfGetOneDataPacket();
 #endif

@@ -72,13 +72,32 @@ void processReceivedData()
 {
 	char sqlStr[450];
 	unsigned char *data;
+	unsigned char toDelay = FALSE;
 
-	//读取nrf24L01收到的数据
-	data = nrfGetReceivedData();
+	while( nrfDataAvailable() )
+	{
+		if( toDelay )//第一个数据包不用延时
+		{
+			//延时50ms。
+			//我怀疑:
+			//发送方发出一包数据，接收方收到，但发送方在没有收到ACK，开始重传。
+			//如果接收方已经把改包数据移出FIFO，则有可能无法辨识重传的数据包，
+			//从而收到重复的数据。
+			//延时就是避免这个情况的发生
+			usleep( 50000 ); // sleep for x us
+		}
+		
+		//读取nrf24L01+收到的1个数据包
+		data = nrfGetOneDataPacket();
 
-	//将数据存入数据库
-	sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
-	execSql( sqlStr );
+		//将数据存入数据库
+		sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
+		execSql( sqlStr );
+
+		toDelay = TRUE;
+	}
+
+
 }
 
 
@@ -219,11 +238,9 @@ int main ( int argc, char **argv )
 
 	while( TRUE ) 
 	{
-		if( nrfIsDataReceived() ) //如果收到数据
-		{
-			//处理接收到的数据，如果有的话
-			processReceivedData();
-		}
+
+		//处理接收到的数据，如果有的话
+		processReceivedData();
 
 		//检查是否有数据需要发送到节点
 		processDataToNode();
