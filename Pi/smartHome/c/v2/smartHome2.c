@@ -1,20 +1,20 @@
 /* 
-±¾³ÌĞòÊÇÅÜÔÚPiÉÏµÄDaemon³ÌĞò£¬
-¸ºÔğ½«¸÷½Úµã·¢À´µÄÊı¾İ´æÈëÊı¾İ¿â;
-Í¬Ê±¸ºÔğ½«Ò»Ğ©Êı¾İ·¢Íù¸÷¸ö½Úµã¡£
+æœ¬ç¨‹åºæ˜¯è·‘åœ¨Piä¸Šçš„Daemonç¨‹åºï¼Œ
+è´Ÿè´£å°†å„èŠ‚ç‚¹å‘æ¥çš„æ•°æ®å­˜å…¥æ•°æ®åº“;
+åŒæ—¶è´Ÿè´£å°†ä¸€äº›æ•°æ®å‘å¾€å„ä¸ªèŠ‚ç‚¹ã€‚
 
-±àÒëÃüÁîĞĞ£ºgcc -Wall -lwiringPi -lsqlite3 -o "smartHome2" "smartHome2.c" "nrf24L01.c"
+ç¼–è¯‘å‘½ä»¤è¡Œï¼šgcc -Wall -lwiringPi -lsqlite3 -o "smartHome2" "smartHome2.c" "nrf24L01.c"
 
 
-ĞŞ¸Ä¼ÇÂ¼£º
+ä¿®æ”¹è®°å½•ï¼š
 Date         Author   Remarks
 -------------------------------------------------------------------------------
-2013-SEP-02  »Æ³¤ºÆ   ³õÊ¼°æ±¾£¬ÖÇÄÜ¼ÒDeamon v2
-2014-SEP-23  »Æ³¤ºÆ   ĞŞ¸ÄcheckSendDataToNode()·½·¨£¬Ôö¼Ótransaction£¬Ôö¼ÓtabDataSent±í
-2014-SEP-23  »Æ³¤ºÆ   ĞŞ¸ÄonDataReceived()·½·¨£¬PiµÄ½ÓÊÕµØÖ·±äÎª5×Ö½Ú
-                      ĞŞ¸ÄcheckSendDataToNode()·½·¨£¬ÒÔÊÊÓ¦ĞÂµÄtabDataToNodeºÍtabDataSent±í½á¹¹
-2014-OCT-05  »Æ³¤ºÆ   tabDataSent±íÔö¼ÓfldRequestor×Ö¶Î
-2014-OCT-05  »Æ³¤ºÆ   Ôö¼ÓexecSql()·½·¨£¬ÕûÀímain()º¯ÊıµÄÖ÷WhileÑ­»·½á¹¹
+2013-SEP-02  é»„é•¿æµ©   åˆå§‹ç‰ˆæœ¬ï¼Œæ™ºèƒ½å®¶Deamon v2
+2014-SEP-23  é»„é•¿æµ©   ä¿®æ”¹checkSendDataToNode()æ–¹æ³•ï¼Œå¢åŠ transactionï¼Œå¢åŠ tabDataSentè¡¨
+2014-SEP-23  é»„é•¿æµ©   ä¿®æ”¹onDataReceived()æ–¹æ³•ï¼ŒPiçš„æ¥æ”¶åœ°å€å˜ä¸º5å­—èŠ‚
+                      ä¿®æ”¹checkSendDataToNode()æ–¹æ³•ï¼Œä»¥é€‚åº”æ–°çš„tabDataToNodeå’ŒtabDataSentè¡¨ç»“æ„
+2014-OCT-05  é»„é•¿æµ©   tabDataSentè¡¨å¢åŠ fldRequestorå­—æ®µ
+2014-OCT-13  é»„é•¿æµ©   å¢åŠ execSql()æ–¹æ³•ï¼Œæ•´ç†main()å‡½æ•°çš„ä¸»Whileå¾ªç¯ç»“æ„
 */
 
 #include <sys/types.h>
@@ -44,7 +44,7 @@ void processDataToNode();
 void processReceivedData();
 
 
-//Ö´ĞĞÖ¸¶¨µÄSQL
+//æ‰§è¡ŒæŒ‡å®šçš„SQL
 void execSql( char *sqlStr )
 {
 	int execResult;
@@ -59,15 +59,15 @@ void execSql( char *sqlStr )
 }
 
 
-//NRF24L01½øÈë½ÓÊÕÄ£Ê½
+//NRF24L01è¿›å…¥æ¥æ”¶æ¨¡å¼
 void startRecv()
 {
 	unsigned char myAddr[5] = {53, 69, 149, 231, 231};
-	nrfSetRxMode( 96, 5, myAddr ); //¼àÌı96ÆµµÀ£¬5×Ö½ÚµØÖ·
+	nrfSetRxMode( 96, 5, myAddr ); //ç›‘å¬96é¢‘é“ï¼Œ5å­—èŠ‚åœ°å€
 }
 
 
-//´¦ÀíNRF½ÓÊÕµ½µÄÊı¾İ
+//å¤„ç†NRFæ¥æ”¶åˆ°çš„æ•°æ®
 void processReceivedData()
 {
 	char sqlStr[450];
@@ -76,21 +76,21 @@ void processReceivedData()
 
 	while( nrfDataAvailable() )
 	{
-		if( toDelay )//µÚÒ»¸öÊı¾İ°ü²»ÓÃÑÓÊ±
+		if( toDelay )//ç¬¬ä¸€ä¸ªæ•°æ®åŒ…ä¸ç”¨å»¶æ—¶
 		{
-			//ÑÓÊ±50ms¡£
-			//ÎÒ»³ÒÉ:
-			//·¢ËÍ·½·¢³öÒ»°üÊı¾İ£¬½ÓÊÕ·½ÊÕµ½£¬µ«·¢ËÍ·½ÔÚÃ»ÓĞÊÕµ½ACK£¬¿ªÊ¼ÖØ´«¡£
-			//Èç¹û½ÓÊÕ·½ÒÑ¾­°Ñ¸Ä°üÊı¾İÒÆ³öFIFO£¬ÔòÓĞ¿ÉÄÜÎŞ·¨±æÊ¶ÖØ´«µÄÊı¾İ°ü£¬
-			//´Ó¶øÊÕµ½ÖØ¸´µÄÊı¾İ¡£
-			//ÑÓÊ±¾ÍÊÇ±ÜÃâÕâ¸öÇé¿öµÄ·¢Éú
+			//å»¶æ—¶50msã€‚
+			//æˆ‘æ€€ç–‘:
+			//å‘é€æ–¹å‘å‡ºä¸€åŒ…æ•°æ®ï¼Œæ¥æ”¶æ–¹æ”¶åˆ°ï¼Œä½†å‘é€æ–¹åœ¨æ²¡æœ‰æ”¶åˆ°ACKï¼Œå¼€å§‹é‡ä¼ ã€‚
+			//å¦‚æœæ¥æ”¶æ–¹å·²ç»æŠŠæ”¹åŒ…æ•°æ®ç§»å‡ºFIFOï¼Œåˆ™æœ‰å¯èƒ½æ— æ³•è¾¨è¯†é‡ä¼ çš„æ•°æ®åŒ…ï¼Œ
+			//ä»è€Œæ”¶åˆ°é‡å¤çš„æ•°æ®ã€‚
+			//å»¶æ—¶å°±æ˜¯é¿å…è¿™ä¸ªæƒ…å†µçš„å‘ç”Ÿ
 			usleep( 50000 ); // sleep for x us
 		}
 		
-		//¶ÁÈ¡nrf24L01+ÊÕµ½µÄ1¸öÊı¾İ°ü
+		//è¯»å–nrf24L01+æ”¶åˆ°çš„1ä¸ªæ•°æ®åŒ…
 		data = nrfGetOneDataPacket();
 
-		//½«Êı¾İ´æÈëÊı¾İ¿â
+		//å°†æ•°æ®å­˜å…¥æ•°æ®åº“
 		sprintf( sqlStr, "INSERT INTO tabDataRecved (fldNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldData11,fldData12,fldData13,fldData14,fldData15) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)", *(data+0), *(data+1), *(data+2), *(data+3), *(data+4), *(data+5), *(data+6), *(data+7), *(data+8), *(data+9), *(data+10), *(data+11), *(data+12), *(data+13), *(data+14), *(data+15));
 		execSql( sqlStr );
 
@@ -101,7 +101,7 @@ void processReceivedData()
 }
 
 
-//¼ì²éÊı¾İ¿â£¬¿´ÊÇ·ñÓĞÊı¾İĞèÒª·¢ËÍÖÁ½Úµã
+//æ£€æŸ¥æ•°æ®åº“ï¼Œçœ‹æ˜¯å¦æœ‰æ•°æ®éœ€è¦å‘é€è‡³èŠ‚ç‚¹
 void processDataToNode()
 {
 	int ret;
@@ -117,7 +117,7 @@ void processDataToNode()
 	unsigned char sentAnything = FALSE;
 
 
-	//Ñ¡³öĞèÒªÍù½Úµã·¢ËÍµÄÊı¾İ	
+	//é€‰å‡ºéœ€è¦å¾€èŠ‚ç‚¹å‘é€çš„æ•°æ®	
 	ret = sqlite3_prepare(g_dbHandle, "SELECT * FROM tabDataToNode WHERE fldUpdatedBy IS NULL OR fldUpdatedBy<>'robot'", -1, &stmt, 0);
 	if (ret != SQLITE_OK){
 		fprintf(stderr, "Could not execute SELECT!\n");
@@ -129,7 +129,7 @@ void processDataToNode()
 
 		if( !sentAnything )
 		{
-			//»¹Ã»ÓĞ·¢ËÍÈÎºÎÊı¾İ£¬ËµÃ÷ÕâÊÇµÚÒ»Ìõ¼ÇÂ¼£¬Ôò¿ªÊ¼Ò»¸ötransaction	
+			//è¿˜æ²¡æœ‰å‘é€ä»»ä½•æ•°æ®ï¼Œè¯´æ˜è¿™æ˜¯ç¬¬ä¸€æ¡è®°å½•ï¼Œåˆ™å¼€å§‹ä¸€ä¸ªtransaction	
 			execSql("BEGIN");
 		}
 
@@ -160,7 +160,7 @@ void processDataToNode()
 
 		//printf( "requestor:[%s]\n\r", fldRequestor );
 		
-		//·¢ËÍÊı¾İ
+		//å‘é€æ•°æ®
 		sendResult = nrfSendData( fldRFChannel, fldRFPower, fldMaxRetry, fldAddrLength, toAddr, fldDataLength, sendData);
 		//printf( "send data to NodeID:[%d], result=%d\n", fldNodeID, sendResult );
 
@@ -170,20 +170,20 @@ void processDataToNode()
 		sprintf( sqlStr, "UPDATE tabDataToNode SET fldUpdatedBy='robot', fldUpdatedOn=datetime('now', 'localtime'), fldLastSentResult=%d WHERE fldNodeID=%d", sendResult, fldNodeID );
 		execSql( sqlStr );
 
-		//½«Êı¾İ´æÈëtabDataSent
+		//å°†æ•°æ®å­˜å…¥tabDataSent
 		sprintf( sqlStr, "INSERT INTO tabDataSent (fldToNodeID,fldData1,fldData2,fldData3,fldData4,fldData5,fldData6,fldData7,fldData8,fldData9,fldData10,fldRequestor,fldSentResult) VALUES (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,'%s',%d)", fldNodeID, sendData[0], sendData[1], sendData[2], sendData[3], sendData[4], sendData[5], sendData[6], sendData[7], sendData[8], sendData[9], fldRequestor, sendResult );
 		execSql( sqlStr );
 	}
 
-	//Èç¹û·¢ËÍ¹ıÊı¾İ£¬ÔòËµÃ÷ÓĞ±íÒª¸üĞÂ£¬½áÊøtransaction¡£
-	//Èç¹û·¢ËÍ¹ıÊı¾İ£¬ÔòËµÃ÷NRF24L01ÒÑ¾­ÍË³öÁËPRXÄ£Ê½
-	//ÖØĞÂÈÃÆä½øÈë½ÓÊÕÄ£Ê½
+	//å¦‚æœå‘é€è¿‡æ•°æ®ï¼Œåˆ™è¯´æ˜æœ‰è¡¨è¦æ›´æ–°ï¼Œç»“æŸtransactionã€‚
+	//å¦‚æœå‘é€è¿‡æ•°æ®ï¼Œåˆ™è¯´æ˜NRF24L01å·²ç»é€€å‡ºäº†PRXæ¨¡å¼
+	//é‡æ–°è®©å…¶è¿›å…¥æ¥æ”¶æ¨¡å¼
 	if(sentAnything)
 	{
-		//ÖØĞÂ½øÈë½ÓÊÕÄ£Ê½
+		//é‡æ–°è¿›å…¥æ¥æ”¶æ¨¡å¼
 		startRecv();
 		
-		//½áÊøtransaction
+		//ç»“æŸtransaction
 		execSql("COMMIT");
 	}
 
@@ -192,7 +192,7 @@ void processDataToNode()
 }
 
 
-//´ò¿ªÊı¾İ¿â£¬²¢Íê³ÉÒ»Ğ©²ÎÊıµÄ³õÊ¼»¯
+//æ‰“å¼€æ•°æ®åº“ï¼Œå¹¶å®Œæˆä¸€äº›å‚æ•°çš„åˆå§‹åŒ–
 void initDatabase()
 {
 	int ret;
@@ -224,7 +224,7 @@ void initDatabase()
 }
 
 
-//Ö÷³ÌĞòÈë¿Ú
+//ä¸»ç¨‹åºå…¥å£
 int main ( int argc, char **argv )
 {
 	printf( "Start SmartHome v2 dameon ... \n\r" );
@@ -232,20 +232,20 @@ int main ( int argc, char **argv )
 	// database initialization
 	initDatabase();
 
-	//³õÊ¼»¯NRF24L01+£¬²¢½øÈë½ÓÊÕÄ£Ê½
+	//åˆå§‹åŒ–NRF24L01+ï¼Œå¹¶è¿›å…¥æ¥æ”¶æ¨¡å¼
 	nrf24L01Init();	
 	startRecv();
 
 	while( TRUE ) 
 	{
 
-		//´¦Àí½ÓÊÕµ½µÄÊı¾İ£¬Èç¹ûÓĞµÄ»°
+		//å¤„ç†æ¥æ”¶åˆ°çš„æ•°æ®ï¼Œå¦‚æœæœ‰çš„è¯
 		processReceivedData();
 
-		//¼ì²éÊÇ·ñÓĞÊı¾İĞèÒª·¢ËÍµ½½Úµã
+		//æ£€æŸ¥æ˜¯å¦æœ‰æ•°æ®éœ€è¦å‘é€åˆ°èŠ‚ç‚¹
 		processDataToNode();
 
-		//Ïß³ÌĞİÃß300ms
+		//çº¿ç¨‹ä¼‘çœ 300ms
 		usleep( 300000 ); // sleep for x us
 	}
 
