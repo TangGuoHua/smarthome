@@ -367,7 +367,7 @@ unsigned char* nrfGetOneDataPacket()
 	static unsigned char dataBuffer[RECEIVE_DATA_WIDTH];
 	//unsigned char status;
 	
-	//有的建议CE＝0，再读取数据
+	//有人建议CE=0，再读取数据
 
 	// 从RX FIFO读取数据
 	nrfReadRxData(R_RX_PAYLOAD,dataBuffer,RECEIVE_DATA_WIDTH);
