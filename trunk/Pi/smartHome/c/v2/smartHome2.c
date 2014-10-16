@@ -68,13 +68,14 @@ void startRecv()
 
 
 //处理NRF接收到的数据
+//执行本函数前，请调用nrfDataAvailable()确保已经收到了数据
 void processReceivedData()
 {
 	char sqlStr[450];
 	unsigned char *data;
 	unsigned char toDelay = FALSE;
 
-	while( nrfDataAvailable() )
+	do
 	{
 		if( toDelay )//第一个数据包不用延时
 		{
@@ -95,7 +96,8 @@ void processReceivedData()
 		execSql( sqlStr );
 
 		toDelay = TRUE;
-	}
+
+	}while( nrfDataAvailable() );
 
 
 }
@@ -238,9 +240,11 @@ int main ( int argc, char **argv )
 
 	while( TRUE ) 
 	{
-
 		//处理接收到的数据，如果有的话
-		processReceivedData();
+		if( nrfDataAvailable() )
+		{
+			processReceivedData();
+		}
 
 		//检查是否有数据需要发送到节点
 		processDataToNode();
