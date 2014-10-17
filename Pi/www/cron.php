@@ -63,14 +63,16 @@ $cronList = array(
 </ul>
 <?php
 
-$installItems = $_GET['installItems'];
-if(isset($installItems) and $installItems=='Y')
+if( isset($_GET['installItems']) )
 {
-	// install cron items
-	file_put_contents('/tmp/phpcrontab.txt', $output);
-	echo exec('crontab -r');
-	echo exec('crontab /tmp/phpcrontab.txt');
-	//$output = shell_exec('crontab -l');
+	if( $_GET['installItems']=='Y' )
+	{
+		// install cron items
+		file_put_contents('/tmp/phpcrontab.txt', $output);
+		echo exec('crontab -r');
+		echo exec('crontab /tmp/phpcrontab.txt');
+		//$output = shell_exec('crontab -l');
+	}
 }
 ?>
 
