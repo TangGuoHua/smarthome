@@ -101,7 +101,7 @@ if ($row = $results->fetchArray())
 	if( $row["fldData3"] == 1 ) echo( "亮" ); else echo( "灭" );
 
 	echo( "], 右[" );
-	if( $row["fldData4"] == 1 ) echo( "亮" ); else echo( "灭" );
+	if( $row["fldData2"] == 1 ) echo( "亮" ); else echo( "灭" );
 	printf( "] <span class='ui-li-count'>%s</span></li>", $row["fldCreatedOn"]);
 }
 
