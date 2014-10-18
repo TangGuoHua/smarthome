@@ -19,6 +19,7 @@
 2014-OCT-04 黄长浩  电视背景墙控制器增加电视、电信机顶盒的控制
                     调整显示顺序按DisplayOrder排
 2014-OCT-12 黄长浩  电视背景墙控制器去掉电视
+2014-OCT-12 黄长浩  增加南卧射灯
 */
 
 $gPageTitle = "控制";
@@ -317,6 +318,36 @@ function btnSetSouthBedroomTempClicked()
 	showButton( 'btnSetSouthBedroomTemp', false );
 }
 
+// 南卧衣柜射灯
+function southBedroomWardrobeLightClicked( val, obj )
+{
+	//alert( val + ' obj.selected=' + obj.checked );
+
+	//开，tmp=1；关，tmp=0
+	var tmp;
+	tmp = obj.checked?1:0;
+
+	if( val == 'E' ) //East
+	{
+		$.post("/api/sendData.php", { nodeID: "83", data3: tmp } );
+	}
+	else if( val == 'W' )
+	{
+		$.post("/api/sendData.php", { nodeID: "83", data4: tmp } );
+	}
+	else if(val == 'ALLON' )
+	{
+		$.post("/api/sendData.php", { nodeID: "83", data3:1, data4:1 } );
+		$("#chkSouthBedroomWardrobeLightEast").attr("checked",true).checkboxradio("refresh");
+		$("#chkSouthBedroomWardrobeLightWest").attr("checked",true).checkboxradio("refresh");
+	}
+	else if(val == 'ALLOFF' )
+	{
+		$.post("/api/sendData.php", { nodeID: "83", data3:0, data4:0 } );
+		$("#chkSouthBedroomWardrobeLightEast").attr("checked",false).checkboxradio("refresh");
+		$("#chkSouthBedroomWardrobeLightWest").attr("checked",false).checkboxradio("refresh");
+	}
+}
 
 //阳台卷帘
 function rdoBalconyCurtainClicked( val )
@@ -523,7 +554,7 @@ while ($row = $results->fetchArray())
 		</li>
 	<?php
 	}
-	elseif( $row["fldNodeID"]==82 ) //南卧
+	elseif( $row["fldNodeID"]==82 ) //南卧油汀
 	{
 	?>
 		<li data-role="fieldcontain">
@@ -543,6 +574,27 @@ while ($row = $results->fetchArray())
 			<button id="btnSetSouthBedroomTemp" data-icon="check" onclick="btnSetSouthBedroomTempClicked();">设定</button>
 		</li>
 	<?php	
+	}
+	elseif( $row["fldNodeID"]==83 )	// 南卧衣柜射灯
+	{
+	?>
+		<li data-role="fieldcontain">
+		    <fieldset data-role="controlgroup" data-type="horizontal">
+		    	<legend>南卧射灯</legend>
+
+				<input type="checkbox" id="chkSouthBedroomWardrobeLightWest" onclick="southBedroomWardrobeLightClicked('W', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
+				<label for="chkSouthBedroomWardrobeLightWest">左</label>
+
+		    	<input type="checkbox" id="chkSouthBedroomWardrobeLightEast" onclick="southBedroomWardrobeLightClicked('E', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
+				<label for="chkSouthBedroomWardrobeLightEast">右</label>
+
+				<input type="radio" name="rdoSouthBedroomWardrobeLight" id="rdoSouthBedroomWardrobeLightAllOn" onclick="southBedroomWardrobeLightClicked('ALLON', this);" />
+				<label for="rdoSouthBedroomWardrobeLightAllOn">全开</label>
+				<input type="radio" name="rdoSouthBedroomWardrobeLight" id="rdoSouthBedroomWardrobeLightAllOff" onclick="southBedroomWardrobeLightClicked('ALLOFF', this);" />
+				<label for="rdoSouthBedroomWardrobeLightAllOff">全关</label>
+		    </fieldset>
+		</li>
+	<?php
 	}
 	elseif( $row["fldNodeID"]==91 )	// 卫生间
 	{
