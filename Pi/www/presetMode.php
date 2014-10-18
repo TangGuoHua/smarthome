@@ -25,14 +25,14 @@ function setMode( modeName )
 		$.post("/api/sendData.php", { nodeID: "41", data1:0, data2:0, data3:0, data4:0 } ); //关餐厅射灯
 		$.post("/api/sendData.php", { nodeID: "51", data2:1, data5:1, data6:1 } ); //开电信机顶盒、台灯、天猫盒子、电视（常闭，不用开）
 		$.post("/api/sendData.php", { nodeID: "53", data3:0 } ); //关客厅落地灯
-		$.post("/api/sendData.php", { nodeID: "200", data2: 1 } ); //书房LED灯带
+		$.post("/api/sendData.php", { nodeID: "32", data3: 1 } ); //书房LED灯带
 	}
 	else if( modeName == 'Sleep' ) // 睡觉
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1:0, data2:0, data3:0, data4:0 } ); //关餐厅射灯
 		$.post("/api/sendData.php", { nodeID: "51", data2:0, data3:0, data4:0, data5:0, data6:0, data7:0, data8:0, data9:0} ); //关电视墙上的电器
 		$.post("/api/sendData.php", { nodeID: "53", data3:0 } ); //关客厅落地灯
-		$.post("/api/sendData.php", { nodeID: "200", data2: 0 } ); //关书房LED灯带
+		$.post("/api/sendData.php", { nodeID: "32", data3: 0 } ); //关书房LED灯带
 		$.post("/api/sendData.php", { nodeID: "31", data1: 0 } ); //关书房台灯
 	}
 }
