@@ -199,7 +199,7 @@ function chkDinningRoomLightclicked( val, obj )
 //书房LED灯带
 function rdoStudyLEDStripeClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "200", data2: val } );
+	$.post("/api/sendData.php", { nodeID: "32", data3: val } );
 }
 
 
@@ -422,16 +422,16 @@ while ($row = $results->fetchArray())
 		</li>
 	<?php
 	}
-	elseif( $row["fldNodeID"]==200 )//书房
+	elseif( $row["fldNodeID"]==32 )//书房
 	{
 	?>
 		<!--li data-role="list-divider">书房</li-->
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>书房灯带</legend>
-					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_0" value="0" onclick="rdoStudyLEDStripeClicked('0');" <?php echo $row["fldData2"]==0?"checked":"";?> />
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_0" value="0" onclick="rdoStudyLEDStripeClicked('0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
 					<label for="rdoStudyLEDStripe_0">关</label>
-					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_1" value="1" onclick="rdoStudyLEDStripeClicked('1');" <?php echo $row["fldData2"]==1?"checked":"";?> />
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_1" value="1" onclick="rdoStudyLEDStripeClicked('1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
 					<label for="rdoStudyLEDStripe_1">开</label>
 
 			</fieldset>

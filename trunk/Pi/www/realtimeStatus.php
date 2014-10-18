@@ -97,7 +97,7 @@ $query = "select * from tabDataRecved where fldNodeID=83 order by fldID desc lim
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
-	echo( "<li>南卧射灯 左[" );
+	echo( "<li>射灯 左[" );
 	if( $row["fldData3"] == 1 ) echo( "亮" ); else echo( "灭" );
 
 	echo( "], 右[" );
