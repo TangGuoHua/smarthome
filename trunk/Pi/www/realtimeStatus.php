@@ -153,9 +153,9 @@ $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
 	echo "<li data-role='list-divider'>阳台</li>";
-	printf( "<li>卷帘覆盖 [%d]%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
+	printf( "<li>卷帘覆盖度 %d%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
 	printf( "<li>卷帘模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);
-	printf( "<li>卷帘电机 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData4"]==1?"运行":"停止", $row["fldCreatedOn"]);
+	printf( "<li>卷帘电机状态 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData4"]==1?"运行":"停止", $row["fldCreatedOn"]);
 
 	echo "<li data-role='list-divider'>室外</li>";
 	printf( "<li><a href='chart.php?param=62'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"-":"", $row["fldData9"], $row["fldData10"], $row["fldCreatedOn"]);
