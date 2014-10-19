@@ -12,6 +12,7 @@
 2014-OCT-04 黄长浩  增加电视墙用电器显示
 2014-OCT-12 黄长浩  电视改接常闭触点
                     修改客厅温湿度节点
+2014-OCT-19 黄长浩  增加室外温度亮度（阳台）
 */
 
 $gPageTitle = "全家实况";
@@ -144,6 +145,21 @@ if ($row = $results->fetchArray())
 	printf( "<li>小厨宝延时 [%d分钟] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"], $row["fldCreatedOn"]);
 	printf( "<li>小厨宝 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=92'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"-":"", $row["fldData3"], $row["fldData4"], $row["fldCreatedOn"]);
+}
+
+
+$query = "select * from tabDataRecved where fldNodeID=62 order by fldID desc limit 1";
+$results = $db->query($query);
+if ($row = $results->fetchArray()) 
+{
+	echo "<li data-role='list-divider'>阳台</li>";
+	printf( "<li>卷帘覆盖 [%d]%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
+	printf( "<li>卷帘模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);
+	printf( "<li>卷帘电机 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData4"]==1?"运行":"停止", $row["fldCreatedOn"]);
+
+	echo "<li data-role='list-divider'>室外</li>";
+	printf( "<li><a href='chart.php?param=62'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"-":"", $row["fldData9"], $row["fldData10"], $row["fldCreatedOn"]);
+	printf( "<li><a href='chart.php?param=62'>亮度 %dLux <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]*256+$row["fldData7"], $row["fldCreatedOn"]);
 }
 
 
