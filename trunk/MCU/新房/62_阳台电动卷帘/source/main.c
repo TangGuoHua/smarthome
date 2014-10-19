@@ -12,7 +12,8 @@
 ----------------------------------------------------------------------
 2014年07月30日  黄长浩  初始版本
 2014年08月01日  黄长浩  实现指定覆盖度，消除累积误差
-
+2014年10月19日  黄长浩  升级nrf驱动
+                        增加BH1750/DS18B20
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -24,9 +25,9 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 #include <reg52.h>
 #include "nrf24L01Node.h"
-//#include "adc.h"
-//#include "stcEEPROM.h"
-//#include "ds18B20.h"
+#include "bh1750fvi.h"
+#include "ds18B20.h"
+
 
 sfr AUXR   = 0x8E;
 
@@ -72,18 +73,34 @@ sfr AUXR   = 0x8E;
 sbit RELAY_POWER = P1^3; //继电器1，控制电源
 sbit RELAY_DIRECTION = P3^5; //继电器2，控制方向，常闭-上升，常开-下降
 
-//unsigned char curtainMode = 1; //1:手动，2：自动
-unsigned char curtainCoverPercent; //卷帘覆盖度百分比
+volatile unsigned char curtainMode = 0; //卷帘工作模式
+volatile unsigned char curtainCoverPercent; //卷帘覆盖度百分比
 
 //马达运动方向
-bit motorDirection = DIRECTION_UP; 
-
+volatile bit motorDirection = DIRECTION_UP; 
 
 //卷帘当前位置 10ms ticks
-unsigned int currentPosTicks = 0;
+volatile unsigned int currentPosTicks = 0;
 
 //目标位置 10ms ticks
-unsigned int targetPosTicks = 0;
+volatile unsigned int targetPosTicks = 0;
+
+// Flag for sending data to Pi
+volatile bit sendDataNow = 0;
+volatile unsigned char sendDataTimer10sCount = 0;
+volatile unsigned char functionNum = 0;
+
+
+void delayMainInterval(void)
+{
+	//延时10秒 @STC12C5616AD, 4MHz晶振
+    unsigned char a,b,c,n;
+    for(c=191;c>0;c--)
+        for(b=209;b>0;b--)
+            for(a=249;a>0;a--);
+    for(n=4;n>0;n--);
+}
+
 
 //继电器延时
 void delayRelay()
@@ -94,6 +111,7 @@ void delayRelay()
         for(b=8;b>0;b--)
             for(a=152;a>0;a--);
 }
+
 
 //启动电机
 //启动电机按照motorDirection设定的方向运转，同时开启timer0计数，
@@ -111,6 +129,7 @@ void startMotor()
 	TR0 = 1;
 }
 
+
 //关闭电机，同时停止timer0
 void stopMotor()
 {
@@ -127,19 +146,6 @@ void stopMotor()
 }
 
 
-////开机延时 
-////根据NodeID，进行约为500*NodeID毫秒的延时
-////作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
-//void initDelay(void)
-//{
-//	//4MHz Crystal, 1T STC11F04E
-//    unsigned char a,b,c,d;
-//    for(d=NODE_ID;d>0;d--)
-//	    for(c=167;c>0;c--)
-//	        for(b=171;b>0;b--)
-//	            for(a=16;a>0;a--);
-//}
-
 void initINT0(void)
 {
 	EA=1;
@@ -150,75 +156,16 @@ void initINT0(void)
 //NRF24L01开始进入接收模式
 void startRecv()
 {
-	unsigned char myAddr[3]= {97, 83, 62}; //本节点的接收地址
-	nrfSetRxMode( 92, 3, myAddr); //接收92频道，3字节地址
+	unsigned char myAddr[5]= {97, 83, 62, 231, 62}; //本节点的接收地址
+	nrfSetRxMode( 92, 5, myAddr); //接收92频道
 }
-//
-//
-////返回当前亮度值
-//unsigned char getBrightness()
-//{
-//	return (255-getADCResult(7));
-//}
-//
-//
-//
-////将开灯阈值存入片内eeprom
-//void saveLightOnThreshold( unsigned char threshold1, unsigned char threshold2 )
-//{
-//	eepromEraseSector( 0x0000 );
-//	eepromWrite( 0x0000, threshold1 );
-//	eepromWrite( 0x0002, threshold2 );
-//}
-//
-//////从片内eeprom取得开灯阈值
-////unsigned char getLightOnThreshold()
-////{
-////	return eepromRead(0x0000);
-////}
-//
-//
 
-//void delay10s(void)   //误差 0us
-//{
-//    unsigned char a,b,c,n;
-//    for(c=191;c>0;c--)
-//        for(b=209;b>0;b--)
-//            for(a=249;a>0;a--);
-//    for(n=4;n>0;n--);
-//
-//}
-//
-//
-//void sendDataToHost( unsigned int tar, unsigned int cur, unsigned char c)
-//{
-//	unsigned char sendData[16];
-//	unsigned char toAddr[3]= {53, 69, 149}; //Pi, 96频道，3字节地址，接收16字节
-//	unsigned char tmp;
-//
-//		
-//	sendData[0] = NODE_ID;//Node ID
-//
-//	sendData[1] = 11;
-//	sendData[2] = 22;
-//	sendData[3] = 33; 
-//	sendData[4] = (tar >> 8); 
-//	sendData[5] = (tar & 0x00ff); 
-//	sendData[6] = (cur >> 8); 
-//	sendData[7] = (cur & 0x00ff); 
-//	sendData[8] = c ; 
-//
-//
-//	tmp = nrfSendData( 96, 3, toAddr, 16, sendData);//向Pi发送, 96频道，3字节地址，16字节数据
-//	
-//	//24L01开始接收数据
-//	startRecv(); 
-//}
 
 
 // 初始化Timer0, 4MHz, 每10ms触发一次中断
 void initTimer0(void)
 {
+	AUXR = AUXR|0x80;  //设置T0为1T模式
     TMOD = 0x01;
     TH0 = 0x63;
     TL0 = 0xC0;
@@ -227,12 +174,14 @@ void initTimer0(void)
     //TR0 = 1; //start timer 0
 }
 
+
 //初始化继电器
 void initRelays()
 {
 	RELAY_POWER=1;
 	RELAY_DIRECTION=1;
 }
+
 
 //初始化卷帘位置
 void initCurtain()
@@ -252,12 +201,50 @@ void initCurtain()
 }
 
 
+//向主机发送数据
+void sendDataToHost( float temperature, unsigned int brightness )
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[5]= {53, 69, 149, 231, 231}; //Pi, 3字节地址
+	unsigned char ret;
+	int intTemperature;
 
+	sendData[0] = NODE_ID;//Node ID
+	sendData[1] = functionNum;// Function Number, 1-regular status update, 51-respond to 50
+
+	sendData[2] = curtainMode; // working mode
+	sendData[3] = curtainCoverPercent;
+	
+	sendData[4] = ~RELAY_POWER;
+	sendData[5] = ~RELAY_DIRECTION;
+	
+	//亮度值
+	sendData[6] = brightness/256;
+	sendData[7] = brightness%265;
+	
+	//温度值
+	//四舍五入到十分位
+	intTemperature = temperature<0? (temperature*(-10)+0.5) : temperature*10+0.5;
+	sendData[8] = temperature<0 ? 1 : 0; //如果是零下则此位置1
+	sendData[9] = intTemperature/10; //温度的整数部分
+	sendData[10] = intTemperature%10; //温度的小数部分
+
+	//发送数据
+	TR0 = 0;//Pause timer0
+	ret = nrfSendData( 96, 5, toAddr, 16, sendData);
+	
+	//24L01开始接收数据
+	startRecv();
+	TR0 = 1;//Resume timer0
+	
+}
+
+
+//主程序
 void main()
 {
-
-	
-	AUXR = AUXR|0x80;  // T0, 1T Mode
+	float temperature;
+	unsigned int brightness;
 	
 	//初始化中断0
 	initINT0();
@@ -267,6 +254,12 @@ void main()
 	
 	//初始化24L01
 	nrf24L01Init();
+	
+	// 初始化 BH1750FVI
+	bh1750Init();
+	
+	//初始化DS18B20
+	initDS18B20();
 	
 	//24L01开始接收数据
 	startRecv(); 
@@ -280,8 +273,28 @@ void main()
 	
 	while(1)
 	{
-//		sendDataToHost(targetPosTicks, currentPosTicks , curtainCoverPercent);
-//		delay10s();
+		// DS18B20取得温度值
+		temperature = readTemperature(0);
+		
+		//读取亮度值
+		brightness = bh1750GetBrightness();
+		
+		if( ++sendDataTimer10sCount >= 60 ) //每10*N秒发送发送一次数据
+		{
+			sendDataTimer10sCount = 0;
+			functionNum = 1; //regular status update
+			sendDataNow = 1;
+			
+		}
+		
+		if( sendDataNow )
+		{
+			sendDataNow = 0;
+			sendDataToHost( temperature, brightness );
+		}
+		
+		delayMainInterval();
+
 	}
 }
 
@@ -297,48 +310,63 @@ void interrupt24L01(void) interrupt 0
 	receivedData = nrfGetReceivedData();
 	
 	// *(receivedData+0): 发送者NodeID （目前忽略该参数）
-	// *(receivedData+1): 功能号 （目前忽略该参数）
+	// *(receivedData+1): 功能号 
 	// *(receivedData+2): 卷帘工作模式 （目前忽略该参数）
 	// *(receivedData+3): 卷帘覆盖度百分比。例如要覆盖30%，则该值为30
-
-	rCoverPercent = *(receivedData+3);
 	
-
-	if( rCoverPercent< 101 ) //rCoverPercent应该是[0,100]区间里面的一个数
+	
+	switch( *(receivedData+1) )
 	{
-		if (curtainCoverPercent != rCoverPercent ) //如果收到的覆盖度与当前的覆盖度不同
-		{
-			curtainCoverPercent = rCoverPercent;
-			
-			if( rCoverPercent== 0 ) 
-			{
-				//如果用户选择“全开”，则利用这个机会进行校正
-				//设置电机运行到顶校正余量位
-				targetPosTicks = CALIBRATION_LIMIT_TOP ;
-			}
-			else if( rCoverPercent== 100 ) 
-			{
-				//如果用户选择“全关”，则利用这个机会进行校正
-				//设置电机运行到底校正余量位			
-				targetPosTicks = CALIBRATION_LIMIT_BOTTOM ;
-			}
-			else
-			{
-				//如果是介于(1%,100%)之间的覆盖度，则根据百分比计算电机运行目标位置
-				targetPosTicks = POS_TOP + rCoverPercent/100.0 *(POS_BOTTOM - POS_TOP);
-			}
-			
-			if( targetPosTicks != currentPosTicks)
-			{
-				//如果目标开度小于当前开度，则窗帘向上
-				motorDirection = targetPosTicks<currentPosTicks ? DIRECTION_UP : DIRECTION_DOWN;
-				
-				//启动马达
-				startMotor();
-			}
+		case 20: //执行命令，无需返回
 
-		}
-	}
+			curtainMode = *(receivedData+2);
+			rCoverPercent = *(receivedData+3);
+		
+			if( rCoverPercent< 101 ) //rCoverPercent应该是[0,100]区间里面的一个数
+			{
+				if (curtainCoverPercent != rCoverPercent ) //如果收到的覆盖度与当前的覆盖度不同
+				{
+					curtainCoverPercent = rCoverPercent;
+					
+					if( rCoverPercent== 0 ) 
+					{
+						//如果用户选择“全开”，则利用这个机会进行校正
+						//设置电机运行到顶校正余量位
+						targetPosTicks = CALIBRATION_LIMIT_TOP ;
+					}
+					else if( rCoverPercent== 100 ) 
+					{
+						//如果用户选择“全关”，则利用这个机会进行校正
+						//设置电机运行到底校正余量位			
+						targetPosTicks = CALIBRATION_LIMIT_BOTTOM ;
+					}
+					else
+					{
+						//如果是介于(1%,100%)之间的覆盖度，则根据百分比计算电机运行目标位置
+						targetPosTicks = POS_TOP + rCoverPercent/100.0 *(POS_BOTTOM - POS_TOP);
+					}
+					
+					if( targetPosTicks != currentPosTicks)
+					{
+						//如果目标开度小于当前开度，则窗帘向上
+						motorDirection = targetPosTicks<currentPosTicks ? DIRECTION_UP : DIRECTION_DOWN;
+						
+						//启动马达
+						startMotor();
+					}
+				}
+			}
+			break;
+		
+
+		
+		case 50: //请求立即报告状态
+			functionNum = 51;//回报50
+			sendDataTimer10sCount = 0; //重新计时
+			sendDataNow = 1;
+			break;
+	
+	}//end of switch
 }
 
 
@@ -378,6 +406,4 @@ void timer0Interrupt(void) interrupt 1
 			}
 		}
 	}
-    
-
 }

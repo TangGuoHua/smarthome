@@ -4,6 +4,8 @@
 日期            作者    备注
 ----------------------------------------------------------------------
 2013年10月01日  黄长浩  初始版本
+2014年10月01日  黄长浩  修改nrfSendData()函数以支持地址宽度设置和发送失败后重试Retry
+                        修改nrfSetRxMode()函数以支持地址宽度设置
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -16,6 +18,8 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #include <reg52.h>
 #include "nrf24L01.h"
 #include "nrf24L01Node.h"
+
+#define SEND_MAX_RETRY 5  //发送数据时，如果失败，最大重试次数 (值可以为 0至9）
 
 unsigned char nrfACK();
 unsigned char nrfCheckACK();
@@ -122,6 +126,22 @@ void nrf24L01Init()
 	CSN=1;
 	SCLK=0;
 	IRQ=1;
+	
+	/***下面这些寄存器的配置，在这个程序运行期间不变化，故在初始化芯片时配置。***/
+	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );     // 使能接收通道0自动应答
+	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); // 使能接收通道0
+
+	//nrfWriteReg( W_REGISTER+SETUP_AW, 0x03 ); // Set up address width to 5 bytes
+	nrfWriteReg( W_REGISTER+SETUP_RETR,0x1f ); // 自动重发延时等待500us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x3f ); // 自动重发延时等待1000us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f ); // 自动重发延时等待1500us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0x7f ); // 自动重发延时等待2000us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0xbf ); // 自动重发延时等待3000us，自动重发15次
+	//nrfWriteReg( W_REGISTER+SETUP_RETR,0xff ); // 自动重发延时等待4000us，自动重发15次
+
+	nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
+	nrfWriteReg( W_REGISTER+STATUS, 0x7e ); //清除RX_DR,TX_DS,MAX_RT状态位
+	nrfWriteReg( W_REGISTER+CONFIG, 0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
 }
 
 
@@ -139,45 +159,54 @@ void nrf24L01Init()
 // nrfSendData( rfChannel, 3, rec_addr, 5, data_to_send );  //发送
 //
 // 返回值：
-// 255-表示大重发次数达到后仍然未收到ACK，发送失败
-// 0到15的一个值，表示发送完成且成功。返回值是自动重发的次数，例如：
-//    0：没有重发，直接发送成功
-//    1: 重发了1次后成功收到ack
-//    2: 重发了2次后成功收到ack
-//    以此类推
-//    最大值是SETUP_RETR这个寄存器里面设置的最大重发次数。（不会超过15）
+// 255-表示大重试次数达到后仍然未收到ACK，发送失败
+// 0到159的一个值，表示发送完成且成功。返回值是自动重传(auto retransmit)的次数，例如：
+//     返回0：没有re-transmit，直接发送成功
+//     返回1: 表示芯片re-transmit 1次成功
+//     返回2：表示芯片re-transmit 2次成功
+//     以此类推，最多re-transmit 159次成功。(SEND_MAX_RETRY最大可以设为9）
 unsigned char nrfSendData( unsigned char rfChannel, unsigned char addrWidth, unsigned char *txAddr, unsigned char dataWidth, unsigned char *txData )
 {
 	unsigned char ret = 0;
+	unsigned char retryCnt = 0;
 	
 	CE=0;
 	
+	nrfWriteReg( W_REGISTER+SETUP_AW, addrWidth-2 ); //设置地址宽度
 	nrfWriteTxData( W_REGISTER+TX_ADDR, txAddr, addrWidth );//写寄存器指令+接收地址使能指令+接收地址+地址宽度
 	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, txAddr,addrWidth );//为了应答接收设备，接收通道0地址和发送地址相同
-	nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth );//写入数据 
+	 
 
-	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
-	nrfWriteReg( W_REGISTER+EN_AA, 0x01 );       // 使能接收通道0自动应答
-	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 );   // 使能接收通道0
-
-	/***下面这些寄存器的配置，如果在这个程序运行期间不变化，也可以在初始化芯片时进行。***/
-	nrfWriteReg( W_REGISTER+SETUP_RETR,0x5f );  // 自动重发延时等待1500us+86us，自动重发15次
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); // 选择射频通道
-	//nrfWriteReg( W_REGISTER+RF_SETUP,0x26 ); // 数据传输率250Kbps，发射功率0dBm
-	nrfWriteReg( W_REGISTER+RF_SETUP,0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
-
 	nrfWriteReg( W_REGISTER+CONFIG,0x7e ); //屏蔽3个中断，CRC使能，2字节CRC校验，上电，PTX
+	//nrfWriteReg( W_REGISTER+STATUS, 0x7f ); // 清除RX_DR,TX_DS,MAX_RT标志
 	
-	CE=1;
-	delayFor24L01();
-
-
-	CE=0; //待发送完毕后转为Standby-1模式
-
-	do
+	for( retryCnt=0; retryCnt<= SEND_MAX_RETRY; retryCnt++ )
 	{
-		ret=nrfCheckACK();
-	}while( ret==100);//检测是否发送完毕
+		nrfWriteTxData( W_TX_PAYLOAD, txData, dataWidth );//写入要发送的数据
+		
+		CE=1;
+		delayFor24L01();
+		CE=0; //待发送完毕后转为Standby-1模式
+	
+		do
+		{
+			ret=nrfCheckACK();
+		}while( ret==100);//检测是否发送完毕
+		
+		//如果返回值小于等于15，说明本次数据传送成功
+		if( ret<=15 ) 
+		{
+			//计算函数返回值，即Retransmission的次数
+			//一次性发送成功，返回0，即没有重传(re-transmission)
+			//retry第1次时，一次性发送成功，则retransit 16次 （之前15次加本次）
+			//一次类推，
+			//retry第9次时，（加开始retry之前的一次，共发射了10次），retransmit 15次成功，则，总共retransmit了16*9+15=159次
+			//每次try是transmit 16次 （本身1次，加15次retransmit）
+			ret += (16*retryCnt);
+			break;
+		}
+	}
 	
 	return ret;
 }
@@ -198,16 +227,18 @@ void nrfSetRxMode(  unsigned char rfChannel, unsigned char addrWidth, unsigned c
 {
     CE=0;
 
+	nrfWriteReg( W_REGISTER+SETUP_AW, addrWidth-2 ); //设置地址宽度
   	nrfWriteTxData( W_REGISTER+RX_ADDR_P0, rxAddr, addrWidth ); //接收设备接收通道0使用和发送设备相同的发送地址
-  	nrfWriteReg( W_REGISTER+EN_AA, 0x01 ); //使能接收通道0自动应答
-  	nrfWriteReg( W_REGISTER+EN_RXADDR, 0x01 ); //使能接收通道0
 
 	nrfWriteReg( W_REGISTER+RF_CH, rfChannel ); //设置射频通道
   	nrfWriteReg( W_REGISTER+RX_PW_P0, RECEIVE_DATA_WIDTH ); //接收通道0选择和发送通道相同有效数据宽度
 
 	//nrfWriteReg( W_REGISTER+RF_SETUP, 0x26 ); // 数据传输率250Kbps，发射功率0dBm
-	nrfWriteReg( W_REGISTER+RF_SETUP, 0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+	//nrfWriteReg( W_REGISTER+RF_SETUP, 0x27 ); // 数据传输率250Kbps，发射功率0dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+	//nrfWriteReg( W_REGISTER+RF_SETUP,0x21 ); // 数据传输率250Kbps，发射功率-18dBm, LNA_HCURR (Low Noise Amplifier, High Current?)
+
 	nrfWriteReg( W_REGISTER+CONFIG, 0x3f ); //使能RX_DR中断，屏蔽TX_DS和MAX_RT中断，CRC使能，2字节CRC校验，上电，接收模式
+
 
   	CE = 1;	//设为接收模式 PRX
 }
