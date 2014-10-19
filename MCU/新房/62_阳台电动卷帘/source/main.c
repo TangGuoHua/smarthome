@@ -280,7 +280,7 @@ void main()
 		brightness = bh1750GetBrightness();
 		
 		//定时状态报告
-		if( ++sendDataTimer10sCount >= 60 ) //每10*N秒发送一次数据
+		if( ++sendDataTimer10sCount >= 600 ) //每10*N秒发送一次数据
 		{
 			sendDataTimer10sCount = 0;
 			functionNum = 1; //regular status update
