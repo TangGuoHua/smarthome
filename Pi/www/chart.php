@@ -7,6 +7,7 @@
                     增加南卧温湿度
                     画图的点数由30增加到33
 2014-AUG-30 黄长浩  增加书房温度气压亮度
+2014-OCT-19 黄长浩  增加室外温度亮度（阳台）
 */
 
 $gPageTitle = "图";
@@ -71,6 +72,16 @@ switch($param)
 		$s2Title="湿度";
 		$s2Unit="%";
 		break;
+
+	case "62": //室外温度亮度
+		$query = "select CASE WHEN fldData8 = 1 THEN '-'||fldData9||'.'||fldData10 ELSE fldData9||'.'||fldData10 END as s1, fldData6*256+fldData4 as s2, fldCreatedOn from tabDataRecved where fldNodeID=62";
+		$chartTitle = "室外温度亮度";
+		$s1Title="温度";
+		$s1Unit="度";
+		$s2Title="亮度";
+		$s2Unit="Lux";
+		break;
+
 	case "82": //南卧温湿度
 		$query = "select fldData4||'.'||fldData5 as s1, fldData2||'.'||fldData3 as s2, fldCreatedOn from tabDataRecved where fldNodeID=82";
 		$chartTitle = "南卧温湿度";

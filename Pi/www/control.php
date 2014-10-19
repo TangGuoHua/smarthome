@@ -352,7 +352,7 @@ function southBedroomWardrobeLightClicked( val, obj )
 //阳台卷帘
 function rdoBalconyCurtainClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "62", data4: val } );
+	$.post("/api/sendData.php", { nodeID: "62", data2:20, data4: val } );
 }
 
 
@@ -362,7 +362,7 @@ function btnSetBalconyCurtainCoverageClicked()
 	
 	if( setVal>=0 && setVal <=100 ) 
 	{
-		$.post("/api/sendData.php", { nodeID: "62", data4:setVal } );
+		rdoBalconyCurtainClicked(setVal);
 	}
 
 	showButton( 'btnSetBalconyCurtainCoverage', false );

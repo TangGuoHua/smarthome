@@ -252,7 +252,7 @@ function rdoBathroomHeaterClicked( val )
 //阳台卷帘
 function rdoBalconyCurtainClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "62", data4: val } );
+	$.post("/api/sendData.php", { nodeID: "62", data2:20, data4: val } );
 }
 
 </script>
