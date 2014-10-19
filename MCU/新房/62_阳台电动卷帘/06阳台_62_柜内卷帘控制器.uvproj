@@ -356,6 +356,16 @@
               <FileType>1</FileType>
               <FilePath>.\source\main.c</FilePath>
             </File>
+            <File>
+              <FileName>BH1750FVI.C</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\BH1750FVI.C</FilePath>
+            </File>
+            <File>
+              <FileName>ds18B20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\ds18B20.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
