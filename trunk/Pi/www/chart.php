@@ -74,7 +74,7 @@ switch($param)
 		break;
 
 	case "62": //室外温度亮度
-		$query = "select CASE WHEN fldData8 = 1 THEN '-'||fldData9||'.'||fldData10 ELSE fldData9||'.'||fldData10 END as s1, fldData6*256+fldData4 as s2, fldCreatedOn from tabDataRecved where fldNodeID=62";
+		$query = "select CASE WHEN fldData8 = 1 THEN '-'||fldData9||'.'||fldData10 ELSE fldData9||'.'||fldData10 END as s1, fldData6*256+fldData7 as s2, fldCreatedOn from tabDataRecved where fldNodeID=62";
 		$chartTitle = "室外温度亮度";
 		$s1Title="温度";
 		$s1Unit="度";
@@ -108,25 +108,8 @@ switch($param)
 		$s2Unit="";
 		break;
 
-
-	case "5-2": //室外温度亮度
-		$query = "select CASE WHEN fldData7 = 1 THEN '-'||fldData5||'.'||fldData6 ELSE fldData5||'.'||fldData6 END as s1, fldData1 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=5";
-		$chartTitle = "室外温度亮度";
-		$s1Title="温度";
-		$s1Unit="度";
-		$s2Title="亮度";
-		$s2Unit="";
-		break;
-	case "55": // 大门
-		$query = "select fldData1 as s1, fldData1 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=55";
-		$chartTitle = "大门";
-		$s1Title="大门";
-		$s1Unit="";
-		$s2Title="大门";
-		$s2Unit="";
-		break;
-		
-
+	//*******************************
+	//*** 以下是未用的节点，保留 ****
 		
 	case "7-2": //客厅耗电量
 		$query = "select (fldData7*16777216+fldData8*65536+fldData9*256+fldData10)/1600.0 as s1, 0 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=7";
@@ -135,26 +118,6 @@ switch($param)
 		$s1Unit="度";
 		$s2Title="";
 		$s2Unit="";
-		break;
-
-
-		
-	case "15": //主卧亮度
-		$query = "select fldData3||'.'||fldData4 as s1, fldData1 as s2, fldCreatedOn from tabDataHistory where fldNodeID2=15";
-		$chartTitle = "主卧温度亮度";
-		$s1Title="温度";
-		$s1Unit="度";
-		$s2Title="亮度";
-		$s2Unit="";
-		break;
-
-	case "18": //次卧温度
-		$query = "select fldData6||'.'||fldData7 as s1, fldData4 s2, fldCreatedOn from tabDataHistory where fldNodeID2=18";
-		$chartTitle = "次卧温度";
-		$s1Title="温度";
-		$s1Unit="度";
-		$s2Title="湿度";
-		$s2Unit="%";
 		break;
 }
 
