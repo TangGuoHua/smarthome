@@ -20,10 +20,10 @@ $mail = new PHPMailer(); //建立邮件发送类
 $mail->IsSMTP(); // 使用SMTP方式发送//
 $mail->Host = "smtp.189.cn"; // 您的企业邮局域名
 $mail->SMTPAuth = true; // 启用SMTP验证功能
-$mail->Username = "huangchanghao@189.cn"; // 邮局用户名(请填写完整的email地址)
-$mail->Password = "3303272q"; // 邮局密码
+$mail->Username = "xxxx"; // 邮局用户名(请填写完整的email地址)
+$mail->Password = "xxx"; // 邮局密码
 $mail->Port=25;
-$mail->From = "huangchanghao@189.cn"; //邮件发送者email地址
+$mail->From = "xxx"; //邮件发送者email地址
 $mail->FromName = "Changhao";
 $mail->AddAddress("hchanghao@163.com", "a");//收件人地址，可以替换成任何想要接收邮件的email信箱,格式是AddAddress("收件人email","收件人姓名")
 //$mail->AddReplyTo("", "");
