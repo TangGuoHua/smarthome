@@ -20,6 +20,7 @@
                     调整显示顺序按DisplayOrder排
 2014-OCT-12 黄长浩  电视背景墙控制器去掉电视
 2014-OCT-12 黄长浩  增加南卧射灯
+2014-NOV-30 黄长浩  增加客厅取暖器及温控
 */
 
 $gPageTitle = "控制";
@@ -57,6 +58,7 @@ $(document).ready(function() {
 	showButton( "btnSetSouthBedroomTemp", false );
 	showButton( "btnSetBathroomXiaoChuBaoDelay", false );
 	showButton( "btnSetBalconyCurtainCoverage", false );
+	showButton( "btnSetLivingRoomTemp", false );
 });
 
 
@@ -101,17 +103,39 @@ function btnSetKitchenLightOnThresholdClicked( ind )
 	}
 }
 
-//客厅东墙南头控制器  （落地灯、插座）
+//客厅东墙南头控制器  （落地灯）
 function rdoLivingRoomEastWallSouthControllerClicked(ind, val)
 {
 	if( ind == 1 ) //落地灯
 	{
 		$.post("/api/sendData.php", { nodeID: "53", data3: val } );
 	}
-	if( ind == 2 ) //插座
+
+}
+
+
+//客厅取暖器插座
+function rdoLivingRoomHeaterClicked(val)
+{
+	$.post("/api/sendData.php", { nodeID: "53", data4: val } );
+}
+
+//客厅取暖器温度设定按钮
+function btnSetLivingRoomTempClicked()
+{
+	var setVal = document.getElementById('sliderLivingRoomTemp').value;
+	setVal *= 10;
+	
+	if( setVal>=30 && setVal <=200 ) 
 	{
-		$.post("/api/sendData.php", { nodeID: "53", data4: val } );
+		$.post("/api/sendData.php", { nodeID: "53", data5:setVal } );
 	}
+	else //温度在3度以下时，关闭油汀
+	{
+		$.post("/api/sendData.php", { nodeID: "53", data4: '0', data5: setVal } );
+	}
+
+	showButton( 'btnSetLivingRoomTemp', false );
 }
 
 //客厅西墙（电视墙）插座
@@ -510,14 +534,20 @@ while ($row = $results->fetchArray())
 		    </fieldset>
 		</li>
 		<li data-role="fieldcontain">
-		    <fieldset data-role="controlgroup" data-type="horizontal">
-		    	<legend>客厅落地灯旁插座</legend>
-					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp0" value="0" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
-					<label for="rdoLivingRoomSocketNext2FloorLamp0">关</label>
-					<input type="radio" name="rdoLivingRoomSocketNext2FloorLamp" id="rdoLivingRoomSocketNext2FloorLamp1" value="1" onclick="rdoLivingRoomEastWallSouthControllerClicked(2, '1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomSocketNext2FloorLamp1">开</label>
-
-		    </fieldset>
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>客厅取暖器</legend>
+					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater0" value="0" onclick="rdoLivingRoomHeaterClicked('0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
+					<label for="rdoLivingRoomHeater0">关</label>
+					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater1" value="1" onclick="rdoLivingRoomHeaterClicked('1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
+					<label for="rdoLivingRoomHeater1">开</label>
+					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater2" value="2" onclick="rdoLivingRoomHeaterClicked('2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
+					<label for="rdoLivingRoomHeater2">温控</label>
+			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderLivingRoomTemp">客厅温度</label>
+			<input type="range" name="sliderLivingRoomTemp" id="sliderLivingRoomTemp" onchange="showButton( 'btnSetLivingRoomTemp', true );" value="<?php echo $row["fldData5"]/10;?>" min="0" max="20" step="0.5" data-highlight="true" />
+			<button id="btnSetLivingRoomTemp" data-icon="check" onclick="btnSetLivingRoomTempClicked();">设定</button>
 		</li>
 	<?php
 	}

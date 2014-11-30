@@ -13,6 +13,8 @@
 2014-OCT-12 黄长浩  电视改接常闭触点
                     修改客厅温湿度节点
 2014-OCT-19 黄长浩  增加室外温度亮度（阳台）
+2014-NOV-30 黄长浩  增加客厅取暖器状态
+                    增加南卧油汀状态
 */
 
 $gPageTitle = "全家实况";
@@ -44,8 +46,11 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=53'>温度 %s%.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"-":"", $T, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=53'>湿度 %.1f%% <span class='ui-li-count'>%s</span></a></li>", $RH, $row["fldCreatedOn"]);
 	printf( "<li>露点 %.1f度 <span class='ui-li-count'>%s</span>", $tDew, $row["fldCreatedOn"]);
-	printf( "<li>落地灯[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"亮":"灭", $row["fldCreatedOn"]);
-	printf( "<li>插座[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData9"]==1?"通电":"断电", $row["fldCreatedOn"]);
+	printf( "<li>落地灯 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>取暖器模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData9"], $row["fldCreatedOn"]);
+	printf( "<li>取暖器 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData11"]==1?"通电":"断电", $row["fldCreatedOn"]);
+	printf( "<li>设定温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData10"]/10, $row["fldCreatedOn"]);
+	//printf( "<li>取暖器继电器2[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData12"]==1?"通电":"断电", $row["fldCreatedOn"]);
 }
 
 
@@ -92,6 +97,10 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=82'>温度 %s%.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $T, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=82'>湿度 %.1f%% <span class='ui-li-count'>%s</span></a></li>", $RH, $row["fldCreatedOn"]);
 	printf( "<li>露点 %.1f度 <span class='ui-li-count'>%s</span></li>", $tDew, $row["fldCreatedOn"]);
+	printf( "<li>油汀模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"], $row["fldCreatedOn"]);
+	printf( "<li>油汀 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"通电":"断电", $row["fldCreatedOn"]);
+	printf( "<li>设定温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData9"]/10, $row["fldCreatedOn"]);
+
 }
 
 $query = "select * from tabDataRecved where fldNodeID=83 order by fldID desc limit 1";
