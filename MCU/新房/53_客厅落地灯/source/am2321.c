@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------
 2014年01月26日  黄长浩  初始版本
 2014年10月07日  黄长浩  调整一些延时函数
+2014年10月07日  黄长浩  调整am2321Delay2S()为延时3秒
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -25,12 +26,11 @@ static unsigned char AM2321_Data[5]={0x00,0x00,0x00,0x00,0x00};
 void am2321Delay2S(void)
 {
 	//晶振为4MHz时 1T STC11F04E
-	//延时2.5s
-    unsigned char a,b,c,n;
-    for(c=165;c>0;c--)
-        for(b=100;b>0;b--)
-            for(a=150;a>0;a--);
-    for(n=1;n>0;n--);
+	//延时3s
+    unsigned char a,b,c;
+    for(c=71;c>0;c--)
+        for(b=168;b>0;b--)
+            for(a=250;a>0;a--);
 }
 
 void am2321DelayMS()
