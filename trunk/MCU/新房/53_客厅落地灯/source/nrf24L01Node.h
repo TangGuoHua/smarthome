@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------
 2013年10月01日  黄长浩  初始版本
 2014年10月12日  黄长浩  修改接收字节数为4
+2014年11月30日  黄长浩  修改接收字节数为5
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -17,7 +18,7 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #ifndef __NRF24L01NODE_H__
 #define __NRF24L01NODE_H__
 
-#define RECEIVE_DATA_WIDTH 4 //本节点的接收的数据宽度 (1-32字节)
+#define RECEIVE_DATA_WIDTH 5 //本节点的接收的数据宽度 (1-32字节)
 
 // ***** 相关函数声明 **********
 void nrf24L01Init( void );
