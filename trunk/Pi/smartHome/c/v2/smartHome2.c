@@ -9,7 +9,7 @@
 修改记录：
 Date         Author   Remarks
 -------------------------------------------------------------------------------
-2013-SEP-02  黄长浩   初始版本，智能家Deamon v2
+2014-SEP-02  黄长浩   初始版本，智能家Deamon v2
 2014-SEP-23  黄长浩   修改checkSendDataToNode()方法，增加transaction，增加tabDataSent表
 2014-SEP-23  黄长浩   修改onDataReceived()方法，Pi的接收地址变为5字节
                       修改checkSendDataToNode()方法，以适应新的tabDataToNode和tabDataSent表结构
