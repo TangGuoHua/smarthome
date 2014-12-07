@@ -69,6 +69,14 @@ if ($row = $results->fetchArray())
 	printf( "] <span class='ui-li-count'>%s</span></li>", $row["fldCreatedOn"]);
 }
 
+$query = "select * from tabDataRecved where fldNodeID=52 order by fldID desc limit 1";
+$results = $db->query($query);
+if ($row = $results->fetchArray()) 
+{
+	printf( "<li>顶灯 [东%s:西%s:南%s:北%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"亮":"灭", $row["fldData3"]==1?"亮":"灭", $row["fldData4"]==1?"亮":"灭", $row["fldData5"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>PIR [%d:%d分钟] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"], $row["fldData8"], $row["fldCreatedOn"]);
+	printf( "<li>有人? [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"是":"否", $row["fldCreatedOn"]);
+}
 
 $query = "select * from tabDataRecved where fldNodeID=31 and fldData1=11 order by fldID desc limit 1";
 $results = $db->query($query);

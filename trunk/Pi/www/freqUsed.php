@@ -135,7 +135,7 @@ function chkLivingRoomCeilingLightclicked( val, obj )
 	}
 	else if(val == 'ALLON' )
 	{
-		$.post("/api/sendData.php", { nodeID: "52", data2:1, data3:1, data4:1, data5:1 } );
+		$.post("/api/sendData.php", { nodeID: "52", data3:1, data4:1, data5:1, data6:1 } );
 		//$("#chkLivingRoomLightEast").attr("checked",true).checkboxradio("refresh");
 		//$("#chkLivingRoomLightWest").attr("checked",true).checkboxradio("refresh");
 		//$("#chkLivingRoomLightNorth").attr("checked",true).checkboxradio("refresh");
@@ -143,7 +143,7 @@ function chkLivingRoomCeilingLightclicked( val, obj )
 	}
 	else if(val == 'ALLOFF' )
 	{
-		$.post("/api/sendData.php", { nodeID: "52", data2:0, data3:0, data4:0, data5:0 } );
+		$.post("/api/sendData.php", { nodeID: "52", data3:0, data4:0, data5:0, data6:0 } );
 		//$("#chkLivingRoomLightEast").attr("checked",false).checkboxradio("refresh");
 		//$("#chkLivingRoomLightWest").attr("checked",false).checkboxradio("refresh");
 		//$("#chkLivingRoomLightNorth").attr("checked",false).checkboxradio("refresh");
@@ -334,9 +334,9 @@ while ($row = $results->fetchArray())
 				<input type="checkbox" name="chkLivingRoomLightNorth" id="chkLivingRoomLightNorth" onclick="chkLivingRoomCeilingLightclicked('N', this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
 				<label for="chkLivingRoomLightNorth">北</label-->
 
-				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOff" onclick="chkLivingRoomCeilingLightclicked('ALLOFF', this);" <?php echo ($row["fldData5"]==0&$row["fldData2"]==0&$row["fldData3"]==0&$row["fldData4"]==0)?"checked":"";?>/>
+				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOff" onclick="chkLivingRoomCeilingLightclicked('ALLOFF', this);" <?php echo ($row["fldData5"]==0&$row["fldData6"]==0&$row["fldData3"]==0&$row["fldData4"]==0)?"checked":"";?>/>
 				<label for="chkLivingRoomLightAllOff">关</label>
-				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOn" onclick="chkLivingRoomCeilingLightclicked('ALLON', this);" <?php echo ($row["fldData5"]==1|$row["fldData2"]==1|$row["fldData3"]==1|$row["fldData4"]==1)?"checked":"";?>/>
+				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOn" onclick="chkLivingRoomCeilingLightclicked('ALLON', this);" <?php echo ($row["fldData5"]==1|$row["fldData6"]==1|$row["fldData3"]==1|$row["fldData4"]==1)?"checked":"";?>/>
 				<label for="chkLivingRoomLightAllOn">开</label>
 			</fieldset>
 		</li>
