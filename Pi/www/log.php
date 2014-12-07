@@ -86,7 +86,7 @@ echo ("</td><td width=40>&nbsp;</td><td>");
 		//var_dump($row);
 		//echo( $row[0] );
 		//echo( "<br>");
-		printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%d</td></tr>", $row["fldID"], $row["fldToNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData7"], $row["fldData8"], $row["fldData10"], $row["fldRequestor"], $row["fldSentOn"], $row["fldSentResult"]);
+		printf( "<tr><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%d</td></tr>", $row["fldID"], $row["fldToNodeID"], $row["fldData1"], $row["fldData2"], $row["fldData3"], $row["fldData4"], $row["fldData5"], $row["fldData6"], $row["fldData7"], $row["fldData8"], $row["fldData9"], $row["fldData10"], $row["fldRequestor"], $row["fldSentOn"], $row["fldSentResult"]);
 	} 
 	echo ("</table>");
 
