@@ -213,7 +213,7 @@
               <RCB>
                 <Type>0</Type>
                 <StartAddress>0x0</StartAddress>
-                <Size>0x10000</Size>
+                <Size>0xffff</Size>
               </RCB>
               <RXB>
                 <Type>0</Type>
@@ -355,6 +355,11 @@
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\source\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>stcEEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\stcEEPROM.c</FilePath>
             </File>
           </Files>
         </Group>
