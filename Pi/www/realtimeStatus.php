@@ -47,10 +47,10 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=53'>温度 %s%.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"-":"", $T, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=53'>湿度 %.1f%% <span class='ui-li-count'>%s</span></a></li>", $RH, $row["fldCreatedOn"]);
 	printf( "<li>露点 %.1f度 <span class='ui-li-count'>%s</span>", $tDew, $row["fldCreatedOn"]);
-	printf( "<li>落地灯 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"亮":"灭", $row["fldCreatedOn"]);
-	printf( "<li>取暖器模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData9"], $row["fldCreatedOn"]);
-	printf( "<li>取暖器 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData11"]==1?"通电":"断电", $row["fldCreatedOn"]);
-	printf( "<li>设定温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData10"]/10, $row["fldCreatedOn"]);
+	printf( "<li>落地灯 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData8"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>取暖器模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData9"], $row["fldCreatedOn"]);
+	printf( "<li>取暖器 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData11"]==1?"通电":"断电", $row["fldCreatedOn"]);
+	printf( "<li>设定温度 %.1f度 <span class='ui-li-count'>%s</span></li>", $row["fldData10"]/10, $row["fldCreatedOn"]);
 	//printf( "<li>取暖器继电器2[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData12"]==1?"通电":"断电", $row["fldCreatedOn"]);
 }
 
@@ -74,9 +74,9 @@ $query = "select * from tabDataRecved where fldNodeID=52 order by fldID desc lim
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
-	printf( "<li>顶灯 [东%s:西%s:南%s:北%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"亮":"灭", $row["fldData3"]==1?"亮":"灭", $row["fldData4"]==1?"亮":"灭", $row["fldData5"]==1?"亮":"灭", $row["fldCreatedOn"]);
-	printf( "<li>PIR [%d:%d分钟] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"], $row["fldData8"], $row["fldCreatedOn"]);
-	printf( "<li>有人? [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"是":"否", $row["fldCreatedOn"]);
+	printf( "<li>顶灯 [东%s:西%s:南%s:北%s] <span class='ui-li-count'>%s</span></li>", $row["fldData2"]==1?"亮":"灭", $row["fldData3"]==1?"亮":"灭", $row["fldData4"]==1?"亮":"灭", $row["fldData5"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>PIR [%d:%d分钟] <span class='ui-li-count'>%s</span></li>", $row["fldData6"], $row["fldData8"], $row["fldCreatedOn"]);
+	printf( "<li><a href='dataHistory.php?param=52'>有人? [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"是":"否", $row["fldCreatedOn"]);
 }
 
 $query = "select * from tabDataRecved where fldNodeID=31 and fldData1=11 order by fldID desc limit 1";
@@ -87,7 +87,7 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=31-1'>温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", ($row["fldData4"]*256+$row["fldData5"])/10, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=31-1'>气压 %.1f hPa <span class='ui-li-count'>%s</span></a></li>", ($row["fldData7"]*65536+$row["fldData8"]*256+$row["fldData9"])/100, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=31-2'>亮度 %d Lux <span class='ui-li-count'>%s</span></a></li>", $row["fldData12"]*256+$row["fldData13"], $row["fldCreatedOn"]);	
-	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData14"]==1?"是":"否", $row["fldCreatedOn"]);	
+	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></li>", $row["fldData14"]==1?"是":"否", $row["fldCreatedOn"]);	
 	
 }
 
@@ -106,9 +106,9 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=82'>温度 %s%.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"]==1?"-":"", $T, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=82'>湿度 %.1f%% <span class='ui-li-count'>%s</span></a></li>", $RH, $row["fldCreatedOn"]);
 	printf( "<li>露点 %.1f度 <span class='ui-li-count'>%s</span></li>", $tDew, $row["fldCreatedOn"]);
-	printf( "<li>油汀模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"], $row["fldCreatedOn"]);
-	printf( "<li>油汀 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"通电":"断电", $row["fldCreatedOn"]);
-	printf( "<li>设定温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData9"]/10, $row["fldCreatedOn"]);
+	printf( "<li>油汀模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData8"], $row["fldCreatedOn"]);
+	printf( "<li>油汀 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData7"]==1?"通电":"断电", $row["fldCreatedOn"]);
+	printf( "<li>设定温度 %.1f度 <span class='ui-li-count'>%s</span></li>", $row["fldData9"]/10, $row["fldCreatedOn"]);
 
 }
 
@@ -133,13 +133,13 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=22'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=22'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData10"]==1?"-":"", $row["fldData11"], $row["fldData12"], $row["fldCreatedOn"]);
 
-	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"是":"否", $row["fldCreatedOn"]);
-	printf( "<li>柜灯 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"亮":"灭", $row["fldCreatedOn"]);
-	printf( "<li>顶灯 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData9"]==1?"亮":"灭", $row["fldCreatedOn"]);
-	printf( "<li>柜灯阈值 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData4"], $row["fldCreatedOn"]);
-	printf( "<li>顶灯阈值 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData5"], $row["fldCreatedOn"]);
-	printf( "<li>柜灯模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"], $row["fldCreatedOn"]);
-	printf( "<li>顶灯模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"], $row["fldCreatedOn"]);
+	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></li>", $row["fldData2"]==1?"是":"否", $row["fldCreatedOn"]);
+	printf( "<li>柜灯 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData8"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>顶灯 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData9"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>柜灯阈值 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData4"], $row["fldCreatedOn"]);
+	printf( "<li>顶灯阈值 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData5"], $row["fldCreatedOn"]);
+	printf( "<li>柜灯模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData6"], $row["fldCreatedOn"]);
+	printf( "<li>顶灯模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData7"], $row["fldCreatedOn"]);
 }
 
 
@@ -150,18 +150,18 @@ if ($row = $results->fetchArray())
 	echo "<li data-role='list-divider'>卫生间</li>";
 	printf( "<li><a href='chart.php?param=91'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
 	printf( "<li>开灯阈值 %d <span class='ui-li-count'>%s</span></li>", $row["fldData4"], $row["fldCreatedOn"]);
-	printf( "<li>灯 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData5"]==1?"亮":"灭", $row["fldCreatedOn"]);
-	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"是":"否", $row["fldCreatedOn"]);
-	printf( "<li>热水器 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
+	printf( "<li>灯 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData5"]==1?"亮":"灭", $row["fldCreatedOn"]);
+	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></li>", $row["fldData2"]==1?"是":"否", $row["fldCreatedOn"]);
+	printf( "<li>热水器 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
 }
 
 $query = "select * from tabDataRecved where fldNodeID=92 order by fldID desc limit 1";
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
-	printf( "<li>小厨宝模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData5"], $row["fldCreatedOn"]);
-	printf( "<li>小厨宝延时 [%d分钟] <span class='ui-li-count'>%s</span></a></li>", $row["fldData6"], $row["fldCreatedOn"]);
-	printf( "<li>小厨宝 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
+	printf( "<li>小厨宝模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData5"], $row["fldCreatedOn"]);
+	printf( "<li>小厨宝延时 [%d分钟] <span class='ui-li-count'>%s</span></li>", $row["fldData6"], $row["fldCreatedOn"]);
+	printf( "<li>小厨宝 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=92'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"-":"", $row["fldData3"], $row["fldData4"], $row["fldCreatedOn"]);
 }
 
@@ -171,9 +171,9 @@ $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
 	echo "<li data-role='list-divider'>阳台</li>";
-	printf( "<li>卷帘覆盖度 %d%% <span class='ui-li-count'>%s</span></a></li>", $row["fldData3"], $row["fldCreatedOn"]);
-	printf( "<li>卷帘模式 [%d] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);
-	printf( "<li>卷帘电机状态 [%s] <span class='ui-li-count'>%s</span></a></li>", $row["fldData4"]==1?"运行":"停止", $row["fldCreatedOn"]);
+	printf( "<li>卷帘覆盖度 %d%% <span class='ui-li-count'>%s</span></li>", $row["fldData3"], $row["fldCreatedOn"]);
+	printf( "<li>卷帘模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData2"], $row["fldCreatedOn"]);
+	printf( "<li>卷帘电机状态 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData4"]==1?"运行":"停止", $row["fldCreatedOn"]);
 
 	echo "<li data-role='list-divider'>室外</li>";
 	printf( "<li><a href='chart.php?param=62'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData8"]==1?"-":"", $row["fldData9"], $row["fldData10"], $row["fldCreatedOn"]);
