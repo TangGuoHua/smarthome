@@ -18,6 +18,7 @@
                     修改客厅落地灯协议
 2014-OCT-12 黄长浩  增加南卧射灯
 2014-NOV-30 黄长浩  增加客厅取暖器及温控
+2014-DEC-14 黄长浩  增加南卧油汀开关
 */
 
 $gPageTitle = "常用";
@@ -211,6 +212,13 @@ function rdoStudyRoomDeskLampClicked(val)
 }
 
 
+//南卧油汀插座
+function rdoSouthBedroomHeaterClicked(val)
+{
+	$.post("/api/sendData.php", { nodeID: "82", data1: val } );
+}
+
+
 // 南卧衣柜射灯
 function southBedroomWardrobeLightClicked( val, obj )
 {
@@ -360,10 +368,10 @@ while ($row = $results->fetchArray())
 				<legend>客厅取暖器</legend>
 					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater0" value="0" onclick="rdoLivingRoomHeaterClicked('0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoLivingRoomHeater0">关</label>
-					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater1" value="1" onclick="rdoLivingRoomHeaterClicked('1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomHeater1">开</label>
-					<!--input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater2" value="2" onclick="rdoLivingRoomHeaterClicked('2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
-					<label for="rdoLivingRoomHeater2">恒温 <?php echo $row["fldData5"]/10;?>度</label-->
+					<!--input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater1" value="1" onclick="rdoLivingRoomHeaterClicked('1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
+					<label for="rdoLivingRoomHeater1">开</label-->
+					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater2" value="2" onclick="rdoLivingRoomHeaterClicked('2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
+					<label for="rdoLivingRoomHeater2">恒温<?php echo $row["fldData5"]/10;?>度</label>
 			</fieldset>
 		</li>
 	<?php
@@ -396,6 +404,22 @@ while ($row = $results->fetchArray())
 		</li>
 
 	<?php
+	}
+	elseif( $row["fldNodeID"]==82 ) //南卧油汀
+	{
+	?>
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>南卧油汀</legend>
+					<input type="radio" name="rdoSouthBedroomHeater" id="rdoSouthBedroomHeater0" value="0" onclick="rdoSouthBedroomHeaterClicked('0');" <?php echo $row["fldData1"]==0?"checked":"";?> />
+					<label for="rdoSouthBedroomHeater0">关</label>
+					<!--input type="radio" name="rdoSouthBedroomHeater" id="rdoSouthBedroomHeater1" value="1" onclick="rdoSouthBedroomHeaterClicked('1');" <?php echo $row["fldData1"]==1?"checked":"";?> />
+					<label for="rdoSouthBedroomHeater1">开</label-->
+					<input type="radio" name="rdoSouthBedroomHeater" id="rdoSouthBedroomHeater2" value="2" onclick="rdoSouthBedroomHeaterClicked('2');" <?php echo $row["fldData1"]==2?"checked":"";?> />
+					<label for="rdoSouthBedroomHeater2">恒温<?php echo $row["fldData2"]/10;?>度</label>
+			</fieldset>
+		</li>
+	<?php	
 	}
 	elseif( $row["fldNodeID"]==83 )	// 南卧衣柜射灯
 	{
