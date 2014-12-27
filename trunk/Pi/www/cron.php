@@ -38,9 +38,13 @@ $cronList = array(
 
 	"每天22:10打开南卧加热器" => "10 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=82\"",
 
-	"每天22:30关闭热水器" => "30 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\""
+	"每天22:30关闭热水器" => "30 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData5=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
+
+	"每天22:35打开南卧射灯" => "35 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData3=1, fldData4=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=83 and (fldData3=0 and fldData4=0)\"",
 
 	"每天23:00关闭南卧加热器" => "0 23 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=82\"",
+
+	"每天23:20关闭南卧射灯" => "20 23 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData3=0, fldData4=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=83 and (fldData3=1 or fldData4=1)\""
 
 	);
 
