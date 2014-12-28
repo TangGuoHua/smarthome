@@ -21,6 +21,7 @@
 2014-OCT-12 黄长浩  电视背景墙控制器去掉电视
 2014-OCT-12 黄长浩  增加南卧射灯
 2014-NOV-30 黄长浩  增加客厅取暖器及温控
+2014-DEC-28 黄长浩  增加卫生间取暖器
 */
 
 $gPageTitle = "控制";
@@ -59,6 +60,7 @@ $(document).ready(function() {
 	showButton( "btnSetBathroomXiaoChuBaoDelay", false );
 	showButton( "btnSetBalconyCurtainCoverage", false );
 	showButton( "btnSetLivingRoomTemp", false );
+	showButton( "btnSetBathroomAirHeaterTemperature", false );
 });
 
 
@@ -277,7 +279,7 @@ function rdoBathroomHeaterClicked( val )
 //卫生间小厨宝
 function rdoBathroomXiaoChuBaoClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "92", data2: val } );
+	$.post("/api/sendData.php", { nodeID: "92", data1:1, data2:20, data3: val } );
 }
 
 function btnSetBathroomXiaoChuBaoDelayClicked()
@@ -286,10 +288,28 @@ function btnSetBathroomXiaoChuBaoDelayClicked()
 
 	if( setVal>=1 && setVal <=20 )
 	{
-		$.post("/api/sendData.php", { nodeID: "92", data3:setVal } );
+		$.post("/api/sendData.php", { nodeID: "92", data1:1, data2:20, data4:setVal } );
 	}
 
 	showButton( 'btnSetBathroomXiaoChuBaoDelay', false );
+}
+
+//卫生间加热器（快热炉）
+function rdoBathroomAirHeaterClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "92", data1:1, data2:20, data5: val } );
+}
+
+function btnSetBathroomAirHeaterTemperatureClicked()
+{
+	var setVal = document.getElementById('sliderBathroomAirHeaterTemperature').value*10;
+
+	if( setVal>=10 && setVal <=250 )
+	{
+		$.post("/api/sendData.php", { nodeID: "92", data1:1, data2:20, data6:setVal } );
+	}
+
+	showButton( 'btnSetBathroomAirHeaterTemperature', false );
 }
 
 //书房LED灯带
@@ -664,20 +684,39 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>卫生间小厨宝</legend>
-					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao0" onclick="rdoBathroomXiaoChuBaoClicked('0');" <?php echo $row["fldData2"]==0?"checked":"";?> />
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao0" onclick="rdoBathroomXiaoChuBaoClicked('0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
 					<label for="rdoBathroomXiaoChuBao0">关</label>
 
-					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao1" onclick="rdoBathroomXiaoChuBaoClicked('1');" <?php echo $row["fldData2"]==1?"checked":"";?> />
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao1" onclick="rdoBathroomXiaoChuBaoClicked('1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
 					<label for="rdoBathroomXiaoChuBao1">开</label>
 
-					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao2" onclick="rdoBathroomXiaoChuBaoClicked('2');" <?php echo $row["fldData2"]==2?"checked":"";?> />
+					<input type="radio" name="rdoBathroomXiaoChuBao" id="rdoBathroomXiaoChuBao2" onclick="rdoBathroomXiaoChuBaoClicked('2');" <?php echo $row["fldData3"]==2?"checked":"";?> />
 					<label for="rdoBathroomXiaoChuBao2">自动</label>
 			</fieldset>
 		</li>
 		<li data-role="fieldcontain">
 			<label for="sliderBathroomXiaoChuBao">小厨宝延时</label>
-			<input type="range" name="sliderBathroomXiaoChuBao" id="sliderBathroomXiaoChuBao" onchange="showButton( 'btnSetBathroomXiaoChuBaoDelay', true );" value="<?php echo $row["fldData3"];?>" min="1" max="20" step="1" data-highlight="true" />
+			<input type="range" name="sliderBathroomXiaoChuBao" id="sliderBathroomXiaoChuBao" onchange="showButton( 'btnSetBathroomXiaoChuBaoDelay', true );" value="<?php echo $row["fldData4"];?>" min="1" max="20" step="1" data-highlight="true" />
 			<button id="btnSetBathroomXiaoChuBaoDelay" data-icon="check" onclick="btnSetBathroomXiaoChuBaoDelayClicked();">设定</button>
+		</li>
+
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>卫生间取暖器</legend>
+					<input type="radio" name="rdoBathroomAirHeater" id="rdoBathroomAirHeater0" onclick="rdoBathroomAirHeaterClicked('0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
+					<label for="rdoBathroomAirHeater0">关</label>
+
+					<input type="radio" name="rdoBathroomAirHeater" id="rdoBathroomAirHeater1" onclick="rdoBathroomAirHeaterClicked('1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
+					<label for="rdoBathroomAirHeater1">开</label>
+
+					<input type="radio" name="rdoBathroomAirHeater" id="rdoBathroomAirHeater2" onclick="rdoBathroomAirHeaterClicked('2');" <?php echo $row["fldData5"]==2?"checked":"";?> />
+					<label for="rdoBathroomAirHeater2">温控</label>
+			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderBathroomAirHeaterTemperature">卫生间温度</label>
+			<input type="range" name="sliderBathroomAirHeaterTemperature" id="sliderBathroomAirHeaterTemperature" onchange="showButton( 'btnSetBathroomAirHeaterTemperature', true );" value="<?php echo ($row["fldData6"]/10);?>" min="15" max="25" step="1" data-highlight="true" />
+			<button id="btnSetBathroomAirHeaterTemperature" data-icon="check" onclick="btnSetBathroomAirHeaterTemperatureClicked();">设定</button>
 		</li>
 	<?php
 	}

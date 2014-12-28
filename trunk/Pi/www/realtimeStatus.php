@@ -16,6 +16,7 @@
 2014-NOV-30 黄长浩  增加客厅取暖器状态
                     增加南卧油汀状态
 2014-DEC-07 黄长浩  增加客厅顶灯、有人状态
+2014-DEC-28 黄长浩  增加卫生间取暖器
 */
 
 $gPageTitle = "全家实况";
@@ -162,6 +163,9 @@ if ($row = $results->fetchArray())
 	printf( "<li>小厨宝模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData5"], $row["fldCreatedOn"]);
 	printf( "<li>小厨宝延时 [%d分钟] <span class='ui-li-count'>%s</span></li>", $row["fldData6"], $row["fldCreatedOn"]);
 	printf( "<li>小厨宝 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData7"]==1?"开":"关", $row["fldCreatedOn"]);
+	printf( "<li>取暖器模式 [%d] <span class='ui-li-count'>%s</span></li>", $row["fldData8"], $row["fldCreatedOn"]);
+	printf( "<li>取暖器 [%s] <span class='ui-li-count'>%s</span></li>", $row["fldData10"]==1?"加热中":"断电", $row["fldCreatedOn"]);
+	printf( "<li>设定温度 [%.1f度] <span class='ui-li-count'>%s</span></li>", ($row["fldData9"]/10), $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=92'>温度 %s%d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"]==1?"-":"", $row["fldData3"], $row["fldData4"], $row["fldCreatedOn"]);
 }
 
