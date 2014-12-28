@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------
 2011年09月25日  黄长浩  初始版本
 2013年10月14日  黄长浩  修改延时函数，去掉对Delay.h的依赖
+2014年12月28日  黄长浩  修改initDS18B20(),增加一次初始测温，避免稍后出现85度的情况
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -16,12 +17,6 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 
 #include <reg52.h>     //包含头文件，一般情况不需要改动，头文件包含特殊功能寄存器的定义
 #include "ds18B20.h"
-
-/*------------------------------------------------
-                  函数声明
-------------------------------------------------*/
-unsigned char readOneByte(void);
-void writeOneByte(unsigned char writeByte);
 
 
 // 延时函数
@@ -54,29 +49,6 @@ void ds18B20Delay800ms(void)   //@4MHz Crystal
             for(a=48;a>0;a--);
 }
 
-/*--------------
-18b20初始化
-返回1则初始化成功
-返回0则初始化失败
-----------------*/
-bit initDS18B20(void)
-{
-	bit returnData;
-	
-	DS18B20 = 1;    //DQ复位
-	ds18B20Delay50us();//稍做延时
-	
-	DS18B20 = 0;    //单片机将DQ拉低
-	ds18B20Delay600us(); //精确延时 大于 480us 小于960us
-	DS18B20 = 1;     //拉高总线
-	ds18B20Delay120us();  //15~60us 后 接收60-240us的存在脉冲
-	returnData=~DS18B20; //如果x=1则初始化成功, x=0则初始化失败
-
-	ds18B20Delay50us();//稍作延时返回
-
-	
-	return returnData;
-}
 
 /*------------
 读取一个字节
@@ -112,6 +84,30 @@ void writeOneByte( unsigned char writeByte)
 		writeByte >>= 1;
 	}
 	ds18B20Delay50us();
+}
+
+
+/*--------------
+18b20初始化
+返回1则初始化成功
+返回0则初始化失败
+----------------*/
+bit initDS18B20(void)
+{
+	bit returnData;
+	
+	DS18B20 = 1;    //DQ复位
+	ds18B20Delay50us();//稍做延时
+	
+	DS18B20 = 0;    //单片机将DQ拉低
+	ds18B20Delay600us(); //精确延时 大于 480us 小于960us
+	DS18B20 = 1;     //拉高总线
+	ds18B20Delay120us();  //15~60us 后 接收60-240us的存在脉冲
+	returnData=~DS18B20; //如果x=1则初始化成功, x=0则初始化失败
+
+	ds18B20Delay50us();//稍作延时返回
+		
+	return returnData;
 }
 
 
