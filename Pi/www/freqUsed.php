@@ -19,6 +19,7 @@
 2014-OCT-12 黄长浩  增加南卧射灯
 2014-NOV-30 黄长浩  增加客厅取暖器及温控
 2014-DEC-14 黄长浩  增加南卧油汀开关
+2014-DEC-28 黄长浩  增加卫生间取暖器
 */
 
 $gPageTitle = "常用";
@@ -256,6 +257,14 @@ function rdoBathroomHeaterClicked( val )
 {
 	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
 }
+
+
+//卫生间取暖器
+function rdoBathroomAirHeaterClicked( val )
+{
+	$.post("/api/sendData.php", { nodeID: "92", data1:1, data2:20, data5: val } );
+}
+
 
 //阳台卷帘
 function rdoBalconyCurtainClicked( val )
@@ -496,6 +505,22 @@ while ($row = $results->fetchArray())
 			<input type="range" name="rangeStudyroomLamp" id="rangeStudyroomLamp" onchange="showButton( 'btnSetStudyroomLamp', true );" value="<?php echo $row["fldData1"];?>" min="0" max="10" step="1" data-highlight="true" />
 			<button id="btnSetStudyroomLamp" data-icon="check" onclick="btnSetStudyroomLampClicked();">设定</button>
 		</li-->
+	<?php
+	}
+	elseif( $row["fldNodeID"]==92 )	// 卫生间南墙
+	{
+	?>
+		<!--li data-role="list-divider">卫生间</li-->
+		<li data-role="fieldcontain">
+			<fieldset data-role="controlgroup" data-type="horizontal">
+				<legend>卫生间取暖器</legend>
+					<input type="radio" name="rdoBathroomAirHeater" id="rdoBathroomAirHeater0" onclick="rdoBathroomAirHeaterClicked('0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
+					<label for="rdoBathroomAirHeater0">关</label>
+
+					<input type="radio" name="rdoBathroomAirHeater" id="rdoBathroomAirHeater2" onclick="rdoBathroomAirHeaterClicked('2');" <?php echo $row["fldData5"]==2?"checked":"";?> />
+					<label for="rdoBathroomAirHeater2">温控 <?php echo ($row["fldData6"]/10);?>度</label>
+			</fieldset>
+		</li>
 	<?php
 	}
 }
