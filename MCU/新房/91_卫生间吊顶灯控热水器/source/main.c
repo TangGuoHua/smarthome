@@ -41,31 +41,43 @@ sbit RELAY_LIGHT1 = P1^7; //灯控继电器1
 sbit RELAY_LIGHT2 = P1^6; //灯控继电器2
 
 
-volatile unsigned char light1Mode = 2; //0：常关，1：常开，2：自动
-volatile unsigned char lightOnThreshold = 90; // 开灯的阈值
+volatile unsigned char gLight1Mode = 2; //0：常关，1：常开，2：自动
+volatile unsigned char gLightOnThreshold = 90; // 开灯的阈值
 
-volatile unsigned char heaterMode = 0; //0：常关，非0：常开
+volatile unsigned char gHeaterMode = 0; //0：常关，1：常开
 
-volatile unsigned char timerCounter10ms = 0;
-volatile unsigned int timerSendData = 0;
+volatile unsigned char gTimerCounter10ms = 0;
+volatile unsigned int gTimerSendData = 0;
 
 // Flag for sending data to Pi
-volatile bit sendDataNow = 0;
+volatile bit gSendDataFunctNum = 0;
 
+
+
+//延时5秒 STC11F04E 4MHz
+//（给下面的开机延时函数用）
+void delay5s(void)
+{
+    unsigned char a,b,c;
+    for(c=191;c>0;c--)
+        for(b=189;b>0;b--)
+            for(a=137;a>0;a--);
+}
 
 
 //开机延时 
-//根据NodeID，进行约为(NodeID*2)秒的延时
-//作用是避免所有节点同时上电，若都按5分钟间隔发送数据造成的通讯碰撞
+//作用是避免所有节点同时上电，若都按相同的时间间隔发送数据造成的通讯碰撞
 void initDelay(void)
 {
-	//4MHz Crystal, 1T
-    unsigned char a,b,c,d;
-    for(d=NODE_ID;d>0;d--)
-	    for(c=252;c>0;c--)
-	        for(b=230;b>0;b--)
-	            for(a=33;a>0;a--);
+	//10秒
+    unsigned n;
+    for(n=0;n<2;n++)
+	{
+		delay5s();
+	}
+
 }
+
 
 
 void initINT0(void)
@@ -113,20 +125,26 @@ void sendDataToHost( )
 	unsigned char tmp;
 	
 	sendData[0]= NODE_ID;//Node ID
-	sendData[1] = 1; //Regular Status Update
+	sendData[1] = gSendDataFunctNum; //Function Number
 
 	sendData[2] = PIR;
 	sendData[3] = getBrightness(); //亮度
-	sendData[4] = lightOnThreshold; 
+	sendData[4] = gLightOnThreshold; 
 		
 	sendData[5] = ~RELAY_LIGHT1;
 	sendData[6] = ~RELAY_LIGHT2;
 	sendData[7] = ~RELAY_HEATER;
-
+	
+	//Stop timer0
+	TR0=0;
+	
 	tmp = nrfSendData( 96, 5, toAddr, 16, sendData);//Pi, 96频道，5字节地址，接收16字节
 	
 	//24L01开始接收数据
-	startRecv(); 
+	startRecv();
+	
+	//Start timer0
+	TR0=1;
 }
 
 
@@ -134,17 +152,26 @@ void sendDataToHost( )
 //供控制小厨宝用
 void sendDataToNode92( unsigned char val )
 {
-	unsigned char sendData[3];
+	unsigned char sendData[6];
 	unsigned char toAddr[5]= {97,83,92,231,92}; //Node 92地址
 	unsigned char tmp;
 	
 	sendData[0]= NODE_ID;//Node ID
-	sendData[1]= val;
+	sendData[1]= 2; //特定事件报告
+	sendData[2]= 0; //跳过（accident）
+	sendData[3]= val;
 
-	tmp = nrfSendData( 92, 5, toAddr, 3, sendData);//Pi, 92频道，5字节地址，接收3字节
+	//Stop timer0
+	TR0=0;
+	
+	tmp = nrfSendData( 92, 5, toAddr, 6, sendData);//Pi, 92频道，5字节地址，6字节数据
 	
 	//24L01开始接收数据
-	startRecv(); 
+	startRecv();
+	
+	//Start timer0
+	TR0=1;
+	
 }
 
 
@@ -185,7 +212,7 @@ void main()
 	initADC();
 	
 	//取得开灯阈值
-	lightOnThreshold = getLightOnThreshold();
+	gLightOnThreshold = getLightOnThreshold();
 
 	//初始化24L01
 	nrf24L01Init();
@@ -204,27 +231,20 @@ void main()
 		//取得传感器的当前值
 		thisPIR = PIR;
 
-		//Send data to Pi
-		if( sendDataNow )
-		{
-			sendDataNow = 0;
-			sendDataToHost();
-		}
-		
 		// 灯控1
-		if( light1Mode == 0 ) //常关
+		if( gLight1Mode == 0 ) //常关
 		{
 			RELAY_LIGHT1=1;
 		}
-		else if( light1Mode ==1 ) //常开
+		else if( gLight1Mode ==1 ) //常开
 		{
 			RELAY_LIGHT1=0;
 		}
-		else if( light1Mode ==2 ) //自动
+		else if( gLight1Mode ==2 ) //自动
 		{
 			if(RELAY_LIGHT1) //当前灯是灭的
 			{
-				if( thisPIR && getBrightness()<=lightOnThreshold ) //有人，且环境亮度在阈值以下
+				if( thisPIR && getBrightness()<=gLightOnThreshold ) //有人，且环境亮度在阈值以下
 				{
 					RELAY_LIGHT1 = 0; //开灯
 				}
@@ -236,8 +256,8 @@ void main()
 			}
 		}
 		
-		//控制小厨宝（NodeID:92）
 		//当有人无人状态发生转变时，将数据传给92号节点
+		//用于控制小厨宝（NodeID:92）		
 		if( thisPIR != lastPIR ) 
 		{
 			sendDataToNode92( thisPIR );
@@ -245,6 +265,14 @@ void main()
 		
 		//记录当前值
 		lastPIR = thisPIR;
+		
+		
+		//Send data to Pi
+		if( gSendDataFunctNum )
+		{
+			sendDataToHost(  );
+			gSendDataFunctNum = 0;
+		}
 
 	}
 }
@@ -255,29 +283,81 @@ void main()
 void interrupt24L01(void) interrupt 0
 {
 	unsigned char * receivedData;
+	unsigned char fromNodeID, funcNum;
 	unsigned char tmp;
+	
+	//Stop timer0
+	TR0=0;
 	
 	//获取接收到的数据
 	receivedData = nrfGetReceivedData();
 	
+	//Start timer0
+	TR0=1;
+	
 	// *(receivedData+0): From Node ID, 固定为1
-	// *(receivedData+1): 开灯的亮度阈值
-	// *(receivedData+2): 灯控继电器1的工作模式
-	// *(receivedData+3): 灯控继电器2的工作模式
-	// *(receivedData+4): 热水器继电器工作模式
+	// *(receivedData+1): Function Number
+	// *(receivedData+2): 开灯的亮度阈值
+	// *(receivedData+3): 灯控继电器1的工作模式
+	// *(receivedData+4): 灯控继电器2的工作模式
+	// *(receivedData+5): 热水器工作模式
+	// *(receivedData+6): 热水器烧水分钟数
 	
-	//开灯阈值
-	tmp = *(receivedData+1);
-	if( tmp!= lightOnThreshold )
+
+	
+	fromNodeID = *receivedData;
+	funcNum = *(receivedData+1);
+	
+	if( fromNodeID == 1 )//来自Pi(#1)
 	{
-		//threshold changed, let's save it.
-		lightOnThreshold = tmp;
-		saveLightOnThreshold( lightOnThreshold );
+		if( funcNum == 20 || funcNum == 22)
+		{
+	
+			//开灯阈值
+			tmp = *(receivedData+2);
+			if( tmp!= gLightOnThreshold )
+			{
+				//threshold changed, let's save it.
+				gLightOnThreshold = tmp;
+				saveLightOnThreshold( gLightOnThreshold );
+			}
+			
+			//灯控1的模式
+			gLight1Mode = *(receivedData+3);
+			
+			//灯控2暂时没用
+			
+			//热水器工作模式
+			tmp = *(receivedData+5);
+			if( tmp != gHeaterMode ) //模式变化了
+			{
+				if( tmp==0 )
+				{
+					//关
+					RELAY_HEATER = 1;
+				}
+				else if( tmp==1 )
+				{
+					//开
+					RELAY_HEATER = 0;
+				}
+				else if( tmp==2 )
+				{
+					//延时
+				}
+				gHeaterMode = tmp;
+			}
+		}
+		
+		if( funcNum == 22 )
+		{
+			gSendDataFunctNum = 23;
+		}
+		else if( funcNum == 50 )
+		{
+			gSendDataFunctNum = 51;
+		}		
 	}
-	
-	light1Mode = *(receivedData+2);
-	
-	RELAY_HEATER = (*(receivedData+4))==0?1:0;
 }
 
 
@@ -287,17 +367,15 @@ void timer0Interrupt(void) interrupt 1
     TH0 = 0x63;
     TL0 = 0xC0;
     
-	if( ++timerCounter10ms == 100 ) //100个10ms，即1秒
+	if( ++gTimerCounter10ms == 100 ) //100个10ms，即1秒
 	{
-		timerCounter10ms=0;
+		gTimerCounter10ms=0;
 		
-		if( ++timerSendData == 600 ) //每600秒向Pi发送一次数据
+		if( ++gTimerSendData == 600 ) //每600秒向Pi发送一次数据
 		{
-			timerSendData = 0;
-			sendDataNow = 1;
+			gTimerSendData = 0;
+			gSendDataFunctNum = 1;
 		}
-		
-
 	}
 }
 
