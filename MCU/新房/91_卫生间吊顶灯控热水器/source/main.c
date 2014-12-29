@@ -15,7 +15,16 @@
 2014年10月03日  黄长浩  增加向92号节点发送数据的逻辑
                         升级NRF24L01+驱动
 2014年10月06日  黄长浩  修改initDelay()延时为(NodeID*2)秒
-					
+2014年12月29日  黄长浩  修改initDelay()延时为5*2=10秒
+                        修改nrf24l01+为接收7字节
+						向92号节点发送6个字节数据
+						增加通讯协议对function number=22、50号功能的支持
+
+!!! TODO:
+增加烧水N分钟后自动断电的功能（即，热水器模式2）
+
+
+
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 版权所有者：黄长浩 HuangChangHao@gmail.com
@@ -38,19 +47,22 @@ sbit LIGHT_R = P1^4;  //光敏电阻 （10K上拉）
 sbit PIR = P3^5;      //热释电红外传感器
 sbit RELAY_HEATER = P3^7; //热水器继电器（30A）
 sbit RELAY_LIGHT1 = P1^7; //灯控继电器1
-sbit RELAY_LIGHT2 = P1^6; //灯控继电器2
+sbit RELAY_LIGHT2 = P1^6; //灯控继电器2（暂时未用）
 
 
 volatile unsigned char gLight1Mode = 2; //0：常关，1：常开，2：自动
 volatile unsigned char gLightOnThreshold = 90; // 开灯的阈值
 
-volatile unsigned char gHeaterMode = 0; //0：常关，1：常开
+volatile unsigned char gHeaterMode = 0; //0：常关，1：常开，2：延时关（暂不支持）
+volatile unsigned char gHeaterOnMinutes = 0;//当gHeaterMode=2时，热水器烧水的分钟数
 
 volatile unsigned char gTimerCounter10ms = 0;
 volatile unsigned int gTimerSendData = 0;
+volatile unsigned int gTimerHeaterOn = 0;
+
 
 // Flag for sending data to Pi
-volatile bit gSendDataFunctNum = 0;
+volatile unsigned char gSendDataFunctNum = 0;
 
 
 
@@ -124,7 +136,7 @@ void sendDataToHost( )
 	unsigned char toAddr[5]= {53, 69, 149, 231, 231}; //Pi
 	unsigned char tmp;
 	
-	sendData[0]= NODE_ID;//Node ID
+	sendData[0] = NODE_ID;//Node ID
 	sendData[1] = gSendDataFunctNum; //Function Number
 
 	sendData[2] = PIR;
@@ -133,7 +145,10 @@ void sendDataToHost( )
 		
 	sendData[5] = ~RELAY_LIGHT1;
 	sendData[6] = ~RELAY_LIGHT2;
-	sendData[7] = ~RELAY_HEATER;
+	
+	sendData[7] = gHeaterMode;
+	sendData[8] = gHeaterOnMinutes;
+	sendData[9] = ~RELAY_HEATER;
 	
 	//Stop timer0
 	TR0=0;
@@ -268,10 +283,12 @@ void main()
 		
 		
 		//Send data to Pi
-		if( gSendDataFunctNum )
+		if( gSendDataFunctNum > 0 )
 		{
-			sendDataToHost(  );
+			sendDataToHost();
 			gSendDataFunctNum = 0;
+			
+			gTimerSendData = 0; //重新开始计时
 		}
 
 	}
@@ -343,10 +360,15 @@ void interrupt24L01(void) interrupt 0
 				}
 				else if( tmp==2 )
 				{
-					//延时
+//					//延时
+//					gTimerHeaterOn = 0; //计数器清零，开始计时
+//					RELAY_HEATER = 0;
 				}
 				gHeaterMode = tmp;
 			}
+			
+			//烧水延时分钟数
+			gHeaterOnMinutes = *(receivedData+6);
 		}
 		
 		if( funcNum == 22 )
@@ -356,7 +378,7 @@ void interrupt24L01(void) interrupt 0
 		else if( funcNum == 50 )
 		{
 			gSendDataFunctNum = 51;
-		}		
+		}
 	}
 }
 
@@ -374,8 +396,16 @@ void timer0Interrupt(void) interrupt 1
 		if( ++gTimerSendData == 600 ) //每600秒向Pi发送一次数据
 		{
 			gTimerSendData = 0;
-			gSendDataFunctNum = 1;
+			gSendDataFunctNum = 1; //定时状态报告
 		}
+		
+//		if( gHeaterMode== 2 && (!RELAY_HEATER) )
+//		{
+//			if( ++gTimerHeaterOn >= gHeaterOnMinutes*60 )
+//			{
+//				RELAY_HEATER = 1; //关热水器
+//			}
+//		}
 	}
 }
 
