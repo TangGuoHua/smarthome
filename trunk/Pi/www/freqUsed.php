@@ -255,7 +255,7 @@ function southBedroomWardrobeLightClicked( val, obj )
 //卫生间热水器
 function rdoBathroomHeaterClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
+	$.post("/api/sendData.php", { nodeID: "91", data1:1, data2:20, data6: val } );
 }
 
 
@@ -458,9 +458,9 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>卫生间热水器</legend>
-					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater0" value="0" onclick="rdoBathroomHeaterClicked('0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
+					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater0" value="0" onclick="rdoBathroomHeaterClicked('0');" <?php echo $row["fldData6"]==0?"checked":"";?> />
 					<label for="rdoBathroomHeater0">关</label>
-					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater1" value="1" onclick="rdoBathroomHeaterClicked('1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
+					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater1" value="1" onclick="rdoBathroomHeaterClicked('1');" <?php echo $row["fldData6"]==1?"checked":"";?> />
 					<label for="rdoBathroomHeater1">开</label>
 			</fieldset>
 		</li>
