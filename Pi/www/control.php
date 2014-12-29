@@ -254,7 +254,7 @@ function chkDinningRoomLightclicked( val, obj )
 //卫生间灯
 function rdoBathroomLightClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "91", data3: val } );
+	$.post("/api/sendData.php", { nodeID: "91", data1:1, data2:20, data4: val } );
 }
 
 //卫生间灯亮阈值
@@ -264,7 +264,7 @@ function btnSetBathroomLightOnThresholdClicked()
 
 	if( setVal>=0 && setVal <=255 )
 	{
-		$.post("/api/sendData.php", { nodeID: "91", data2:setVal } );
+		$.post("/api/sendData.php", { nodeID: "91", data1:1, data2:20, data3:setVal } );
 	}
 
 	showButton( 'btnSetBathroomLightOnThreshold', false );
@@ -273,7 +273,7 @@ function btnSetBathroomLightOnThresholdClicked()
 //卫生间热水器
 function rdoBathroomHeaterClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "91", data5: val } );
+	$.post("/api/sendData.php", { nodeID: "91", data1:1, data2:20, data6: val } );
 }
 
 //卫生间小厨宝
@@ -294,7 +294,7 @@ function btnSetBathroomXiaoChuBaoDelayClicked()
 	showButton( 'btnSetBathroomXiaoChuBaoDelay', false );
 }
 
-//卫生间加热器（快热炉）
+//卫生间取暖器
 function rdoBathroomAirHeaterClicked( val )
 {
 	$.post("/api/sendData.php", { nodeID: "92", data1:1, data2:20, data5: val } );
@@ -653,25 +653,25 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>卫生间灯</legend>
-					<input type="radio" name="rdoBathroomLight" id="rdoBathroomLight0" value="0" onclick="rdoBathroomLightClicked('0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
+					<input type="radio" name="rdoBathroomLight" id="rdoBathroomLight0" value="0" onclick="rdoBathroomLightClicked('0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoBathroomLight0">关</label>
-					<input type="radio" name="rdoBathroomLight" id="rdoBathroomLight1" value="1" onclick="rdoBathroomLightClicked('1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
+					<input type="radio" name="rdoBathroomLight" id="rdoBathroomLight1" value="1" onclick="rdoBathroomLightClicked('1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
 					<label for="rdoBathroomLight1">开</label>
-					<input type="radio" name="rdoBathroomLight" id="rdoBathroomLight2" value="2" onclick="rdoBathroomLightClicked('2');" <?php echo $row["fldData3"]==2?"checked":"";?> />
+					<input type="radio" name="rdoBathroomLight" id="rdoBathroomLight2" value="2" onclick="rdoBathroomLightClicked('2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
 					<label for="rdoBathroomLight2">自动</label>
 			</fieldset>
 		</li>
 		<li data-role="fieldcontain">
 			<label for="rangeBathroomLightOnThreshold">卫生间开灯阈值</label>
-			<input type="range" name="rangeBathroomLightOnThreshold" id="rangeBathroomLightOnThreshold" onchange="showButton( 'btnSetBathroomLightOnThreshold', true );" value="<?php echo $row["fldData2"];?>" min="0" max="255" step="1" data-highlight="true" />
+			<input type="range" name="rangeBathroomLightOnThreshold" id="rangeBathroomLightOnThreshold" onchange="showButton( 'btnSetBathroomLightOnThreshold', true );" value="<?php echo $row["fldData3"];?>" min="0" max="255" step="1" data-highlight="true" />
 			<button id="btnSetBathroomLightOnThreshold" data-icon="check" onclick="btnSetBathroomLightOnThresholdClicked();">设定</button>
 		</li>
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>卫生间热水器</legend>
-					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater0" value="0" onclick="rdoBathroomHeaterClicked('0');" <?php echo $row["fldData5"]==0?"checked":"";?> />
+					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater0" value="0" onclick="rdoBathroomHeaterClicked('0');" <?php echo $row["fldData6"]==0?"checked":"";?> />
 					<label for="rdoBathroomHeater0">关</label>
-					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater1" value="1" onclick="rdoBathroomHeaterClicked('1');" <?php echo $row["fldData5"]==1?"checked":"";?> />
+					<input type="radio" name="rdoBathroomHeater" id="rdoBathroomHeater1" value="1" onclick="rdoBathroomHeaterClicked('1');" <?php echo $row["fldData6"]==1?"checked":"";?> />
 					<label for="rdoBathroomHeater1">开</label>
 			</fieldset>
 		</li>
