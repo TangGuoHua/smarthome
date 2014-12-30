@@ -19,6 +19,7 @@
                         修改nrf24l01+为接收7字节
 						向92号节点发送6个字节数据
 						增加通讯协议对function number=22、50号功能的支持
+2014年12月29日  黄长浩  修改本节点接收频道为106
 
 !!! TODO:
 增加烧水N分钟后自动断电的功能（即，热水器模式2）
@@ -103,7 +104,7 @@ void initINT0(void)
 void startRecv()
 {
 	unsigned char myAddr[5]= {97, 83, 91, 231, 91}; //本节点的接收地址
-	nrfSetRxMode( 92, 5, myAddr);
+	nrfSetRxMode( 106, 5, myAddr);
 }
 
 
