@@ -527,6 +527,21 @@ while ($row = $results->fetchArray())
 $db->close();
 ?>
 
+<li data-role="fieldcontain">
+	<fieldset data-role="controlgroup" data-type="horizontal">
+		<legend>*厨房收音机</legend>
+			<input type="radio" name="rdoKitchenRadio" id="rdoKitchenRadio0" checked/>
+			<label for="rdoKitchenRadio0">关</label>
+			<input type="radio" name="rdoKitchenRadio" id="rdoKitchenRadio1" />
+			<label for="rdoKitchenRadio1">江苏音乐</label>
+			<input type="radio" name="rdoKitchenRadio" id="rdoKitchenRadio2" />
+			<label for="rdoKitchenRadio2">苏州新闻</label>
+			<input type="radio" name="rdoKitchenRadio" id="rdoKitchenRadio3" />
+			<label for="rdoKitchenRadio3">苏州交通</label>
+			<input type="radio" name="rdoKitchenRadio" id="rdoKitchenRadio4" />
+			<label for="rdoKitchenRadio4">中央台</label>
+	</fieldset>
+</li>
 
 </ul>
 <?php
