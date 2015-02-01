@@ -356,6 +356,11 @@
               <FileType>1</FileType>
               <FilePath>.\source\main.c</FilePath>
             </File>
+            <File>
+              <FileName>stcEEPROM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\source\stcEEPROM.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

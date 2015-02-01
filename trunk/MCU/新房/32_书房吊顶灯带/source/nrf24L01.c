@@ -38,8 +38,7 @@ void delayFor24L01( )
 	unsigned int i;
 	unsigned int t;
 	for( t=1; t>0; t-- )
-		//for( i=305; i>0; i-- ); // 1T STC11F04E 外部晶振4MHz
-		for( i=530; i>0; i-- ); // 1T STC11F04E 内部RC 6.97MHz
+		for( i=305; i>0; i-- ); // 1T STC11F04E 外部晶振4MHz
 }
 
 

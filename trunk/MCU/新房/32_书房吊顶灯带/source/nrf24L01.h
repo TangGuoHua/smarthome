@@ -55,19 +55,11 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #define  FEATURE         0x1D// Additional features register, needed to enable the additional commands
 
 /******************硬件接线*******************************/
-//sbit CE =  P3^3; //Pin3
-//sbit CSN=  P1^0; //Pin4
-//sbit SCLK= P3^4; //Pin5
-//sbit MOSI= P1^1; //Pin6
-//sbit MISO= P1^2; //Pin7
-//sbit IRQ = P3^2; //Pin8
-
-// 手焊板，非标
-sbit CE =  P3^5;
-sbit CSN=  P3^7;
-sbit SCLK= P3^4;
-sbit MOSI= P1^0;
-sbit MISO= P3^3;
-sbit IRQ = P3^2;
+sbit CE =  P3^3; //Pin3
+sbit CSN=  P1^0; //Pin4
+sbit SCLK= P3^4; //Pin5
+sbit MOSI= P1^1; //Pin6
+sbit MISO= P1^2; //Pin7
+sbit IRQ = P3^2; //Pin8
 
 #endif
