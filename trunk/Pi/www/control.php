@@ -61,6 +61,8 @@ $(document).ready(function() {
 	showButton( "btnSetBalconyCurtainCoverage", false );
 	showButton( "btnSetLivingRoomTemp", false );
 	showButton( "btnSetBathroomAirHeaterTemperature", false );
+	showButton( "btnSetStudyPIRDelay", false );
+	showButton( "btnSetLivingRoomPIRDelay", false );
 });
 
 
@@ -79,6 +81,7 @@ function rdoKitchenLightClicked( ind, val )
 	}
 }
 
+//厨房开灯阈值
 function btnSetKitchenLightOnThresholdClicked( ind )
 {
 	if( ind == 1)
@@ -221,6 +224,18 @@ function chkLivingRoomCeilingLightclicked( val, obj )
 	}
 }
 
+//客厅PIR
+function btnSetLivingRoomPIRDelayClicked()
+{
+	var setVal = document.getElementById('sliderLivingRoomPIRDelay').value;
+
+	if( setVal>=1 && setVal <=250 )
+	{
+		$.post("/api/sendData.php", { nodeID: "52", data1:1, data2:20, data7:setVal } );
+	}
+
+	showButton( 'btnSetLivingRoomPIRDelay', false );
+}
 
 
 // 餐厅
@@ -315,9 +330,21 @@ function btnSetBathroomAirHeaterTemperatureClicked()
 //书房LED灯带
 function rdoStudyLEDStripeClicked( val )
 {
-	$.post("/api/sendData.php", { nodeID: "32", data3: val } );
+	$.post("/api/sendData.php", { nodeID: "32", data1:1, data2:20, data4: val } );
 }
 
+//书房PIR
+function btnSetStudyPIRDelayClicked()
+{
+	var setVal = document.getElementById('sliderStudyPIRDelay').value;
+
+	if( setVal>=1 && setVal <=250 )
+	{
+		$.post("/api/sendData.php", { nodeID: "32", data1:1, data2:20, data3:setVal } );
+	}
+
+	showButton( 'btnSetStudyPIRDelay', false );
+}
 
 //书房调光台灯
 function rdoStudyRoomDeskLampClicked(val)
@@ -538,6 +565,11 @@ while ($row = $results->fetchArray())
 				<label for="chkLivingRoomLightAllOff">全关</label>
 			</fieldset>
 		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderLivingRoomPIRDelay">客厅PIR延时分钟数</label>
+			<input type="range" name="sliderLivingRoomPIRDelay" id="sliderLivingRoomPIRDelay" onchange="showButton( 'btnSetLivingRoomPIRDelay', true );" value="<?php echo $row["fldData7"];?>" min="1" max="120" step="1" data-highlight="true" />
+			<button id="btnSetLivingRoomPIRDelay" data-icon="check" onclick="btnSetLivingRoomPIRDelayClicked();">设定</button>
+		</li>
 	<?php
 	}
 	elseif( $row["fldNodeID"]==53 )	// 客厅东墙南头（落地灯）
@@ -727,12 +759,18 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>书房灯带</legend>
-					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_0" value="0" onclick="rdoStudyLEDStripeClicked('0');" <?php echo $row["fldData3"]==0?"checked":"";?> />
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_0" value="0" onclick="rdoStudyLEDStripeClicked('0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoStudyLEDStripe_0">关</label>
-					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_1" value="1" onclick="rdoStudyLEDStripeClicked('1');" <?php echo $row["fldData3"]==1?"checked":"";?> />
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_1" value="1" onclick="rdoStudyLEDStripeClicked('1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
 					<label for="rdoStudyLEDStripe_1">开</label>
-
+					<input type="radio" name="rdoStudyLEDStripe" id="rdoStudyLEDStripe_2" value="2" onclick="rdoStudyLEDStripeClicked('2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
+					<label for="rdoStudyLEDStripe_2">自动</label>
 			</fieldset>
+		</li>
+		<li data-role="fieldcontain">
+			<label for="sliderStudyPIRDelay">书房PIR延时分钟数</label>
+			<input type="range" name="sliderStudyPIRDelay" id="sliderStudyPIRDelay" onchange="showButton( 'btnSetStudyPIRDelay', true );" value="<?php echo $row["fldData3"];?>" min="1" max="60" step="1" data-highlight="true" />
+			<button id="btnSetStudyPIRDelay" data-icon="check" onclick="btnSetStudyPIRDelayClicked();">设定</button>
 		</li>
 	<?
 	}

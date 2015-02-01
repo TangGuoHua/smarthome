@@ -32,6 +32,10 @@ switch($param)
 		$query = "select CASE WHEN fldData2 = 0 THEN '关' WHEN fldData2 = 1 THEN '开' ELSE 'UNKNOWN' END as s1, fldCreatedOn from tabDataRecved where fldNodeID=18 order by fldID desc limit 20";
 		echo "<li data-role='list-divider'>次卧加热器状态最近20次更新</li>";
 		break;
+	case "32": // 书房PIR
+		$query = "select CASE WHEN fldData3 = 0 THEN '-0.1' WHEN fldData3 = 1 THEN '3.8' ELSE 'UNKNOWN' END as s1, fldCreatedOn from tabDataRecved where fldNodeID=32 and fldData1=2 order by fldID desc limit 20";
+		echo "<li data-role='list-divider'>调试参数</li>";
+		break;
 	case "52": // 客厅PIR
 		$query = "select CASE WHEN fldData7 = 0 THEN '-0.1' WHEN fldData7 = 1 THEN '3.8' ELSE 'UNKNOWN' END as s1, fldCreatedOn from tabDataRecved where fldNodeID=52 and fldData1=2 order by fldID desc limit 20";
 		echo "<li data-role='list-divider'>调试参数</li>";
