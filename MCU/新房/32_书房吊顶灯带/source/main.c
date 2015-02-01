@@ -222,12 +222,19 @@ void main()
 		}
 		
 		
-		//如果灯带在自动模式
-		if( gLEDStripMode == 2 )
+		//灯带模式
+		if( gLEDStripMode == 2 ) //自动
 		{
 			RELAY_1 = ~gPeopleIn;
 		}
-
+		else if( gLEDStripMode == 1 ) //常开
+		{
+			RELAY_1 = 0;
+		}
+		else if( gLEDStripMode == 0 ) //常关
+		{
+			RELAY_1 = 1;
+		}
 		
 		//发送数据给主机
 		if(gSendDataNow)
@@ -267,15 +274,6 @@ void interrupt24L01(void) interrupt 0
 					
 		case 20: //执行命令，无需返回
 			gLEDStripMode = *(receivedData+3);
-
-			if( gLEDStripMode == 1 ) //常开
-			{
-				RELAY_1 = 0;
-			}
-			else if( gLEDStripMode == 0 ) //常关
-			{
-				RELAY_1 = 1;
-			}
 			
 			if( gPIRDelay != *(receivedData+2))
 			{
