@@ -1,3 +1,17 @@
+/***************************************************************************
+【修改历史】
+
+日期            作者    备注
+----------------------------------------------------------------------
+2015年02月08日  黄长浩  升级nrf驱动，修过程序，在新房使用
+
+【版权声明】
+Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
+版权所有者：黄长浩 HuangChangHao@gmail.com
+
+未经作者书面授权，不可以将本程序此程序用于任何商业目的。
+用于学习与参考目的，请在引用处注明版权和作者信息。
+****************************************************************************/
 //STC12c5608ad 4M External Crystal
 
 #include <reg52.h>
@@ -5,6 +19,9 @@
 #include "nrf24L01Node.h"
 #include "adc.h"
 #include "ds18b20.h"
+
+// Node ID
+#define NODE_ID 203
 
 sbit LED_A = P2^1;
 sbit LED_B = P1^0;
@@ -222,6 +239,38 @@ void initINT0(void)
 	EX0=1; // Enable int0 interrupt.
 }
 
+
+//NRF24L01开始进入接收模式
+void startRecv()
+{
+	unsigned char myAddr[5]= {97, 83, 182, 231, 231}; //本节点的接收地址
+	nrfSetRxMode( 92, 5, myAddr);
+}
+
+
+//发送数据给Pi
+void sendDataToHost( bit belowZero )
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[5]= {53, 69, 149, 231, 231}; //Pi
+	unsigned char tmp;
+	
+	sendData[0] = NODE_ID;//Node ID
+	sendData[1] = 1; //Function Number
+	sendData[2] = brightness;
+	sendData[3] = belowZero;
+	sendData[4] = intTemperature/10; //温度的整数部分
+	sendData[5] = intTemperature%10; //温度的小数部分
+	
+	TR0=0;
+	tmp = nrfSendData( 96, 5, toAddr, 16, sendData);//Pi, 96频道，5字节地址，接收16字节
+	TR0=1;
+	
+	//24L01开始接收数据
+	startRecv(); 
+}
+
+
 void main()
 {
 
@@ -241,7 +290,7 @@ void main()
 	nrf24L01Init();
 	
 	//设置24L01为接收模式PRX
-	nrfSetRxMode();
+	startRecv();
 	
 	DIG_1 = 1;
 	DIG_2 = 1;
@@ -279,7 +328,7 @@ void main()
 
 void timer0Interrupt(void) interrupt 1
 {
-	unsigned char sendData[15];
+	//unsigned char sendData[15];
 	float temperature;
 
     TH0 = 0x64; //64 每小时
@@ -324,23 +373,22 @@ void timer0Interrupt(void) interrupt 1
 				second=0;
 				minute++;
 				
-				if( minute%1 == 0 )
+				if( minute%10 == 0 )
 				{
 				
-					// 发送亮度数据
-					// initialize Node ID
-					sendData[0]=NODE_ID_0;
-					sendData[1]=NODE_ID_1;
-					sendData[2]=brightness;
-					
-					sendData[3]= temperature<0 ? 1 : 0; //如果是零下则此位置1
-					sendData[4]= intTemperature/10; //温度的整数部分
-					sendData[5]= intTemperature%10; //温度的小数部分
+//					// 发送亮度数据
+//					// initialize Node ID
+//					sendData[0]=NODE_ID;
+//					sendData[1]=1;
+//					sendData[2]=brightness;
+//					
+//					sendData[3]= temperature<0 ? 1 : 0; //如果是零下则此位置1
+//					sendData[4]= intTemperature/10; //温度的整数部分
+//					sendData[5]= intTemperature%10; //温度的小数部分
 							
-					nrfSendData( HOST_RF_CHANNEL, ADDRESS_WIDTH, HOST_ADDR, HOST_DATA_WIDTH, sendData);
-					
-					//设置24L01为接收模式PRX
-					nrfSetRxMode();
+							
+					sendDataToHost( temperature<0 ? 1 : 0 );
+
 					
 					if( minute==60 )
 					{
