@@ -13,7 +13,8 @@ include "include/utils.php";
 $cronList = array(
 
 	"每20分钟更新IP地址" => "*/20 * * * * /home/pi/smartHome/script/updateExtIP.sh",
-	"每12小时校时电子钟" => "* */12 * * * /home/pi/smartHome/script/adjClock.sh",
+
+	"每12小时校时电子钟" => "* */12 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=strftime('%H','now','localtime'), fldData2=strftime('%M', 'now','localtime'), fldData3=strftime('%S','now','localtime'), fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=203\"",
 
 	"每天4:30厨房顶灯设为自动模式" => "30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"",
 	
