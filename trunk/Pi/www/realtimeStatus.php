@@ -89,7 +89,7 @@ if ($row = $results->fetchArray())
 	printf( "<li><a href='chart.php?param=31-1'>温度 %.1f度 <span class='ui-li-count'>%s</span></a></li>", ($row["fldData4"]*256+$row["fldData5"])/10, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=31-1'>气压 %.1f hPa <span class='ui-li-count'>%s</span></a></li>", ($row["fldData7"]*65536+$row["fldData8"]*256+$row["fldData9"])/100, $row["fldCreatedOn"]);
 	printf( "<li><a href='chart.php?param=31-2'>亮度 %d Lux <span class='ui-li-count'>%s</span></a></li>", $row["fldData12"]*256+$row["fldData13"], $row["fldCreatedOn"]);	
-	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></li>", $row["fldData14"]==1?"是":"否", $row["fldCreatedOn"]);	
+	//printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></li>", $row["fldData14"]==1?"是":"否", $row["fldCreatedOn"]);	
 	
 }
 
@@ -97,7 +97,7 @@ $query = "select * from tabDataRecved where fldNodeID=32 order by fldID desc lim
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 { 
-	echo "<li data-role='list-divider'>书房</li>";
+	//echo "<li data-role='list-divider'>书房</li>";
 	printf( "<li><a href='dataHistory.php?param=32'>IR [%d:%d分钟] <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldData4"], $row["fldCreatedOn"]);
 	printf( "<li>有人？[%s] <span class='ui-li-count'>%s</span></li>", $row["fldData3"]==1?"是":"否", $row["fldCreatedOn"]);
 	printf( "<li>灯带模式[%d] <span class='ui-li-count'>%s</span></li>", $row["fldData5"], $row["fldCreatedOn"]);
