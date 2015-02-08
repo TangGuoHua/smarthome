@@ -8,6 +8,7 @@
                     画图的点数由30增加到33
 2014-AUG-30 黄长浩  增加书房温度气压亮度
 2014-OCT-19 黄长浩  增加室外温度亮度（阳台）
+2015-FEB-08 黄长浩  增加北卧温度亮度
 */
 
 $gPageTitle = "图";
@@ -119,6 +120,17 @@ switch($param)
 		$s2Title="";
 		$s2Unit="";
 		break;
+
+
+	case "203": //北卧温度亮度
+		$query = "select CASE WHEN fldData3 = 1 THEN '-'||fldData4||'.'||fldData5 ELSE fldData4||'.'||fldData5 END as s1, fldData2 as s2, fldCreatedOn from tabDataRecved where fldNodeID=203";
+		$chartTitle = "北卧温度亮度";
+		$s1Title="温度";
+		$s1Unit="度";
+		$s2Title="亮度";
+		$s2Unit="";
+		break;
+
 }
 
 //$query = $query." and fldID%3=0 order by fldID desc limit 33";
