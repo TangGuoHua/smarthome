@@ -14,7 +14,7 @@ $cronList = array(
 
 	"每20分钟更新IP地址" => "*/20 * * * * /home/pi/smartHome/script/updateExtIP.sh",
 
-	//"每天2:00电子钟校时" => "13 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=strftime('%H','now','localtime'),fldData2=strftime('%M','now','localtime'),fldData3=strftime('%S','now','localtime'),fldUpdatedOn=datetime('now','localtime'),fldUpdatedBy='cron' where fldNodeID=203\"",
+	//"每天2:00电子钟校时" => "0 2 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=strftime('%H','now','localtime'),fldData2=strftime('%M','now','localtime'),fldData3=strftime('%S','now','localtime'),fldUpdatedOn=datetime('now','localtime'),fldUpdatedBy='cron' where fldNodeID=203\"",
 
 	"每天2:00电子钟校时" => "0 2 * * * /home/pi/smartHome/script/adjClock.sh",
 
