@@ -109,18 +109,10 @@ $query = "select * from tabDataRecved where fldNodeID=203 order by fldID desc li
 $results = $db->query($query);
 if ($row = $results->fetchArray()) 
 {
-	//计算露点
-	$Tn = 243.12;
-	$m =17.62;
-	$T=floatval($row["fldData4"])+floatval($row["fldData5"])*0.1;
-	$RH= floatval($row["fldData2"])+floatval($row["fldData3"])*0.1;
-	$tDew=$Tn*(log($RH/100)+$m*$T/($Tn+$T))/($m-log($RH/100)-$m*$T/($Tn+$T));
 
 	echo "<li data-role='list-divider'>北卧</li>";
-
 	printf( "<li><a href='chart.php?param=203'>温度 %d.%d度 <span class='ui-li-count'>%s</span></a></li>", $row["fldData4"], $row["fldData5"], $row["fldCreatedOn"]);
-
-	printf( "<li><a href='chart.php?param=203'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData12"], $row["fldCreatedOn"]);	
+	printf( "<li><a href='chart.php?param=203'>亮度 %d <span class='ui-li-count'>%s</span></a></li>", $row["fldData2"], $row["fldCreatedOn"]);	
 
 }
 
