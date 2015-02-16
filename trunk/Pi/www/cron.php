@@ -16,7 +16,7 @@ $cronList = array(
 
 	//"每天2:00电子钟校时" => "0 2 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=strftime('%H','now','localtime'),fldData2=strftime('%M','now','localtime'),fldData3=strftime('%S','now','localtime'),fldUpdatedOn=datetime('now','localtime'),fldUpdatedBy='cron' where fldNodeID=203\"",
 
-	"每天2:00电子钟校时" => "0 2 * * * /home/pi/smartHome/script/adjClock.sh",
+	"每周一、四2:00电子钟校时" => "0 2 * * 1,4 /home/pi/smartHome/script/adjClock.sh",
 
 	"每天4:30厨房顶灯设为自动模式" => "30 4 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData4=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=22\"",
 	
@@ -30,7 +30,7 @@ $cronList = array(
 
 	"每天17:35打开客厅落地灯、台灯" => "35 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData3=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=53; update tabDataToNode set fldData5=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=51\"",
 
-	"每天19:30阳台窗帘全关" => "30 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData2=20, fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"",
+	//"每天19:30阳台窗帘全关" => "30 19 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData2=20, fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"",
 
 	//"每天17:40打开餐厅灯" => "40 17 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData3=1, fldData4=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=41\"",
 
@@ -40,6 +40,8 @@ $cronList = array(
 
 	"每天21:50打开热水器" => "50 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData6=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
 
+	"每天22:00阳台窗帘全关" => "0 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData2=20, fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"",
+	
 	"每天22:10打开南卧加热器" => "10 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=2, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=82\"",
 
 	"每天22:30关闭热水器" => "30 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData6=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
