@@ -20,6 +20,7 @@
 						向92号节点发送6个字节数据
 						增加通讯协议对function number=22、50号功能的支持
 2014年12月29日  黄长浩  修改本节点接收频道为106
+2015年02月23日  黄长浩  怀疑1号继电器触点烧粘着了，改用2号继电器控制灯
 
 !!! TODO:
 增加烧水N分钟后自动断电的功能（即，热水器模式2）
@@ -47,8 +48,8 @@ sfr AUXR   = 0x8E;
 sbit LIGHT_R = P1^4;  //光敏电阻 （10K上拉）
 sbit PIR = P3^5;      //热释电红外传感器
 sbit RELAY_HEATER = P3^7; //热水器继电器（30A）
-sbit RELAY_LIGHT1 = P1^7; //灯控继电器1
-sbit RELAY_LIGHT2 = P1^6; //灯控继电器2（暂时未用）
+sbit RELAY_LIGHT2 = P1^7; //灯控继电器1（暂时未用）
+sbit RELAY_LIGHT1 = P1^6; //灯控继电器2
 
 
 volatile unsigned char gLight1Mode = 2; //0：常关，1：常开，2：自动
