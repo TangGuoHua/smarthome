@@ -6,6 +6,7 @@
 2013年10月01日  黄长浩  初始版本
 2014年10月01日  黄长浩  修改nrfSendData()函数以支持地址宽度设置和发送失败后重试Retry
                         修改nrfSetRxMode()函数以支持地址宽度设置
+2015年02月23日  黄长浩  修改SEND_MAX_RETRY为9
 
 【版权声明】
 Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
@@ -19,7 +20,7 @@ Copyright(C) All Rights Reserved by Changhao Huang (HuangChangHao@gmail.com)
 #include "nrf24L01.h"
 #include "nrf24L01Node.h"
 
-#define SEND_MAX_RETRY 5  //发送数据时，如果失败，最大重试次数 (值可以为 0至9）
+#define SEND_MAX_RETRY 9  //发送数据时，如果失败，最大重试次数 (值可以为 0至9）
 
 unsigned char nrfACK();
 unsigned char nrfCheckACK();
