@@ -138,22 +138,12 @@ function chkLivingRoomCeilingLightclicked( val, obj )
 	else if(val == 'ALLON' )
 	{
 		$.post("/api/sendData.php", { nodeID: "52", data3:1, data4:1, data5:1, data6:1 } );
-		//$("#chkLivingRoomLightEast").attr("checked",true).checkboxradio("refresh");
-		//$("#chkLivingRoomLightWest").attr("checked",true).checkboxradio("refresh");
-		//$("#chkLivingRoomLightNorth").attr("checked",true).checkboxradio("refresh");
-		//$("#chkLivingRoomLightSouth").attr("checked",true).checkboxradio("refresh");
 	}
 	else if(val == 'ALLOFF' )
 	{
 		$.post("/api/sendData.php", { nodeID: "52", data3:0, data4:0, data5:0, data6:0 } );
-		//$("#chkLivingRoomLightEast").attr("checked",false).checkboxradio("refresh");
-		//$("#chkLivingRoomLightWest").attr("checked",false).checkboxradio("refresh");
-		//$("#chkLivingRoomLightNorth").attr("checked",false).checkboxradio("refresh");
-		//$("#chkLivingRoomLightSouth").attr("checked",false).checkboxradio("refresh");
 	}
 }
-
-
 
 
 // 餐厅
@@ -184,16 +174,10 @@ function chkDinningRoomLightclicked( val, obj )
 	else if( val == 'DINNERON' )
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1:1, data3:1, data4:1 } );
-		//$("#chkDinningLightEast").attr("checked",true).checkboxradio("refresh");
-		//$("#chkDinningLightWest").attr("checked",true).checkboxradio("refresh");
-		//$("#chkDinningLightNorth").attr("checked",true).checkboxradio("refresh");
 	}
 	else if( val == 'ALLOFF' )
 	{
 		$.post("/api/sendData.php", { nodeID: "41", data1:0, data2:0, data3:0, data4:0  } );
-		//$("#chkDinningLightEast").attr("checked",false).checkboxradio("refresh");
-		//$("#chkDinningLightWest").attr("checked",false).checkboxradio("refresh");
-		//$("#chkDinningLightNorth").attr("checked",false).checkboxradio("refresh");
 	}
 }
 
@@ -292,14 +276,6 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>餐厅顶灯</legend>
-		    	<!--input type="checkbox" name="chkDinningLightEast" id="chkDinningLightEast" onclick="chkDinningRoomLightclicked('E', this);" <?php echo $row["fldData1"]==1?"checked":"";?> />
-				<label for="chkDinningLightEast">东</label>
-				<input type="checkbox" name="chkDinningLightSouth" id="chkDinningLightSouth" onclick="chkDinningRoomLightclicked('S', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
-				<label for="chkDinningLightSouth">南</label>
-				<input type="checkbox" name="chkDinningLightWest" id="chkDinningLightWest" onclick="chkDinningRoomLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
-				<label for="chkDinningLightWest">西</label>
-				<input type="checkbox" name="chkDinningLightNorth" id="chkDinningLightNorth" onclick="chkDinningRoomLightclicked('N', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
-				<label for="chkDinningLightNorth">灯带</label-->
 				<input type="radio" name="rdoDinningLight" id="rdoDinningLightAllOff" onclick="chkDinningRoomLightclicked('ALLOFF', this);" <?php echo ($row["fldData1"]==0&$row["fldData2"]==0&$row["fldData3"]==0&$row["fldData4"]==0)?"checked":"";?>/>
 				<label for="rdoDinningLightAllOff">关</label>
 				<input type="radio" name="rdoDinningLight" id="rdoDinningLightAllOn" onclick="chkDinningRoomLightclicked('DINNERON', this);" <?php echo ($row["fldData1"]==1|$row["fldData2"]==1|$row["fldData3"]==1|$row["fldData4"]==1)?"checked":"";?>/>
@@ -342,15 +318,6 @@ while ($row = $results->fetchArray())
 		<li data-role="fieldcontain">
 		    <fieldset data-role="controlgroup" data-type="horizontal">
 		    	<legend>客厅顶灯</legend>
-		    	<!--input type="checkbox" name="chkLivingRoomLightEast" id="chkLivingRoomLightEast" onclick="chkLivingRoomCeilingLightclicked('E', this);" <?php echo $row["fldData2"]==1?"checked":"";?> />
-				<label for="chkLivingRoomLightEast">东</label>
-				<input type="checkbox" name="chkLivingRoomLightSouth" id="chkLivingRoomLightSouth" onclick="chkLivingRoomCeilingLightclicked('S', this);" <?php echo $row["fldData4"]==1?"checked":"";?> />
-				<label for="chkLivingRoomLightSouth">南</label>
-				<input type="checkbox" name="chkLivingRoomLightWest" id="chkLivingRoomLightWest" onclick="chkLivingRoomCeilingLightclicked('W', this);" <?php echo $row["fldData3"]==1?"checked":"";?> />
-				<label for="chkLivingRoomLightWest">西</label>
-				<input type="checkbox" name="chkLivingRoomLightNorth" id="chkLivingRoomLightNorth" onclick="chkLivingRoomCeilingLightclicked('N', this);" <?php echo $row["fldData5"]==1?"checked":"";?> />
-				<label for="chkLivingRoomLightNorth">北</label-->
-
 				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOff" onclick="chkLivingRoomCeilingLightclicked('ALLOFF', this);" <?php echo ($row["fldData5"]==0&$row["fldData6"]==0&$row["fldData3"]==0&$row["fldData4"]==0)?"checked":"";?>/>
 				<label for="chkLivingRoomLightAllOff">关</label>
 				<input type="radio" name="rdoLivingRoomLight" id="chkLivingRoomLightAllOn" onclick="chkLivingRoomCeilingLightclicked('ALLON', this);" <?php echo ($row["fldData5"]==1|$row["fldData6"]==1|$row["fldData3"]==1|$row["fldData4"]==1)?"checked":"";?>/>
@@ -372,17 +339,15 @@ while ($row = $results->fetchArray())
 
 		    </fieldset>
 		</li>
-		<li data-role="fieldcontain">
+		<!--li data-role="fieldcontain">
 			<fieldset data-role="controlgroup" data-type="horizontal">
 				<legend>客厅取暖器</legend>
 					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater0" value="0" onclick="rdoLivingRoomHeaterClicked('0');" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoLivingRoomHeater0">关</label>
-					<!--input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater1" value="1" onclick="rdoLivingRoomHeaterClicked('1');" <?php echo $row["fldData4"]==1?"checked":"";?> />
-					<label for="rdoLivingRoomHeater1">开</label-->
 					<input type="radio" name="rdoLivingRoomHeater" id="rdoLivingRoomHeater2" value="2" onclick="rdoLivingRoomHeaterClicked('2');" <?php echo $row["fldData4"]==2?"checked":"";?> />
 					<label for="rdoLivingRoomHeater2">恒温<?php echo $row["fldData5"]/10;?>度</label>
 			</fieldset>
-		</li>
+		</li-->
 	<?php
 	}
 	elseif( $row["fldNodeID"]==62 )	// 阳台卷帘
@@ -414,7 +379,7 @@ while ($row = $results->fetchArray())
 
 	<?php
 	}
-	elseif( $row["fldNodeID"]==82 ) //南卧油汀
+	elseif( $row["fldNodeID"]==820 ) //南卧油汀
 	{
 	?>
 		<li data-role="fieldcontain">
@@ -508,7 +473,7 @@ while ($row = $results->fetchArray())
 		</li-->
 	<?php
 	}
-	elseif( $row["fldNodeID"]==92 )	// 卫生间南墙
+	elseif( $row["fldNodeID"]==920 )	// 卫生间南墙
 	{
 	?>
 		<!--li data-role="list-divider">卫生间</li-->
