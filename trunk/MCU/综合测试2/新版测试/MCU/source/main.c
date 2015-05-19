@@ -32,6 +32,16 @@ void delay100us(void)   //误差 0us
         for(a=97;a>0;a--);
 }
 
+void delay5s(void)   //11.0592Mhz
+{
+    unsigned char a,b,c,n;
+    for(c=249;c>0;c--)
+        for(b=219;b>0;b--)
+            for(a=252;a>0;a--);
+    for(n=32;n>0;n--);
+
+}
+
 //void delay10s(void) 
 //{
 //
@@ -107,43 +117,46 @@ void replyData( )
 	 
 }
 
+void sendData()
+{
+	unsigned char sendData[16];
+	unsigned char toAddr[5]= {53, 69, 149, 231, 231};
+	
+	sendData[0] = 251;
+	sendData[1] = 1;
+	sendData[2] = 2;
+	sendData[3] = 3;
+	sendData[4] = 4;
+	sendData[5] = 5;
+	
+	nrfSendData(96, 5, toAddr, 16, sendData);
+
+}
+
 
 void main()
 {
 
 	
 
-	delay500ms();
+	//delay500ms();
 	
 	//RELAY=1; //switch off relay
 	
 	//初始化中断0
-	initINT0();
+	//initINT0();
 	
 	//初始化24L01
 	nrf24L01Init();
 	
 	//24L01开始接收数据
-	startRecv(); 
+	//startRecv(); 
 	
-	LED2=1;
+
 	while(1)
 	{	
-		if( replyFlag )
-		{
-			LED1=0;
-		
-			delay500ms();
-			
-			//delay100us();
-			
-			replyData();
-			
-			startRecv();
-			
-			replyFlag=0;
-			LED1=1;
-		}
+		sendData();
+		delay5s();
 	}
 }
 

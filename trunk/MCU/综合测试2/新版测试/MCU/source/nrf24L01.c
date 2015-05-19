@@ -35,11 +35,20 @@ unsigned char nrfWriteTxData(unsigned char regAddr, unsigned char *txData, unsig
 *****************************************************/
 void delayFor24L01( )
 {
+	/* // 1T STC11F04E 外部晶振4MHz
 	unsigned int i;
 	unsigned int t;
 	for( t=1; t>0; t-- )
-		for( i=305; i>0; i-- ); // 1T STC11F04E 外部晶振4MHz
+		for( i=305; i>0; i-- ); 
+	*/
+	
+	// 1T STC12C5608AD 外部晶振11.0592MHz
+    unsigned char a,b;
+    for(b=1;b>0;b--)
+        for(a=38;a>0;a--);
+
 }
+
 
 
 //********* 以下函数仅供本模块内部调用 **************
