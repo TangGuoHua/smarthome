@@ -137,23 +137,6 @@
           <Name>(98=-1,-1,-1,-1,0)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=-1,-1,-1,-1,0)(99=-1,-1,-1,-1,0)(91=-1,-1,-1,-1,0)(92=-1,-1,-1,-1,0)(93=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>171</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>nrf24L01.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
@@ -226,8 +209,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>11</CurrentLine>
+      <TopLine>133</TopLine>
+      <CurrentLine>170</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\source\nrf24L01.c</PathWithFileName>
       <FilenameWithoutPath>nrf24L01.c</FilenameWithoutPath>
@@ -305,7 +288,7 @@
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点5 餐厅室外\下位机\SOURCE\NRF24L01NODE.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\NRF24L01NODE.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>12</CurrentLine>
     <Constant>0</Constant>
@@ -331,9 +314,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点5 餐厅室外\下位机\SOURCE\NRF24L01.H</PathWithFilename>
-    <TopLine>22</TopLine>
-    <CurrentLine>40</CurrentLine>
+    <PathWithFilename>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\NRF24L01.H</PathWithFilename>
+    <TopLine>6</TopLine>
+    <CurrentLine>15</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -357,7 +340,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点5 餐厅室外\下位机\SOURCE\AM2301.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\AM2301.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>12</CurrentLine>
     <Constant>0</Constant>
@@ -383,7 +366,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点5 餐厅室外\下位机\SOURCE\DELAY.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\DELAY.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>11</CurrentLine>
     <Constant>0</Constant>
@@ -409,7 +392,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点5 餐厅室外\下位机\SOURCE\DS18B20.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\DS18B20.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>5</CurrentLine>
     <Constant>0</Constant>
@@ -435,7 +418,7 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>E:\MCUWorks\Proj\综合测试2\节点5 餐厅室外\下位机\SOURCE\DHT11.H</PathWithFilename>
+    <PathWithFilename>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\DHT11.H</PathWithFilename>
     <TopLine>1</TopLine>
     <CurrentLine>13</CurrentLine>
     <Constant>0</Constant>
@@ -1801,10 +1784,28 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>5</ActiveTab>
+      <ActiveTab>1</ActiveTab>
       <Documents>
         <Doc>
-          <Name>SOURCE\DHT11.H</Name>
+          <Name>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\NRF24L01.H</Name>
+          <ColumnNumber>25</ColumnNumber>
+          <TopLine>6</TopLine>
+          <CurrentLine>15</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\source\nrf24L01.c</Name>
+          <ColumnNumber>0</ColumnNumber>
+          <TopLine>133</TopLine>
+          <CurrentLine>170</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\NRF24L01NODE.H</Name>
+          <ColumnNumber>18</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>12</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\DHT11.H</Name>
           <ColumnNumber>0</ColumnNumber>
           <TopLine>1</TopLine>
           <CurrentLine>13</CurrentLine>
@@ -1816,7 +1817,7 @@
           <CurrentLine>42</CurrentLine>
         </Doc>
         <Doc>
-          <Name>SOURCE\DS18B20.H</Name>
+          <Name>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\DS18B20.H</Name>
           <ColumnNumber>2</ColumnNumber>
           <TopLine>1</TopLine>
           <CurrentLine>5</CurrentLine>
@@ -1846,46 +1847,16 @@
           <CurrentLine>6</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\source\com.c</Name>
-          <ColumnNumber>18</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>1</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>SOURCE\DELAY.H</Name>
+          <Name>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\DELAY.H</Name>
           <ColumnNumber>15</ColumnNumber>
           <TopLine>1</TopLine>
           <CurrentLine>11</CurrentLine>
         </Doc>
         <Doc>
-          <Name>SOURCE\AM2301.H</Name>
+          <Name>D:\MyWorks\SourceForge\SmartHome\MCU\综合测试2\节点5 餐厅室外\下位机\SOURCE\AM2301.H</Name>
           <ColumnNumber>43</ColumnNumber>
           <TopLine>1</TopLine>
           <CurrentLine>12</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\source\nrf24L01.c</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>11</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>SOURCE\NRF24L01.H</Name>
-          <ColumnNumber>49</ColumnNumber>
-          <TopLine>22</TopLine>
-          <CurrentLine>40</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>SOURCE\NRF24L01NODE.H</Name>
-          <ColumnNumber>18</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>12</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\source\adc.c</Name>
-          <ColumnNumber>2</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>1</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>
