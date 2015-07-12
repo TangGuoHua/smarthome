@@ -359,14 +359,8 @@ while ($row = $results->fetchArray())
 					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain0" onclick="rdoBalconyCurtainClicked(0);" <?php echo $row["fldData4"]==0?"checked":"";?> />
 					<label for="rdoBalconyCurtain0">全开</label>
 
-					<!--input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain20" onclick="rdoBalconyCurtainClicked(20);" <?php echo $row["fldData4"]==20?"checked":"";?> />
-					<label for="rdoBalconyCurtain20">20%</label-->
-
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain40" onclick="rdoBalconyCurtainClicked(40);" <?php echo $row["fldData4"]==40?"checked":"";?> />
-					<label for="rdoBalconyCurtain40">40%</label>
-
-					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain60" onclick="rdoBalconyCurtainClicked(60);" <?php echo $row["fldData4"]==60?"checked":"";?> />
-					<label for="rdoBalconyCurtain60">60%</label>
+					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain45" onclick="rdoBalconyCurtainClicked(45);" <?php echo $row["fldData4"]==45?"checked":"";?> />
+					<label for="rdoBalconyCurtain45">半开</label>
 
 					<input type="radio" name="rdoBalconyCurtain" id="rdoBalconyCurtain85" onclick="rdoBalconyCurtainClicked(85);" <?php echo $row["fldData4"]==85?"checked":"";?> />
 					<label for="rdoBalconyCurtain85">85%</label>
@@ -462,8 +456,6 @@ while ($row = $results->fetchArray())
 					<label for="radioLEDGreen6">中</label>
 					<input type="radio" name="radioLEDGreen" id="radioLEDGreen10" onclick="rdoStudyRoomDeskLampClicked(10);" <?php echo $row["fldData1"]==10?"checked":"";?> />
 					<label for="radioLEDGreen10">强</label>
-					<input type="radio" name="radioLEDGreen" id="radioLEDGreen20" onclick="rdoStudyRoomDeskLampClicked(20);" <?php echo $row["fldData1"]==20?"checked":"";?> />
-					<label for="radioLEDGreen20">延时关</label>
 			</fieldset>
 		</li>
 		<!--li data-role="fieldcontain">
