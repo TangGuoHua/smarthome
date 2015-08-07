@@ -40,7 +40,7 @@ $cronList = array(
 
 	"每天21:10打开热水器" => "10 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData6=1, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
 
-	"每天21:20关闭热水器" => "20 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData6=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
+	"每天21:25关闭热水器" => "25 21 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData6=0, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=91\"",
 
 	//"每天22:00阳台窗帘全关" => "0 22 * * * sqlite3 /var/www/db/smarthome.sqlite3 \"update tabDataToNode set fldData1=1, fldData2=20, fldData4=100, fldUpdatedOn=datetime('now', 'localtime'), fldUpdatedBy='cron' where fldNodeID=62\"",
 	
